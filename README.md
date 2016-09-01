@@ -1,7 +1,7 @@
 # about
 black.box is a proprietary plug-and-play, peer-to-peer VPN policy routing sofware, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) hardware device. This service is not designed for privacy and/or anonymity since it uses OpenVPN as the tunnel transport protocol, without encryption.
 
-The software alows a configurable list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 subnets/IPs[[n2](#footnotes)] to be specified, which is routed via the tunnel interface, while the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n3](#footnotes)]. All other traffic is blocked on the tunnel interface.
+The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 subnets/IPs[[n2](#footnotes)], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n3](#footnotes)], while the local interface in unrestricted. All other traffic is blocked on the tunnel interface.
 
 ```
 +---------+         +-----------------+
