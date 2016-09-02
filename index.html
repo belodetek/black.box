@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>black.box by netflix-proxy</title>
+    <title>black.box by ab77</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
@@ -38,9 +37,9 @@
 <pre><code>+---------+         +-----------------+
 |         |  Wi-Fi  |                 |  google.com, etc.
 |   iOS   | +-----&gt; |    black.box    | +----------------&gt;
-|         |         |                 |
-+---------+         |                 |
-                    |                 |
+|         |         |    ---------    |
++---------+         |    VPN policy   |
+                    |    router       |
 +---------+         |                 |
 |         |  Wi-Fi  |                 |
 | Windows | +-----&gt; |                 |
@@ -48,9 +47,9 @@
 +---------+         |                 |
                     |                 |
 +---------+         |                 |         +--------+
-|         |  Wi-Fi  |                 |   VPN   |        |
-|  OS X   | +-----&gt; |                 | +-----&gt; | VPN US +----+
-|         |         |                 |         |        |    |
+|         |  Wi-Fi  |   netflix.com   |   VPN   |        |
+|  OS X   | +-----&gt; |   nflxvideo.net | +-----&gt; | VPN US +----+
+|         |         |   hulu.com      |         |        |    |
 +---------+         +-----------------+         +----+---+ UK |
                                                      |        |
                                                      +--------+
@@ -62,59 +61,47 @@
 <a id="instructions" class="anchor" href="#instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>instructions</h1>
 
 <ul>
-<li>obtain a compatible device and SD card (4GB is enough)</li>
+<li>obtain a Rasberry Pi 3 and SD card (4GB+)</li>
 <li>download and install <a href="http://www.etcher.io/">Etcher</a>
 </li>
 <li>download the <a href="#">.img</a> file</li>
-<li>burn the <code>.img</code> file to the SD card, eject the freshly burnt card and insert into your Rasberry Pi</li>
-<li>connect your Rasberry Pi to the Internet using a spare Ethernet port on your router</li>
-<li>power the Rasberry Pi using the recommended power adapter (<strong>do not</strong> just plug in into a spare USB port)</li>
+<li>burn the <code>.img</code> file to the SD card, eject the freshly burnt card and insert into your device</li>
+<li>connect your device to the Internet using a spare Ethernet port on your router</li>
+<li>power the device using the recommended power adapter (<strong>do not</strong> power off a USB port)</li>
 <li>after a few minutes, connect to the new Wi-Fi network called <code>black.box</code>
 </li>
 <li>your <code>black.box</code> will automatically connect to a VPN server in the default region[<a href="#footnotes">n4</a>]</li>
 <li>visit the local API at <a href="http://172.24.255.254/">http://172.24.255.254/</a>
 </li>
-<li>record and email your unique <code>guid</code> and <strong>subscription</strong> email address to <a href="mailto:blackbox@belodedenko.me">support</a>
+<li>record and email your unique <code>guid</code> and <strong>subscription</strong> email address to <a href="blackbox@belodedenko.me">support</a>
 </li>
-<li>for issues, please contact <a href="mailto:blackbox@belodedenko.me">support</a>
+<li>for issues, please contact <a href="blackbox@belodedenko.me">support</a>
 </li>
 </ul>
 
 <h1>
 <a id="subscription" class="anchor" href="#subscription" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>subscription</h1>
 
-<p>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="TESWBUWCZ8S6A">
-<input type="hidden" name="currency_code" value="EUR">
-
-<div class="clear"><input type="hidden" name="on0" value=""><select name="os0">
-	<option value="I have a compatible device">I have a compatible device : €9.95 EUR - monthly</option>
-</select></div>
-
-<div class="clear"><input type="hidden" name="on1" value="My device"><select name="os1">
-	<option value="Raspberry Pi 3">Raspberry Pi 3 </option>
-</select></div>
-
-<div class="clear"><input type="submit" value="Subscribe" name="submit" id="mc-embedded-subscribe" class="button"></div>
-</form>
-</p>
+<p>...</p>
 
 <h1>
 <a id="cancellation" class="anchor" href="#cancellation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>cancellation</h1>
 
-<p>
-To cancel your **black.box** subscription, please visit <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=BLLTH9CS2LEGS">PayPal</a>.
-</p>
+<p>To cancel your <code>black.box</code> subscription, please visit <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&amp;alias=BLLTH9CS2LEGS">PayPal</a>.</p>
 
 <h4>
 <a id="footnotes" class="anchor" href="#footnotes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>footnotes</h4>
 
-<p>[1] default domain list: <code>netflix.com</code>, <code>nflxvideo.net</code> and <code>hulu.com</code></p>
-<p>[2] default ASNs: <code>AS2906</code></p>
-<p>[3] default ports: <code>80/tcp</code>, <code>443/tcp</code> and <code>53/udp</code></p>
-<p>[4] default region: <code>United States</code></p>
+<ol>
+<li>default domain list: <code>netflix.com</code>, <code>nflxvideo.net</code> and <code>hulu.com</code>
+</li>
+<li>default ASNs: <code>AS2906</code>
+</li>
+<li>default ports: <code>80/tcp</code>, <code>443/tcp</code> and <code>53/udp</code>
+</li>
+<li>default region: <code>United States</code>
+</li>
+</ol>
       </section>
     </div>
     <footer>
