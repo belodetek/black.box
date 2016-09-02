@@ -7,9 +7,9 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
 +---------+         +-----------------+
 |         |  Wi-Fi  |                 |  google.com, etc.
 |   iOS   | +-----> |    black.box    | +---------------->
-|         |         |                 |
-+---------+         |                 |
-                    |                 |
+|         |         |    ---------    |
++---------+         |    VPN policy   |
+                    |    router       |
 +---------+         |                 |
 |         |  Wi-Fi  |                 |
 | Windows | +-----> |                 |
@@ -17,9 +17,9 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
 +---------+         |                 |
                     |                 |
 +---------+         |                 |         +--------+
-|         |  Wi-Fi  |                 |   VPN   |        |
-|  OS X   | +-----> |                 | +-----> | VPN US +----+
-|         |         |                 |         |        |    |
+|         |  Wi-Fi  |   netflix.com   |   VPN   |        |
+|  OS X   | +-----> |   nflxvideo.net | +-----> | VPN US +----+
+|         |         |   hulu.com      |         |        |    |
 +---------+         +-----------------+         +----+---+ UK |
                                                      |        |
                                                      +--------+
@@ -28,12 +28,12 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
 A [subscription](#subscription) is required to activate the device. This service is offered on a rolling subscription basis, with first month free. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
 
 # instructions
-* obtain a compatible device and SD card (4GB is enough)
+* obtain a Rasberry Pi 3 and SD card (4GB+)
 * download and install [Etcher](http://www.etcher.io/)
 * download the [.img](#) file
-* burn the `.img` file to the SD card, eject the freshly burnt card and insert into your Rasberry Pi
-* connect your Rasberry Pi to the Internet using a spare Ethernet port on your router
-* power the Rasberry Pi using the recommended power adapter (**do not** just plug in into a spare USB port)
+* burn the `.img` file to the SD card, eject the freshly burnt card and insert into your device
+* connect your device to the Internet using a spare Ethernet port on your router
+* power the device using the recommended power adapter (**do not** power off a USB port)
 * after a few minutes, connect to the new Wi-Fi network called `black.box`
 * your `black.box` will automatically connect to a VPN server in the default region[[n4](#footnotes)]
 * visit the local API at [http://172.24.255.254/](http://172.24.255.254/)
@@ -44,10 +44,10 @@ A [subscription](#subscription) is required to activate the device. This service
 ...
 
 # cancellation
-...
+To cancel your `black.box` subscription, please visit [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=BLLTH9CS2LEGS).
 
 #### footnotes
-[1] default domain list: `netflix.com`, `nflxvideo.net` and `hulu.com`.
-[2] default ASNs: `AS2906`
-[3] default ports: `80/tcp`, `443/tcp` and `53/udp`.
-[4] default region: `United States`
+1. default domain list: `netflix.com`, `nflxvideo.net` and `hulu.com`
+2. default ASNs: `AS2906`
+3. default ports: `80/tcp`, `443/tcp` and `53/udp`
+4. default region: `United States`
