@@ -36,15 +36,12 @@ A [subscription](#subscription) is required to activate the device. This service
 * power the device using the recommended power adapter (**do not** power off a USB port)
 * after a few minutes, connect to the new Wi-Fi network called `black.box`
 * your `black.box` will automatically connect to a VPN server in the default region[[n4](#footnotes)]
-* visit the local API at [http://172.24.255.254/](http://172.24.255.254/)
-* record and email your unique `guid` and **subscription** email address to [support](blackbox@belodedenko.me)
+* visit [black.box](http://blackbox/), subscribe via PayPal to get **1 month free** trial
+* your device will automatically reboot with the activated subscription
 * for issues, please contact [support](blackbox@belodedenko.me)
 
-# subscription
-...
-
 # cancellation
-To cancel your `black.box` subscription, please visit [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=BLLTH9CS2LEGS).
+Please visit PayPal to cancel your `black.box` subscription.
 
 #### footnotes
 1. default domain list: `netflix.com`, `nflxvideo.net` and `hulu.com`
