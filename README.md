@@ -25,7 +25,7 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
                                                      +--------+
 ```
 
-A [subscription](#subscription) is required to activate the device. This service is offered on a rolling subscription basis, with first month free. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
+A subscription is required to activate the device. This service is offered on a rolling subscription basis, with first month free. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
 
 # instructions
 * obtain a Rasberry Pi 3 and SD card (4GB+)
@@ -35,9 +35,8 @@ A [subscription](#subscription) is required to activate the device. This service
 * connect your device to the Internet using a spare Ethernet port on your router
 * power the device using the recommended power adapter (**do not** power off a USB port)
 * after a few minutes, connect to the new Wi-Fi network called `black.box`
-* your `black.box` will automatically connect to a VPN server in the default region[[n4](#footnotes)]
 * visit [black.box](http://blackbox/), subscribe via PayPal to get **1 month free** trial
-* your device will automatically reboot with the activated subscription
+* your device will automatically reboot and connect to a VPN server in the default region[[n4](#footnotes)]
 * for issues, please contact [support](blackbox@belodedenko.me)
 
 # cancellation
