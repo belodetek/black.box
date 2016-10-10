@@ -37,7 +37,7 @@ A subscription is required to activate the device. This service is offered on a 
 * after a few minutes, connect to the new Wi-Fi network called `black.box`
 * visit [black.box](http://blackbox/), subscribe via PayPal to get **1 month free** trial
 * your device will automatically reboot and connect to a VPN server in the default region[[n4](#footnotes)]
-* for issues, please contact [support](blackbox@belodedenko.me)
+* for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
