@@ -39,6 +39,12 @@ A subscription is required to activate the device. This service is offered on a 
 * your device will automatically reboot and connect to a VPN server in the default region[[n4](#footnotes)]
 * for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
+# dashboard
+
+The device dashboard is accessible by navigating to [black.box](http://blackbox/) while connected to the `black.box` Wi-Fi network.
+
+![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
+
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
 
