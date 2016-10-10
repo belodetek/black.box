@@ -50,4 +50,4 @@ Please visit PayPal to cancel your `black.box` subscription.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
-<p align="center"><img src="https://avatars2.githubusercontent.com/u/2033996?v=3&s=50"></p>
+<p align="center"><a href="http://anton.belodedenko.me/"><img src="https://avatars2.githubusercontent.com/u/2033996?v=3&s=50"></a></p>
