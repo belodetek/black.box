@@ -36,7 +36,7 @@ A subscription is required to activate the device. This service is offered on a 
 * power the device using the recommended power adapter (**do not** power off a USB port)
 * after a few minutes, connect to the new Wi-Fi network called `black.box`
 * visit [black.box](http://blackbox/), subscribe via PayPal to get **1 month free** trial
-* once subscribed, you will be redirected back to the [[dashboard](#dashboard)], where you can monitor the status by periodically hitting the `refresh` button
+* once subscribed, you will be redirected back to the [dashboard](#dashboard), where you can monitor the status by periodically hitting the `refresh` button
 * after a few minutes, your device will update and unblock the default region[[n4](#footnotes)]
 * for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
