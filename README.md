@@ -28,25 +28,27 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
 A subscription is required to activate the device. This service is offered on a rolling subscription basis, with first month free. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
 
 # instructions
-* obtain a Rasberry Pi 3 and SD card (4GB+)
-* download and install [Etcher](http://www.etcher.io/)
-* download the [.img](#) file
-* burn the `.img` file to the SD card, eject the freshly burnt card and insert into your device
-* connect your device to the Internet using a spare Ethernet port on your router
-* power the device using the recommended power adapter (**do not** power off a USB port)
-* after a few minutes, connect to the new Wi-Fi network called `black.box`
-* visit [black.box](http://blackbox/), subscribe via PayPal to get **1 month free** trial
-* once subscribed, you will be redirected back to the [dashboard](#dashboard), where you can monitor the status by periodically hitting the `refresh` button
-* after a few minutes, your device will update and unblock the default region[[n4](#footnotes)]
-* for issues, please contact [support](mailto:blackbox@belodedenko.me)
+1. obtain a Rasberry Pi 3 with a SD card (4GB+) and download and install [Etcher](http://www.etcher.io/)
+2. download the [.img](#) file, burn it to the SD card, then insert the card into the RPi
+3. connect the RPi to the Internet using a spare Ethernet port on your router (power using the recommended power adapter **do not** power off a USB port)
+5. after a few minutes, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`)
+6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and get **1 month free** trial
+7. once subscribed, you will be redirected back to the [dashboard](#dashboard), where you can monitor the status by periodically hitting the `refresh` button
+8. after a few minutes, your device will finish updating and unblock the default region[[n4](#footnotes)]
+9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
 # dashboard
 The device dashboard is accessible by navigating to [black.box](http://blackbox/) while connected to the `black.box` Wi-Fi network.
 
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
+# other regions
+To change the default region[[n4](#footnotes)], click the appropriate flag on the [dashboard](#dashboard). Please note, you may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to you normal network for a few minutes, before changing back to `black.box`.
+
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
+
+![PayPal cancel subscription](https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png)
 
 #### footnotes
 1. default domain list: `netflix.com`, `nflxvideo.net` and `hulu.com`
