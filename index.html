@@ -30,9 +30,9 @@
         <h1>
 <a id="about" class="anchor" href="#about" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>about</h1>
 
-<p>black.box is a proprietary plug-and-play, peer-to-peer VPN policy routing sofware, which runs on a <a href="https://en.wikipedia.org/wiki/Raspberry_Pi">Raspberry Pi 3</a> hardware device. This service is not designed for privacy and/or anonymity since it uses OpenVPN as the tunnel transport protocol, without encryption.</p>
+<p>black.box is a small Wi-Fi policy routing VPN appliance, which runs on a <a href="https://en.wikipedia.org/wiki/Raspberry_Pi">Raspberry Pi 3</a>. Devices connected to the <code>black.box</code> Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.</p>
 
-<p>The software uses a list of DNS domain names[<a href="#footnotes">n1</a>] and IPv4/IPv6 subnets/IPs[<a href="#footnotes">n2</a>], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[<a href="#footnotes">n3</a>], while the local interface in unrestricted. All other traffic is blocked on the tunnel interface.</p>
+<p>The software uses a list of DNS domain names[<a href="#footnotes">n1</a>] and IPv4/IPv6 subnets/IPs[<a href="#footnotes">n2</a>], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[<a href="#footnotes">n3</a>], while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.</p>
 
 <pre><code>+---------+         +-----------------+
 |         |  Wi-Fi  |                 |  google.com, etc.
@@ -82,6 +82,8 @@
 
 <h1>
 <a id="other-regions" class="anchor" href="#other-regions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>other regions</h1>
+
+<p><code>United States</code> and <code>United Kingdom</code> are currently suported regions.</p>
 
 <p>To change the default region[<a href="#footnotes">n4</a>], click the appropriate flag on the <a href="#dashboard">dashboard</a>. Please note, you may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to you normal network for a few minutes, before changing back to <code>black.box</code>.</p>
 
