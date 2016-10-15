@@ -1,7 +1,7 @@
 # about
-black.box is a proprietary plug-and-play, peer-to-peer VPN policy routing sofware, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) hardware device. This service is not designed for privacy and/or anonymity since it uses OpenVPN as the tunnel transport protocol, without encryption.
+black.box is a small Wi-Fi policy routing VPN appliance, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi). Devices connected to the `black.box` Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.
 
-The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 subnets/IPs[[n2](#footnotes)], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n3](#footnotes)], while the local interface in unrestricted. All other traffic is blocked on the tunnel interface.
+The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 subnets/IPs[[n2](#footnotes)], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n3](#footnotes)], while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.
 
 ```
 +---------+         +-----------------+
@@ -43,6 +43,8 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox/
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
 # other regions
+`United States` and `United Kingdom` are currently suported regions.
+
 To change the default region[[n4](#footnotes)], click the appropriate flag on the [dashboard](#dashboard). Please note, you may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to you normal network for a few minutes, before changing back to `black.box`.
 
 # cancellation
