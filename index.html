@@ -30,7 +30,11 @@
         <h1>
 <a id="about" class="anchor" href="#about" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>about</h1>
 
-<p>black.box is a small Wi-Fi policy routing VPN appliance, which runs on a <a href="https://en.wikipedia.org/wiki/Raspberry_Pi">Raspberry Pi 3</a>. Devices connected to the <code>black.box</code> Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.</p>
+<p>black.box is a small subscription-based Wi-Fi policy routing VPN appliance, which runs on a <a href="https://en.wikipedia.org/wiki/Raspberry_Pi">Raspberry Pi 3</a>.</p>
+
+<p>Devices connected to the <code>black.box</code> Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.</p>
+
+<p>A subscription is required to activate the device. This service is offered on a rolling subscription basis, with <strong>1 moth free trial</strong>. Afterwards a monthly subscription fee applies, unless the subscription is <a href="#cancellation">cancelled</a> prior to the next billing cycle.</p>
 
 <p>The software uses a list of DNS domain names[<a href="#footnotes">n1</a>] and IPv4/IPv6 subnets/IPs[<a href="#footnotes">n2</a>], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[<a href="#footnotes">n3</a>], while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.</p>
 
@@ -55,8 +59,6 @@
                                                      +--------+
 </code></pre>
 
-<p>A subscription is required to activate the device. This service is offered on a rolling subscription basis, with first month free. Afterwards a monthly subscription fee applies, unless the subscription is <a href="#cancellation">cancelled</a> prior to the next billing cycle.</p>
-
 <h1>
 <a id="instructions" class="anchor" href="#instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>instructions</h1>
 
@@ -66,8 +68,9 @@
 <li>download the <a href="#">.img</a> file, burn it to the SD card, then insert the card into the RPi</li>
 <li>connect the RPi to the Internet using a spare Ethernet port on your router (power using the recommended power adapter <strong>do not</strong> power off a USB port)</li>
 <li>after a few minutes, connect to a new Wi-Fi network called <code>black.box</code> (passphrase: <code>blackbox</code>)</li>
-<li>visit <a href="http://blackbox/">http://blackbox/</a>, click subscribe to setup up a PayPal billing agreement and get <strong>1 month free</strong> trial</li>
-<li>once subscribed, you will be redirected back to the <a href="#dashboard">dashboard</a>, where you can monitor the status by periodically hitting the <code>refresh</code> button</li>
+<li>visit <a href="http://blackbox/">http://blackbox/</a>, click subscribe to setup up a PayPal billing agreement and claim your <strong>1 month free</strong> trial</li>
+<li>once subscribed, you will be redirected back to the <a href="#dashboard">dashboard</a>
+</li>
 <li>after a few minutes, your device will finish updating and unblock the default region[<a href="#footnotes">n4</a>]</li>
 <li>for issues, please contact <a href="mailto:blackbox@belodedenko.me">support</a>
 </li>
