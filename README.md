@@ -1,5 +1,9 @@
 # about
-black.box is a small Wi-Fi policy routing VPN appliance, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi). Devices connected to the `black.box` Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.
+black.box is a small subscription-based Wi-Fi policy routing VPN appliance, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi).
+
+Devices connected to the `black.box` Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.
+
+A subscription is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial**. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
 
 The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 subnets/IPs[[n2](#footnotes)], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n3](#footnotes)], while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.
 
@@ -25,15 +29,13 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
                                                      +--------+
 ```
 
-A subscription is required to activate the device. This service is offered on a rolling subscription basis, with first month free. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
-
 # instructions
 1. obtain a Rasberry Pi 3 with a SD card (4GB+) and download and install [Etcher](http://www.etcher.io/)
 2. download the [.img](#) file, burn it to the SD card, then insert the card into the RPi
 3. connect the RPi to the Internet using a spare Ethernet port on your router (power using the recommended power adapter **do not** power off a USB port)
 5. after a few minutes, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`)
-6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and get **1 month free** trial
-7. once subscribed, you will be redirected back to the [dashboard](#dashboard), where you can monitor the status by periodically hitting the `refresh` button
+6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial
+7. once subscribed, you will be redirected back to the [dashboard](#dashboard)
 8. after a few minutes, your device will finish updating and unblock the default region[[n4](#footnotes)]
 9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
