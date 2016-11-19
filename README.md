@@ -31,11 +31,11 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
 
 # instructions
 1. obtain a Rasberry Pi 3 with a SD card (4GB+) and download and install [Etcher](http://www.etcher.io/)
-2. download the [.img](#) file, burn it to the SD card, then insert the card into the RPi
-3. connect the RPi to the Internet using a spare Ethernet port on your router (power using the recommended power adapter **do not** power off a USB port)
+2. download the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.16.0-2.3.0-46c05b958e51.img) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
+3. connect the Pi to the Internet using a spare Ethernet port on your router (power using an adapter, not USB port)
 5. after a few minutes, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`)
 6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial
-7. once subscribed, you will be redirected back to the [dashboard](#dashboard)
+7. once subscribed, you will be redirected back to the [dashboard](#dashboard)[[n5](#footnotes)]
 8. after a few minutes, your device will finish updating and unblock the default region[[n4](#footnotes)]
 9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
@@ -47,7 +47,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox/
 # other regions
 `United States` and `United Kingdom` are currently suported regions.
 
-To change the default region[[n4](#footnotes)], click the appropriate flag on the [dashboard](#dashboard). Please note, you may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to you normal network for a few minutes, before changing back to `black.box`.
+To change the default region[[n4](#footnotes)], click the appropriate flag on the [dashboard](#dashboard)[[n5](#footnotes)].
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
@@ -59,6 +59,7 @@ Please visit PayPal to cancel your `black.box` subscription.
 2. default ASNs: `AS2906`
 3. default ports: `80/tcp`, `443/tcp` and `53/udp`
 4. default region: `United States`
+5. You may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to your normal network for a few minutes, before changing back to `black.box`.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
