@@ -30,7 +30,7 @@ The software only routes specific DNS domain names and IPv4/IPv6 subnets/IPs via
 ```
 
 # instructions
-1. obtain a Rasberry Pi 3 with a SD card (4GB+) and download and install [Etcher](http://www.etcher.io/)
+1. obtain a [Rasberry Pi 3](https://www.raspberrypi.org/products/) with a SD card (4GB+) and download and install [Etcher](http://www.etcher.io/)
 2. download the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.16.0-2.3.0-46c05b958e51.img) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
 3. connect the Pi to the Internet using a spare Ethernet port on your router (power using an adapter, not USB port)[[n3](#footnotes)]
 5. after a few minutes, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`)
