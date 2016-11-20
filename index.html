@@ -65,12 +65,11 @@
 <ol>
 <li>obtain a Rasberry Pi 3 with a SD card (4GB+) and download and install <a href="http://www.etcher.io/">Etcher</a>
 </li>
-<li>download the <a href="#">.img</a> file, burn it to the SD card, then insert the card into the RPi</li>
-<li>connect the RPi to the Internet using a spare Ethernet port on your router (power using the recommended power adapter <strong>do not</strong> power off a USB port)</li>
+<li>download the <a href="https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.16.0-2.3.0-46c05b958e51.img">.img</a> file, burn it to the SD card with <code>Etcher</code>, then insert the card into the Pi</li>
+<li>connect the Pi to the Internet using a spare Ethernet port on your router (power using an adapter, not USB port)[<a href="#footnotes">n6</a>]</li>
 <li>after a few minutes, connect to a new Wi-Fi network called <code>black.box</code> (passphrase: <code>blackbox</code>)</li>
 <li>visit <a href="http://blackbox/">http://blackbox/</a>, click subscribe to setup up a PayPal billing agreement and claim your <strong>1 month free</strong> trial</li>
-<li>once subscribed, you will be redirected back to the <a href="#dashboard">dashboard</a>
-</li>
+<li>once subscribed, you will be redirected back to the <a href="#dashboard">dashboard</a>[<a href="#footnotes">n5</a>]</li>
 <li>after a few minutes, your device will finish updating and unblock the default region[<a href="#footnotes">n4</a>]</li>
 <li>for issues, please contact <a href="mailto:blackbox@belodedenko.me">support</a>
 </li>
@@ -88,7 +87,7 @@
 
 <p><code>United States</code> and <code>United Kingdom</code> are currently suported regions.</p>
 
-<p>To change the default region[<a href="#footnotes">n4</a>], click the appropriate flag on the <a href="#dashboard">dashboard</a>. Please note, you may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to you normal network for a few minutes, before changing back to <code>black.box</code>.</p>
+<p>To change the default region[<a href="#footnotes">n4</a>], click the appropriate flag on the <a href="#dashboard">dashboard</a>[<a href="#footnotes">n5</a>].</p>
 
 <h1>
 <a id="cancellation" class="anchor" href="#cancellation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>cancellation</h1>
@@ -109,6 +108,8 @@
 </li>
 <li>default region: <code>United States</code>
 </li>
+<li>You may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to your normal network for a few minutes, before changing back to <code>black.box</code>.</li>
+<li>The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).</li>
 </ol>
 
 <hr>
