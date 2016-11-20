@@ -5,7 +5,7 @@ Devices connected to the `black.box` Wi-Fi network, can access geo-restricted In
 
 A subscription is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial**. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle.
 
-The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 subnets/IPs[[n2](#footnotes)], which are routed via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n3](#footnotes)], while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.
+The software only routes specific DNS domain names and IPv4/IPv6 subnets/IPs via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.
 
 ```
 +---------+         +-----------------+
@@ -32,11 +32,11 @@ The software uses a list of DNS domain names[[n1](#footnotes)] and IPv4/IPv6 sub
 # instructions
 1. obtain a Rasberry Pi 3 with a SD card (4GB+) and download and install [Etcher](http://www.etcher.io/)
 2. download the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.16.0-2.3.0-46c05b958e51.img) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
-3. connect the Pi to the Internet using a spare Ethernet port on your router (power using an adapter, not USB port)[[n6](#footnotes)]
+3. connect the Pi to the Internet using a spare Ethernet port on your router (power using an adapter, not USB port)[[n3](#footnotes)]
 5. after a few minutes, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`)
 6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial
-7. once subscribed, you will be redirected back to the [dashboard](#dashboard)[[n5](#footnotes)]
-8. after a few minutes, your device will finish updating and unblock the default region[[n4](#footnotes)]
+7. once subscribed, you will be redirected back to the [dashboard](#dashboard)[[n2](#footnotes)]
+8. after a few minutes, your device will finish updating and unblock the selected country
 9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
 
 # dashboard
@@ -47,7 +47,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox/
 # other regions
 `United States` and `United Kingdom` are currently suported regions.
 
-To change the default region[[n4](#footnotes)], click the appropriate flag on the [dashboard](#dashboard)[[n5](#footnotes)].
+To change the default region, click the appropriate flag on the [dashboard](#dashboard)[[n2](#footnotes)].
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
@@ -55,12 +55,9 @@ Please visit PayPal to cancel your `black.box` subscription.
 ![PayPal cancel subscription](https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png)
 
 #### footnotes
-1. default domain list: `netflix.com`, `nflxvideo.net` and `hulu.com`
-2. default ASNs: `AS2906`
-3. default ports: `80/tcp`, `443/tcp` and `53/udp`
-4. default region: `United States`
-5. You may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to your normal network for a few minutes, before changing back to `black.box`.
-6. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).
+1. default ports: `80/tcp`, `443/tcp` and `53/udp`
+2. You may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to your normal network for a few minutes, before changing back to `black.box`.
+3. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
