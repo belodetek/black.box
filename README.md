@@ -44,10 +44,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox/
 
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
-# other regions
-`United States` and `United Kingdom` are currently suported regions.
-
-To change the default region, click the appropriate flag on the [dashboard](#dashboard)[[n2](#footnotes)].
+To change regions, click any available flag in the top right corner of the [dashboard](#dashboard)[[n2](#footnotes)].
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
