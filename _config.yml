@@ -1,0 +1,8 @@
+title: black.box
+description: A policy based VPN router.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-modernist
+
+gems:
+  - jekyll-mentions
