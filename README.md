@@ -34,7 +34,7 @@ The software only routes specific DNS domain names and IPv4/IPv6 subnets/IPs via
 2. download the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.16.0-2.3.0-46c05b958e51.img) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
 3. connect the Pi to the Internet using a spare Ethernet port on your router (power using an adapter, not USB port)[[n3](#footnotes)]
 5. after a few minutes, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`)
-6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial
+6. visit [http://blackbox/](http://blackbox/), click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin
 7. once subscribed, you will be redirected back to the [dashboard](#dashboard)[[n2](#footnotes)]
 8. after a few minutes, your device will finish updating and unblock the selected country
 9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
