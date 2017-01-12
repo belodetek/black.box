@@ -1,13 +1,13 @@
 # about
-black.box is a small subscription-based Wi-Fi policy routing VPN appliance, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi).
+black.box is a small Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks Netflix on all devices, including tablets, smartphones, desktops, laptops and TVs.
 
-Devices connected to the `black.box` Wi-Fi network, can access geo-restricted Internet content, such as Netflix and BBC iPlayer in various geographic regions.
+Devices connected to the `black.box` Wi-Fi network, can access content, such as Netflix and BBC iPlayer from anywhere in the world.
 
 PayPal subscription or Bitcoin credit is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
-The software only routes specific DNS domain names and IPv4/IPv6 subnets/IPs via the tunnel interface, while all the remaining traffic flows via the local Internet interface. The tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local Internet interface in unrestricted. All other traffic is blocked on the tunnel interface.
+The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n5](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) flows via the local Internet interface. The tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local Internet interface in unrestricted for gaming, etc.
 
 ```
 +---------+         +-----------------+
@@ -58,6 +58,7 @@ Please visit PayPal to cancel your `black.box` subscription.
 2. You may temporarily lose network connectivity while the device reboots with the new settings. To avoid this, change back to your normal network for a few minutes, before changing back to `black.box`.
 3. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).
 4. [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) with an [Alfa Network AWUS036NEH](https://www.amazon.co.uk/dp/B003JTM9JY) USB Wi-Fi dongle will also work and may even provide better signal due to the external Wi-Fi antenna.
+5. For performance reasons, the tunnel interface provides no additional encryption overhead.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
