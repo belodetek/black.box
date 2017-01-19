@@ -1,7 +1,7 @@
 # about
-black.box is a small Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks Netflix on all devices, including tablets, smartphones, desktops, laptops and TVs.
+black.box is a small Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks Netflix on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloacking mode, to enable functioning in hostile deep packet inspection environments.
 
-Devices connected to the `black.box` Wi-Fi network, can access content, such as Netflix and BBC iPlayer from anywhere in the world.
+Devices connected to the default `black.box` Wi-Fi network, can access content, such as Netflix and BBC iPlayer from anywhere in the world.
 
 PayPal subscription or Bitcoin credit is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
 
