@@ -1,13 +1,13 @@
 # about
-black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks Netflix on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloacking mode, to enable functioning in hostile deep packet inspection environments.
+black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet contect on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloacking mode, to enable functioning in hostile deep packet inspection environments.
 
-Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can access content, such as Netflix and BBC iPlayer from anywhere in the world.
+Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can access blocked Internet content from anywhere in the world.
 
 PayPal subscription or Bitcoin credit is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
-The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) flows via the local Internet interface. For security reasons, the tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface in unrestricted for gaming traffic, etc.
+The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) goes out via the local Internet interface. For security reasons, the tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface in unrestricted for gaming traffic, etc.
 
 ```
 +---------+         +-----------------+
@@ -36,8 +36,7 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.24.1-2.8.3-eef8cf4afe02.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
 3. connect the Pi to the Internet using a spare Ethernet port on your router (1A+ power supply, not USB port)[[n2](#footnotes)]
 4. after initial initialisation (around 15-20 minutes)[[n5](#footnotes)] visit [http://blackbox.local/](http://blackbox.local/) URL, click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin
-5. once subscribed, you will be redirected back to the [dashboard](#dashboard)
-6. your device will automatically re-boot and un-block the selected country after a few minutes
+5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
 8. try accessing some previously blocked Internet content
 9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
@@ -47,7 +46,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
-To change to an alternative region (subject to availability), click a country flag in the top right corner of the [dashboard](#dashboard).
+If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
