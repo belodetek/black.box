@@ -34,7 +34,7 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
 2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.24.1-2.8.3-eef8cf4afe02.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
-3. connect the Pi to the Internet using a spare Ethernet port on your router (1A+ power supply, not USB port)[[n2](#footnotes)]
+3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] (1A+ power supply, not USB port)[[n2](#footnotes)]
 4. after initial initialisation (around 15-20 minutes)[[n5](#footnotes)] visit [http://blackbox.local/](http://blackbox.local/) URL, click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin
 5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
@@ -58,7 +58,8 @@ Please visit PayPal to cancel your `black.box` subscription.
 2. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).
 3. [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) with an [Alfa Network AWUS036NEH](https://www.amazon.co.uk/dp/B003JTM9JY) USB Wi-Fi dongle will also work and may even provide better signal due to the external Wi-Fi antenna.
 4. For performance reasons, the tunnel interface provides no additional encryption overhead.
-5. monitor by pinging `blackbox.local` from your LAN
+5. Monitor by pinging `blackbox.local` from your LAN.
+6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN. The device needs unrestricted oubound access to the Internet. Your DMZ should forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API as AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
