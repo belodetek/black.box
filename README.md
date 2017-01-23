@@ -39,7 +39,7 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
 8. try accessing some previously blocked Internet content
-9. for issues, please contact [support](mailto:blackbox@belodedenko.me)
+9. for issues, please contact [support](mailto:blackbox@belodedenko.me) or `#netflix-proxy` on Freenode IRC.
 
 # dashboard
 The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN.
