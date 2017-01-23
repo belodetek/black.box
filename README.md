@@ -1,5 +1,5 @@
 # about
-black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet contect on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloacking mode, to enable functioning in hostile deep packet inspection environments.
+black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloacking mode, to enable functioning in hostile deep packet inspection environments.
 
 Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can access blocked Internet content from anywhere in the world.
 
