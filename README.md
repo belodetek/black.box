@@ -36,7 +36,7 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
 2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.24.1-2.8.3-eef8cf4afe02.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
-3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] (2.5A power supply, not USB port)[[n2](#footnotes)]
+3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 4. after initial initialisation (around 15-20 minutes)[[n5](#footnotes)] visit [http://blackbox.local/](http://blackbox.local/) URL, click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
 5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status[[n8](#footnotes)]
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
