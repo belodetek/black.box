@@ -1,6 +1,8 @@
 # about
 black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloaking mode, to enable functioning in hostile deep packet inspection environments.
 
+<p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
+
 Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can access blocked Internet content from anywhere in the world.
 
 PayPal subscription or Bitcoin credit is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
