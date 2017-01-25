@@ -44,7 +44,7 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 9. for issues, please contact [support](mailto:blackbox@belodedenko.me) or `#netflix-proxy` on Freenode IRC.
 
 # dashboard
-The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN.
+The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dashboard URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
 
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
