@@ -62,7 +62,7 @@ Please visit PayPal to cancel your `black.box` subscription.
 2. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).
 3. [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) with an [Alfa Network AWUS036NEH](https://www.amazon.co.uk/dp/B003JTM9JY) USB Wi-Fi dongle will also work and may even provide better signal due to the external Wi-Fi antenna.
 4. For performance reasons, the tunnel interface provides no additional encryption overhead.
-5. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local, the third `blackbox-2.local` and so on.
+5. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN. The device needs unrestricted oubound access to the Internet. Your DMZ should forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API as AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
 8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it.
