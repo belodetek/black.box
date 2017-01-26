@@ -1,7 +1,7 @@
 # about
 black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloaking mode, to enable functioning in hostile deep packet inspection environments.
 
-Multiple `black.box(es)` can be used not only to un-block contect, but to also establish private links. Leave one at home/office and dial back in when travelling or on holidays.
+Multiple `black.box(es)` can be used not only to un-block content, but to also establish private links. Leave one at home/office and dial back in when travelling or on holidays.
 
 <p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
