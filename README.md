@@ -1,7 +1,7 @@
 # about
 black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloaking mode, to enable functioning in hostile deep packet inspection environments.
 
-Multiple `black.box(es)` can be used not only to un-block content, but to also establish private links. Leave one at home/office and dial back in when travelling or on holidays.
+Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays.
 
 <p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
@@ -56,6 +56,15 @@ If multiple regions are available to un-block, click a country flag in the top r
 Please visit PayPal to cancel your `black.box` subscription.
 
 ![PayPal cancel subscription](https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png)
+
+# technical architecture
+OpenVPN/Stunnel is used for building `black.box` VPN tunnels, whether encrypted or otherwise. Python 2.7.x is used to wrap the OpenVPN binary together with Linux Bash shell scripts to interface to the operating system. All Python code is compiled into executables using Nuitka on dynamically provisioned Digital Ocean Droplets for both `armv7l` (QEMU) and `x86_64` architectures and shipped to devices in a secure manner, by first encrypting the payload using OpenSSL. Devices are managed using `resin.io` IoT infrastructure, which runs the `black.box` code inside Docker containers on custom ResinOS images. All runtime code is unpacked onto encrypted disk partitions inside Docker containers with all transient data stored in memory only and disk encryption keys never recorded.
+
+Amazon AWS (EBS) is used to host both the `black.box` API and the device Dashboard, which are implemented in Python/Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, although technically something like Redis would be a better architectural choice.
+
+For subscriptions, the `black.box` API talks to the PayPal Subscriptions API to set-up monthly subscriptions. For Bitcoin payments, the BlockCypher API provides nesessary WebHooks to advise the `black.box` API when a payment has been confirmed (single confirmation) as well as a WebSocket notification for the Dashboard. no Bitcoin payment provider is used in the Bitcoin payment flow.
+
+Additional management VPS is used to provide `ipinfo` support services as well as execute automated headless video playback tests using  Selenium WebDriver wrapped in Python.
 
 #### footnotes
 1. default ports: `80/tcp`, `443/tcp` and `53/udp`
