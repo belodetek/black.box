@@ -5,7 +5,7 @@ Multiple `black.box(es)` can be used not only to un-block content, but to also e
 
 <p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
-Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can access blocked Internet content from anywhere in the world.
+Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access [blocked Internet content](#services) from anywhere in the world.
 
 PayPal subscription or Bitcoin credit is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
 
