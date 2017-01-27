@@ -53,7 +53,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are routed by default. If you require a specific service to be routed via the VPN, please contact [support](mailto:blackbox@belodedenko.me) or `#netflix-proxy` on Freenode IRC to request it.
+A number of popular services are routed by default. If you require a specific service to be routed via `black.box`, please contact [support](mailto:blackbox@belodedenko.me) or `#netflix-proxy` on Freenode IRC to request it.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
