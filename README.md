@@ -1,7 +1,7 @@
 # about
 black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloaking mode, to enable functioning in hostile deep packet inspection environments.
 
-Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Both client and server devices need to have an active subscription or Bitcoin credits to work in pairing mode.
+Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Currently, both client and server devices need to have an active subscription or Bitcoin credits to work in pairing mode. For the launch we are considering dropping that requirement, only requiring an active subscription on the device in server mode.
 
 <p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
