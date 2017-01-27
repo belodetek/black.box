@@ -15,8 +15,8 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 
 ```
 +---------+         +-----------------+
-|         |  Wi-Fi  |                 |  google.com, etc.
-|   iOS   | +-----> |    black.box    | +---------------->
+|         |  Wi-Fi  |                 |  Google, Facebook, etc.
+|   iOS   | +-----> |    black.box    | +--------------------->
 |         |         |    ---------    |
 +---------+         |    VPN policy   |
                     |    router       |
@@ -26,10 +26,10 @@ The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4]
 |         |         |                 |
 +---------+         |                 |
                     |                 |
-+---------+         |                 |         +--------+
-|         |  Wi-Fi  |   netflix.com   |   VPN   |        |
-|  OS X   | +-----> |   nflxvideo.net | +-----> | VPN US +----+
-|         |         |   hulu.com      |         |        |    |
++---------+         |   Sling TV      |         +--------+
+|         |  Wi-Fi  |   Netflix       |   VPN   |        |
+|  OS X   | +-----> |   Hulu          | +-----> | VPN US +----+
+|         |         |   etc.          |         |        |    |
 +---------+         +-----------------+         +----+---+ UK |
                                                      |        |
                                                      +--------+
@@ -51,6 +51,9 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
+
+# services
+A number of popular services are routed by default. If you require a specific service to be routed via the VPN, please contact [support](mailto:blackbox@belodedenko.me) or `#netflix-proxy` on Freenode IRC to request it.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
