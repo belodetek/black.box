@@ -74,7 +74,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 5. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN. The device needs unrestricted oubound access to the Internet. Your DMZ should forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API as AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
-8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it.
+8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it. If that fails, please contact [support](mailto:blackbox@belodedenko.me) or `#netflix-proxy` on Freenode IRC. There is currently an outstandng Docker [bug](https://github.com/docker/docker/issues/22312), which causes devices to hang in "Stopping" state.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
