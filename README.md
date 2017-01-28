@@ -1,5 +1,5 @@
 # about
-black.box is a small secondary Wi-Fi router, which runs on a [Raspberry Pi 3](https://en.wikipedia.org/wiki/Raspberry_Pi) and un-blocks popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. Includes optional VPN obfuscation/cloaking mode, to enable functioning in hostile deep packet inspection environments.
+`black.box` is a [ResinOS](https://resinos.io/) based Wi-Fi and Ethernet policy router, which runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It also ncludes optional VPN obfuscation/cloaking mode, to enable functioning in hostile deep packet inspection environments (e.g. China).
 
 Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Currently, both client and server devices need to have an active subscription or Bitcoin credits to work in pairing mode. For the launch we are considering dropping that requirement, only requiring an active subscription on the device in server mode.
 
@@ -11,7 +11,7 @@ PayPal subscription or Bitcoin credit is required to activate the device. This s
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
-The device routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) goes out via the local Internet interface. For security reasons, the tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface in unrestricted for gaming traffic, etc.
+For performance reasons, `black.box` only routes specified traffic (e.g. netflix.com) via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) goes out via the local Internet interface. For security reasons, the tunnel interface only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface in unrestricted for gaming traffic, etc.
 
 ```
 +---------+         +-----------------+
