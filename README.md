@@ -43,7 +43,7 @@ For performance reasons, `black.box` only routes un-blocking traffic via the un-
 5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status[[n8](#footnotes)]
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
 8. try accessing some previously blocked Internet content
-9. for issues, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/) on Freenode, or use the live chat link on the dashboard
+9. for issues, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
 
 # dashboard
 The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dashboard URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
@@ -53,7 +53,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are routed by default. If you require a specific service to be routed via `black.box`, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/) on Freenode or use the live chat link on the dashboard to request it.
+A number of popular services are routed by default. If you require a specific service to be routed via `black.box`, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
@@ -77,7 +77,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 5. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN. The device needs unrestricted oubound access to the Internet. Your DMZ should forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API as AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
-8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it. If that fails, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/) on Freenode or use the live chat link on the dashboard. There is currently an outstandng Docker [bug](https://github.com/docker/docker/issues/22312), which causes devices to hang in "Stopping" state.
+8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it. If that fails, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard. There is currently an outstandng Docker [bug](https://github.com/docker/docker/issues/22312), which causes devices to hang in "Stopping" state.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
