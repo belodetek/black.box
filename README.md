@@ -61,6 +61,14 @@ Please visit PayPal to cancel your `black.box` subscription.
 ![PayPal cancel subscription](https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png)
 
 # technical architecture
+`black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `exit-node` in the target region and routes selected services through the tunnel.
+
+In `exit-node` mode, `black.box` devices advertise themselves to devices running in `client` mode. This mode is useful for deploying `black.box` exit nodes anywhere in the world with an Internet connection and a power socket.
+
+In `server` mode, the device advertises its private `GUID` and listens for incoming VPN connections from paired device(s). Device(s) in `paired` mode, which have specified the private `GUID` in their pairing configuration, connect to the `server` node. This mode is useful for establishing point to point links betwen two or more devices.
+
+Finally, there is a `double-vpn` mode. Devices configured in this mode, both listen for incoming client connections, as well as establish a outbound connection to a down-stream VPN server.
+
 OpenVPN/Stunnel is used for building `black.box` VPN tunnels, whether encrypted or otherwise. Python 2.7.x is used to wrap the OpenVPN binary together with Linux Bash shell scripts to interface to the operating system. All Python code is compiled into executables using Nuitka on dynamically provisioned Digital Ocean Droplets for both `armv7l` (QEMU) and `x86_64` architectures and shipped to devices in a secure manner, by first encrypting the payload using OpenSSL. Devices are managed using `resin.io` IoT infrastructure, which runs the `black.box` code inside Docker containers on custom ResinOS images. All runtime code is unpacked onto encrypted disk partitions inside Docker containers with all transient data stored in memory only and disk encryption keys never recorded.
 
 Amazon AWS (EBS) is used to host both the `black.box` API and the device Dashboard, which are implemented in Python/Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, although technically something like Redis would be a better architectural choice.
