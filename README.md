@@ -1,13 +1,15 @@
 # about
-`black.box` is a [ResinOS](https://resinos.io/) based Wi-Fi and Ethernet policy router, which runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It also includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+`black.box` is a [ResinOS](https://resinos.io/) based VPN router and content un-blocker. It runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
-Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Currently, both client and server devices need to have an active subscription or Bitcoin credits to work in pairing mode. For the launch we are considering dropping that requirement, only requiring an active subscription on the device in server mode.
+The device also includes a **free** 3rd party VPN mode, supprting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) adn [VPNArea](https://vpnarea.com). In this mode the device functions purely as a VPN router.
+
+Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Only devices in server mode need to have an active subscription or Bitcoin credits to work in pairing mode.
 
 <p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
 Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access [blocked Internet content](#services) from anywhere in the world.
 
-PayPal subscription or Bitcoin credit is required to activate the device. This service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
+PayPal subscription or Bitcoin credit is required for un-blocking or pairing. The un-blocking service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
