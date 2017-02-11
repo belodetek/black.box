@@ -1,5 +1,5 @@
 # about
-`black.box` is a Linux VPN router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n9](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+`black.box` is a Linux VPN router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
 The device also includes a **free** 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) adn [VPNArea](https://vpnarea.com).
 
@@ -42,7 +42,7 @@ For performance reasons, `black.box` only routes un-blocking traffic via the un-
 2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.24.1-2.8.3-eef8cf4afe02.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
 3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 4. after initial initialisation of around 15-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL, if un-blocking or pairing (server), click subscribe to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
-5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status[[n8](#footnotes)]
+5. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
 8. try accessing some previously blocked Internet content
 9. for issues, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
@@ -89,8 +89,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
-8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it. If that fails, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard. There is currently an outstandng Docker [bug](https://github.com/docker/docker/issues/22312), which causes devices to hang in "Stopping" state.
-9. Other supported (but untested) devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
+8. Other supported (but untested) devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
