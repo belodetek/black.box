@@ -1,5 +1,5 @@
 # about
-`black.box` is a Linux VPN router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+`black.box` is a Linux VPN router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n9](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
 The device also includes a **free** 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) adn [VPNArea](https://vpnarea.com).
 
@@ -90,6 +90,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
 8. If your device does not establish a connection to the VPN after 5-10 minutes, manually power-cycle it. If that fails, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard. There is currently an outstandng Docker [bug](https://github.com/docker/docker/issues/22312), which causes devices to hang in "Stopping" state.
+9. Other supported (but untested) devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
