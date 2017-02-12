@@ -1,5 +1,5 @@
 # about
-`black.box` is a Linux VPN router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+`black.box` is a Linux based VPN policy router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
 The device also includes a **free** 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) adn [VPNArea](https://vpnarea.com).
 
