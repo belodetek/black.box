@@ -1,7 +1,7 @@
 # about
 `black.box` is a Linux based VPN policy router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
-The device also includes a **free** 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) adn [VPNArea](https://vpnarea.com).
+The device also includes a **free** 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com).
 
 Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Only devices in server mode need to have an active subscription or Bitcoin credits to work in pairing mode.
 
@@ -56,6 +56,8 @@ If multiple regions are available to un-block, click a country flag in the top r
 
 # services
 A number of popular services are available to be routed via the tunnel on [Dashboard](#dashboard). If the serice you require is missing please, email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it.
+
+Alternatively, set your device into `VPN` mode on the dashboard, then select `black.box` VPN provider from the drop-down list as well as the required location (i.e. UK or US). Login with your `GUID` as both the username and password. In this mode, all traffic will be routed via the unencrypted VPN tunnel.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
