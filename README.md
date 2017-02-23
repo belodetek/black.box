@@ -3,7 +3,7 @@
 
 The device also includes a **free** 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com).
 
-Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays. Only devices in server mode need to have an active subscription or Bitcoin credits to work in pairing mode.
+Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them. Leave one at home/office and dial back in securely when travelling or on holidays.
 
 <p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
