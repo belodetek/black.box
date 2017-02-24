@@ -13,7 +13,7 @@ PayPal subscription or Bitcoin credit is required for un-blocking mode. The un-b
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
-For performance reasons, `black.box` only routes un-blocking traffic via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) goes out via the local Internet interface. For security reasons, the tunnel interface may only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
+For performance reasons, `black.box` only routes un-blocking traffic via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) goes out via the local Internet interface. For security reasons, the tunnel interface  only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
 
 ```
 +---------+         +-----------------+
