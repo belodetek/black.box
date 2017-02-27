@@ -1,7 +1,7 @@
 # about
-`black.box` is a Linux based VPN policy router and content un-blocker. It currently runs on a [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] and helps un-block popular Internet content on all devices, including tablets, smartphones, desktops, laptops and TVs. It includes two optional VPN obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+`black.box` is a Linux based VPN `policy router` and content `un-blocker`. It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN. It includes two optional obfuscation/cloaking modes (both SSH and SSL), to enable functioning in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
-The device also includes a **free**[[n9](#footnotes)] 3rd party VPN mode, supporting a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services.
+The device also supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services. VPN client mode is **free**, so no `black.box` subscription is required.
 
 Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them (pairing). Leave one at home/office and dial back in securely when travelling or on holidays. Pairing mode is **free**, so no `black.box` subscription is required.
 
@@ -13,7 +13,7 @@ PayPal subscription or Bitcoin credit is required for un-blocking mode. The un-b
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
-For performance reasons, `black.box` only routes un-blocking traffic via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface, while all the remaining traffic (e.g. google.com) goes out via the local Internet interface. For security reasons, the tunnel interface  only allows specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
+For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface. With `policy routing` enabled all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
 
 ```
 +---------+         +-----------------+
@@ -55,7 +55,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are available to be routed via the tunnel on [Dashboard](#dashboard). If the serice you require is missing please, email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it.
+A number of popular services are available to be routed via the tunnel on [Dashboard](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it. In the meantime, disable `policy routing` so all traffic is routed out the tunnel interface.
 
 Alternatively, set your device into `VPN` mode on the dashboard, then select `black.box` VPN provider from the drop-down list as well as the required location (i.e. UK or US). Login with your `GUID` as both the username and password. In this mode, all traffic will be routed via the unencrypted VPN tunnel.
 
@@ -85,14 +85,13 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 
 #### footnotes
 1. default ports: `80/tcp`, `443/tcp` and `53/udp`
-2. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s).
+2. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s) or turn the radio off and use in LAN router mode.
 3. [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) with an [Alfa Network AWUS036NEH](https://www.amazon.co.uk/dp/B003JTM9JY) USB Wi-Fi dongle will also work and may even provide better signal due to the external Wi-Fi antenna.
-4. For performance reasons, the tunnel interface provides no additional encryption overhead.
+4. For performance reasons, the tunnel interface provides no additional packet encryption/authentication overheads.
 5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
-8. Other supported (but untested) devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
-9. `black.box` VPN provider requires an active PayPal or Bitcoin subscription.
+8. Other supported, but currently un-tested devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
