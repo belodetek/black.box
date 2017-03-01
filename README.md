@@ -30,13 +30,13 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
 |         |         |                 |
 +---------+         |                 |
                     |                 |
-+---------+         |   Sling TV      |         +--------+
-|         |  Wi-Fi  |   Netflix       |   VPN   |        |
-|  OS X   | +-----> |   Hulu          | +-----> | VPN US +----+
-|         |         |   etc.          |         |        |    |
-+---------+         +-----------------+         +----+---+ UK |
-                                                     |        |
-                                                     +--------+
++---------+         |   Sling TV      |            +----------+
+|         |  Wi-Fi  |   Netflix       |   tunnel   |          |
+|  OS X   | +-----> |   Hulu          | +--------> | Exit US  +----+
+|         |         |   etc.          |            |          |    |
++---------+         +-----------------+            +-----+----+ UK |
+                                                        |          |
+                                                        +----------+
 ```
 
 # instructions
