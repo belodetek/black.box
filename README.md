@@ -96,7 +96,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
 8. Other supported, but currently un-tested devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
-9. Try disabling both `Policy Routing` and `Local DNS` on the dashboard if you are having issues with a particular service.
+9. Try disabling both `Policy Routing` and `Local DNS` on the dashboard if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
