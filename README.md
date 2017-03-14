@@ -7,7 +7,7 @@ The device also supports a number of popular VPN services, such as [PIA](https:/
 
 Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them (pairing). Leave one at home/office and dial back in securely when travelling or on holidays. Pairing mode is **free**, so no `black.box` subscription is required.
 
-<p align="center"><a href="http://black-box.belodedenko.me/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
+<p align="center"><a href="http://unzoner.com/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
 Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access a number of [blocked Internet content](#services) from anywhere in the world or to provide privacy and anonymity.
 
@@ -48,7 +48,7 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
 6. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status of the device
 7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
 8. when the dashboard lights up green, try accessing some previously blocked Internet content[[n9](#footnotes)]
-9. for issues, please email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
+9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
 
 # dashboard
 The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dashboard URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
@@ -58,7 +58,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are available to be routed via the tunnel on [Dashboard](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@belodedenko.me), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic is routed out the tunnel interface.
+A number of popular services are available to be routed via the tunnel on [Dashboard](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic is routed out the tunnel interface.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
