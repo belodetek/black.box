@@ -11,7 +11,7 @@ Multiple `black.box(es)` can be used not only to un-block content, but to also e
 
 Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access a number of [blocked Internet content](#services) from anywhere in the world or to provide privacy and anonymity.
 
-PayPal subscription or Bitcoin credit is required for un-blocking mode. The un-blocking service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 USD per month**.
+PayPal subscription or Bitcoin credit is required for un-blocking mode. The un-blocking service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 EUR per month**.
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
 
@@ -41,7 +41,7 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
-2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/resin-rpi3-1.24.1-2.8.3-eef8cf4afe02.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
+2. download and uncompress the [.img]() file, burn it to the SD card with `Etcher`, then insert the card into the Pi
 3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 4. after initial initialisation of around 15-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL (not the `resin.io` dashboard)[[n9](#footnotes)]
 5. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
