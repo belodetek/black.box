@@ -13,7 +13,7 @@ Devices connected to the `black.box` Wi-Fi network or routed via the device's Et
 
 PayPal subscription or Bitcoin credit is required for un-blocking mode. The un-blocking service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is currently **$9.95 EUR per month**.
 
-Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new USD/BTC exchange rate.
+Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on USD/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new EUR/BTC exchange rate.
 
 For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface. With `policy routing` enabled all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
 
