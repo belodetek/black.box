@@ -12,6 +12,7 @@
 8. when the dashboard lights up green, try accessing some previously blocked Internet content[[n9](#footnotes)]
 9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
 
+# information
 The device includes optional obfuscation/cloaking modes (SSH and SSL), to help function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
 The device also supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services. VPN client mode is **free**, so no `black.box` subscription is required.
@@ -56,7 +57,7 @@ The device dashboard is accessible by navigating to [black.box](http://blackbox.
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are available to be routed via the tunnel on [Dashboard](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic is routed out the tunnel interface.
+A number of popular services are available in policy routing mode on [Dashboard](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic goes via the tunnel interface.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
