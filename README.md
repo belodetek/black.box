@@ -1,13 +1,22 @@
 # about
 `black.box` is a Linux based VPN `policy router` and content `un-blocker`. It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
-It includes optional obfuscation/cloaking modes (SSH and SSL), to help function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+# instructions
+1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
+2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
+3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
+4. after initial initialisation of around 15-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL (not the `resin.io` dashboard)[[n9](#footnotes)]
+5. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
+6. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status of the device
+7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
+8. when the dashboard lights up green, try accessing some previously blocked Internet content[[n9](#footnotes)]
+9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
+
+The device includes optional obfuscation/cloaking modes (SSH and SSL), to help function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
 The device also supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services. VPN client mode is **free**, so no `black.box` subscription is required.
 
 Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them (pairing). Leave one at home/office and dial back in securely when travelling or on holidays. Pairing mode is **free**, so no `black.box` subscription is required.
-
-<p align="center"><a href="http://unzoner.com/#instructions"><strong>I've read enough, tell me what to do!</strong></a></p>
 
 Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access a number of [blocked Internet content](#services) from anywhere in the world or to provide privacy and anonymity.
 
@@ -38,17 +47,6 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
                                                         |          |
                                                         +----------+
 ```
-
-# instructions
-1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
-2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
-3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
-4. after initial initialisation of around 15-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL (not the `resin.io` dashboard)[[n9](#footnotes)]
-5. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
-6. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status of the device
-7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
-8. when the dashboard lights up green, try accessing some previously blocked Internet content[[n9](#footnotes)]
-9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
 
 # dashboard
 The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dashboard URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
