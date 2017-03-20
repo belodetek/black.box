@@ -7,10 +7,11 @@
 3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 4. after initial initialisation of around 15-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL (not the `resin.io` dashboard)[[n9](#footnotes)]
 5. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
-6. once subscribed, you will be redirected back to the [dashboard](#dashboard) where you can monitor the status of the device
-7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dashboard](#dashboard)
-8. when the dashboard lights up green, try accessing some previously blocked Internet content[[n9](#footnotes)]
-9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dashboard
+6. once subscribed, you will be redirected back to the [dash](#dashboard) where you can monitor the status of the device
+7. connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dash](#dashboard)
+8. when the dash lights up green, try accessing some previously blocked Internet content[[n9](#footnotes)]
+9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dash
+10. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
 
 # information
 The device includes optional obfuscation/cloaking modes (SSH and SSL), to help function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
@@ -50,14 +51,14 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
 ```
 
 # dashboard
-The device dashboard is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dashboard URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
+The device dash is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
 
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
-If multiple regions are available to un-block, click a country flag in the top right corner of the [dashboard](#dashboard). The device will re-boot with the new settings and un-block the selected country.
+If multiple regions are available to un-block, click a country flag in the top right corner of the [dash](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are available in policy routing mode on [Dashboard](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dashboard to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic goes via the tunnel interface.
+A number of popular services are available in policy routing mode on [dash](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dash to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic goes via the tunnel interface.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
@@ -67,21 +68,21 @@ Please visit PayPal to cancel your `black.box` subscription.
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `exit-node` in the target region and routes traffic through the tunnel.
 
-In `exit-node` mode, `black.box` devices advertise themselves to devices running in `client` mode. This mode is useful for deploying `black.box` exit nodes anywhere in the world with an Internet connection and a power socket. This (system) mode is not available via the dashboard.
+In `exit-node` mode, `black.box` devices advertise themselves to devices running in `client` mode. This mode is useful for deploying `black.box` exit nodes anywhere in the world with an Internet connection and a power socket. This (system) mode is not available via the dash.
 
 In `server` mode, the device advertises its private `GUID` and listens for incoming VPN connections from paired device(s). Device(s) in `paired` mode, which have specified the private `GUID` in their pairing configuration, connect to the `server` node. This mode is useful for establishing point to point links betwen two or more devices.
 
 In `VPN` mode, the device supports connecting to a number of popular VPN services, such as PIA and VPNArea.
 
-Finally, there is a `double-vpn` mode. Devices configured in this mode, both listen for incoming client connections, as well as establish a outbound connection to a down-stream VPN server. This (system) mode is not available via the dashboard.
+Finally, there is a `double-vpn` mode. Devices configured in this mode, both listen for incoming client connections, as well as establish a outbound connection to a down-stream VPN server. This (system) mode is not available via the dash.
 
 `black.box` devices run on [ResinOS](https://resinos.io/), using [resin.io](https://resin.io/) management back-end. OpenVPN 2.4 is used for building `black.box` VPN tunnels, whether encrypted or otherwise. OpenSSL is compiled with NEON support to accelerate certain cryptographic functions on the `ARMv7` CPUs and linked with OpenVPN. Stunnel and WANProxy are use for obfuscation and/or acceleration. You can expect to get anywhere from 5Mbit/s to 10Mbit/s through the Pi Ethernet interface in unblocking mode and less in VPN mode. VPN providers which use default SHA1 authentication should be a little faster, due to ARMv7 NEON optimisations.
 
 Python 2.7 is used for the main application, together with Linux Bash shell scripts to help interface with the operating system. All Python code is compiled into executables using Nuitka on dynamically provisioned Digital Ocean Droplets for both `armv7l` (QEMU) and `x86_64` architectures and shipped to devices in a secure manner, by first encrypting the payload using OpenSSL. Devices are managed using `resin.io` IoT infrastructure, which runs the `black.box` code inside Docker containers on custom ResinOS images. All runtime code is unpacked onto encrypted disk partitions inside Docker containers with all transient data stored in memory only and disk encryption keys never recorded. Source code for the main Python application is available at [https://github.com/ab77/black.box/tree/master/src](https://github.com/ab77/black.box/tree/master/src).
 
-Amazon AWS (EBS) is used to host both the `black.box` API and the device Dashboard, which are implemented in Python-Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, although technically something like Redis would be a better architectural choice.
+Amazon AWS (EBS) is used to host both the `black.box` API and the device dashboard, which are implemented in Python-Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, although technically something like Redis would be a better architectural choice.
 
-For subscriptions, the `black.box` API talks to the PayPal Subscriptions API to set-up monthly subscriptions. For Bitcoin payments, the BlockCypher API provides nesessary WebHooks to advise the `black.box` API when a payment has been received as well as a WebSocket notification for the Dashboard. No Bitcoin payment provider (middle-man) is used in the Bitcoin payment flow.
+For subscriptions, the `black.box` API talks to the PayPal Subscriptions API to set-up monthly subscriptions. For Bitcoin payments, the BlockCypher API provides nesessary WebHooks to advise the `black.box` API when a payment has been received as well as a WebSocket notification for the dashboard. No Bitcoin payment provider (middle-man) is used in the Bitcoin payment flow.
 
 Additional management VPS is used to provide `ipinfo` support services as well as execute automated headless video playback tests using  Selenium WebDriver wrapped in Python.
 
@@ -92,10 +93,10 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 4. For performance reasons, the tunnel interface provides no additional packet encryption/authentication overheads.
 5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
-7. The dashboard will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
+7. The dash will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
 8. Other supported, but currently un-tested devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
-9. Try disabling both `Policy Routing` and `Local DNS` on the dashboard if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
+9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
