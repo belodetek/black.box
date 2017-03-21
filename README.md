@@ -51,9 +51,9 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
 ```
 
 # dashboard
-The device dash is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
+Once the device is running, the dash is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
 
-![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
+[![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)](https://dashboard.unzoner.com/?guid=f69575a0ff60b57d482ab9e5fa68af196765140d35b68bfe7ec7ed8632abc4)
 
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dash](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
