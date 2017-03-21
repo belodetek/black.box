@@ -1,5 +1,5 @@
 # about
-`black.box` is a Linux based VPN `policy router` and content `un-blocker`. It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+`black.box` is a Linux based VPN `policy router` and content `un-blocker`. It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and other[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
@@ -94,7 +94,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dash will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
-8. Other supported, but currently un-tested devices include ODROID-XU4 and Intel NUC among [others](https://docs.resin.io/hardware/devices/). 
+8. Other supported devices include [ODROID-C1+](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143703355573) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odc1p.img.gz) and [ODROID-XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odxu4.img.gz) among [others](https://docs.resin.io/hardware/devices/).
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 
