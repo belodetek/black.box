@@ -3,7 +3,7 @@
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and install [Etcher](http://www.etcher.io/)[[n3](#footnotes)]
-2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi
+2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with `Etcher`, then insert the card into the Pi <img align="right" src="https://etcher.io/static/images/product.gif" width="300">
 3. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 4. after initial initialisation of around 15-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL (not the `resin.io` dashboard)[[n9](#footnotes)]
 5. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
@@ -63,7 +63,7 @@ A number of popular services are available in policy routing mode on [dash](#das
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
 
-![PayPal cancel subscription](https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png)
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="450">
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `exit-node` in the target region and routes traffic through the tunnel.
