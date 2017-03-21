@@ -65,15 +65,13 @@ Please visit PayPal to cancel your `black.box` subscription.
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="450">
 
 # technical architecture
-`black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `exit-node` in the target region and routes traffic through the tunnel.
+`black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
 
-In `exit-node` mode, `black.box` devices advertise themselves to devices running in `client` mode. This mode is useful for deploying `black.box` exit nodes anywhere in the world with an Internet connection and a power socket. This (system) mode is not available via the dash.
+In `server` mode, the device advertises its private `GUID` and listens for incoming VPN connections from paired device(s). Device(s) in `paired` mode, which have specified the private `GUID` in their configuration, locate and connect to the `server` node, while advertising a local Wi-Fi AP to all consumer devices within range. This mode is useful for establishing point to point links betwen two of more locations.
 
-In `server` mode, the device advertises its private `GUID` and listens for incoming VPN connections from paired device(s). Device(s) in `paired` mode, which have specified the private `GUID` in their pairing configuration, connect to the `server` node. This mode is useful for establishing point to point links betwen two or more devices.
+In `VPN` mode, the device supports connecting to a number of popular VPN services, such as [PIA](https://www.privateinternetaccess.com/), [VPNArea](https://vpnarea.com/) and [VanishedVPN](https://www.vanishedvpn.com.au/). Additional VPN providers can be easily integrated.
 
-In `VPN` mode, the device supports connecting to a number of popular VPN services, such as PIA and VPNArea.
-
-Finally, there is a `double-vpn` mode. Devices configured in this mode, both listen for incoming client connections, as well as establish a outbound connection to a down-stream VPN server. This (system) mode is not available via the dash.
+There are two more system modes the device can function in, namely `exit-node` and `double-vpn`. These are suitable for white-labelling of the `black.box` service and are not available via the dash. In `exit-node` mode, `black.box` devices advertise themselves to devices running in `client` mode. This mode is useful for deploying `black.box` exit-nodes anywhere in the world with an Internet connection and a power socket. In `double-vpn` mode, devices both listen for incoming VPN client connections, as well as establish a outbound connection to a down-stream VPN server.
 
 `black.box` devices run on [ResinOS](https://resinos.io/), using [resin.io](https://resin.io/) management back-end. OpenVPN 2.4 is used for building `black.box` VPN tunnels, whether encrypted or otherwise. OpenSSL is compiled with NEON support to accelerate certain cryptographic functions on the `ARMv7` CPUs and linked with OpenVPN. Stunnel and WANProxy are use for obfuscation and/or acceleration. You can expect to get anywhere from 5Mbit/s to 10Mbit/s through the Pi Ethernet interface in unblocking mode and less in VPN mode. VPN providers which use default SHA1 authentication should be a little faster, due to ARMv7 NEON optimisations.
 
