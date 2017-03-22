@@ -9,7 +9,7 @@
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
 5. once subscribed, you will be redirected back to the [dash](#dashboard) where you can monitor the status of the device
 6. when the dash lights up green, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dash](#dashboard)
-7. now try accessing some previously blocked Internet content[[n9](#footnotes)]
+7. now try accessing some previously blocked Internet content[[n10](#footnotes)]
 8. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dash
 9. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
 
