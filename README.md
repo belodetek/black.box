@@ -98,6 +98,10 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 
+```
+-- v1.0
+```
+
 <hr>
 <p align="center">&copy; 2016 <a href="http://ab77.github.io/">belodetek</a></p>
 <p align="center"><a href="http://anton.belodedenko.me/"><img src="https://avatars2.githubusercontent.com/u/2033996?v=3&s=50"></a></p>
