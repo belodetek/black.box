@@ -232,7 +232,13 @@ def main():
                         c_str = list()
                         result = {'status': 1, 'down': None, 'up': None}
                         log('run_speedtest: result=%r' % result)
-                        res = update_speedtest(guid=GUID, data=result)
+                        
+                        try:
+                            res = update_speedtest(data=result)
+                        except Exception as e:
+                            print repr(e)
+                            if DEBUG: print_exc()
+                            
                         log('update_speedtest(%r): %r' % (res[0], res[1]))
 
                     if DEBUG:
@@ -271,7 +277,12 @@ def main():
 
                         log('run_speedtest: result=%r' % result)
 
-                        res = update_speedtest(guid=GUID, data=result)
+                        try:
+                            res = update_speedtest(guid=GUID, data=result)
+                        except Exception as e:
+                            print repr(e)
+                            if DEBUG: print_exc()
+                            
                         log('update_speedtest(%r): %r' % (res[0], res[1]))
 
                         c_str = list()
@@ -348,10 +359,14 @@ def main():
 
                     if connected and not connecting:
                         if i % LOOP_CYCLE == 0:
-                            if not c_timer and dequeue_speedtest():
-                                c_timer = now
-                                c_str = list()
-                                (c_stq, c_stp) = run_speedtest(guid=GUID)
+                            try:
+                                if not c_timer and dequeue_speedtest():
+                                    c_timer = now
+                                    c_str = list()
+                                    (c_stq, c_stp) = run_speedtest()
+                            except Exception as e:
+                                print repr(e)
+                                if DEBUG: print_exc()
 
                             if c_timer:
                                 log('run_speedtest: pid=%r elapsed=%r results=%r' % (c_stp.pid, now - c_timer, len(c_str)))

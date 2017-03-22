@@ -15,7 +15,7 @@ from traceback import print_exc
 from config import (WORKDIR, DEBUG, TEMPDIR, CONN_TIMEOUT, MGMT_HOST,
                     DNS_SERVERS, DNS_HOST, THRESHOLD, PING_COUNT, PING_TIMEOUT,
                     TUN_IFACE, AF, TARGET_COUNTRY, DEVICE_TYPE, LOOP_TIMER,
-                    LOOP_CYCLE, ON_POSIX, DNS6_SERVERS)
+                    LOOP_CYCLE, ON_POSIX, DNS6_SERVERS, GUID)
 
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
@@ -204,7 +204,7 @@ def resolve_dns(host='us.%s' % DNS_HOST, record='A', family=4):
     
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
-def run_speedtest(guid=None):
+def run_speedtest(guid=GUID):
     server = '%s.1' % '.'.join(get_ip_address(TUN_IFACE).split('.')[:-1])
 
     cmd = ['/usr/bin/iperf', '--client', server,
