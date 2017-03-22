@@ -51,7 +51,7 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
 ```
 
 # dashboard
-Once the device is running, the dash is accessible by navigating to [black.box](http://blackbox.local/) URL while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
+Once the device is running, the dash is accessible by navigating to [http://blackbox.local/](http://blackbox.local/) while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
 
 A live demo dashboard is available [here](https://dashboard.unzoner.com/?guid=f69575a0ff60b57d482ab9e5fa68af196765140d35b68bfe7ec7ed8632abc4). The demo is connected to a device, which does not exist, so feel free to poke around.
 
