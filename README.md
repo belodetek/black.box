@@ -65,7 +65,7 @@ A number of popular services are available in policy routing mode on [dash](#das
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
 
-<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="550">
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="600">
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
