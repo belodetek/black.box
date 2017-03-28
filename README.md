@@ -15,7 +15,6 @@
   <link rel="manifest" href="/favicon/manifest.json">
   <meta name="msapplication-TileColor" content="#ffffff">
   <meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
-  <link rel="shortcut icon" type="image/x-icon" href="/favicons/favicon.ico">
   <meta name="theme-color" content="#ffffff">
 </head>
 
