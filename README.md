@@ -92,7 +92,7 @@ EOF
 
 cat << EOF > qemu-ifdown.sh
 #!/bin/bash
-ifconfig bridge1 deletem $1
+ifconfig bridge1 deletem \$1
 EOF
 
 chmod +x qemu-ifup.sh qemu-ifdown.sh
