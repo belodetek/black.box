@@ -1,6 +1,6 @@
 `black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and other[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
-> TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image
+> TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu-os-x) on Mac OS X
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://etcher.io/static/images/product.gif" hspace="5" vspace="10" width="250">
@@ -8,7 +8,7 @@
 3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL[[n9](#footnotes)]
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
 5. once subscribed, you will be redirected back to the [dash](#dashboard) where you can monitor the status of the device
-6. when the dash lights up green, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP as shown on the [dash](#dashboard)
+6. when the dash lights up green, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP (LAN mode) as shown on the [dash](#dashboard)
 7. now try accessing some previously blocked Internet content[[n10](#footnotes)]
 8. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dash
 9. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
@@ -67,6 +67,48 @@ Please visit PayPal to cancel your `black.box` subscription.
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="600">
 
+# qemu OS X
+If you don't have a compatible device, or waiting for one to arrive, you can use your Mac OS X with [QEMU](http://www.qemu-project.org/) to run `black.box`.
+
+1. install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
+```
+(brew install qemu || sudo port install qemu) && \
+  (brew install tuntap || sudo port install tuntaposx)
+```
+2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) fil and resize the image
+```
+mkdir -p ~/black.box && \
+  cd ~/black.box && \
+  qemu-img resize -f raw blackbox-qemux86_64.img +2G
+```
+3. under System Preferences > Network > Manage Virtual Interfaces, create `bridge1` and add Thunderbolt Ethernet
+4. create helper scripts, and mark executable
+```
+cat << EOF > qemu-ifup.sh
+#!/bin/bash
+ifconfig bridge1 addm \$1
+EOF
+
+cat << EOF > qemu-ifdown.sh
+#!/bin/bash
+ifconfig bridge1 deletem $1
+EOF
+
+chmod +x qemu-ifup.sh qemu-ifdown.sh
+```
+5. start QEMU
+```
+sudo qemu-system-x86_64 \
+  -nographic \
+  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw \
+  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//') \
+  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh \
+  -machine type=pc \
+  -m 1024 \
+  -smp 4
+```
+6. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
+
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
 
@@ -97,6 +139,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 8. Other supported devices include [Intel NUC](http://www.intel.com/content/www/us/en/nuc/overview.html), [ODROID-C1+](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143703355573) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odc1p.img.gz) and [ODROID-XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odxu4.img.gz) among [others](https://docs.resin.io/hardware/devices/). If you have a supported board, [request](mailto:blackbox@unzoner.com) an image.
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
+10. Issues with `avahi-daemon` under QEMU currently prevent `.local` name advertisement. You'll need to find the IP of your emulated `black.box` device from DHCP or similar.
 
 ```
 -- v1.0
