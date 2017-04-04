@@ -81,8 +81,9 @@ mkdir -p ~/black.box && \
   cd ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
-3. under System Preferences > Network > Manage Virtual Interfaces, create `bridge1` and add `Thunderbolt Ethernet` interface to it
+3. under `System Preferences > Network > Manage Virtual Interfaces`, create `bridge1` and add `Thunderbolt Ethernet` interface to it
 4. create helper scripts, and mark executable
+
 ```
 cat << EOF > qemu-ifup.sh
 #!/bin/bash
@@ -96,6 +97,7 @@ EOF
 
 chmod +x qemu-ifup.sh qemu-ifdown.sh
 ```
+
 5. start QEMU
 ```
 sudo qemu-system-x86_64 \
