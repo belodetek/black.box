@@ -75,13 +75,13 @@ If you don't have a compatible device, or waiting for one to arrive, you can use
 (brew install qemu || sudo port install qemu) && \
   (brew install tuntap || sudo port install tuntaposx)
 ```
-2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) fil and resize the image
+2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file and resize the image
 ```
 mkdir -p ~/black.box && \
   cd ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
-3. under System Preferences > Network > Manage Virtual Interfaces, create `bridge1` and add Thunderbolt Ethernet
+3. under `System Preferences > Network > Manage Virtual Interfaces`, create `bridge1` and add `Thunderbolt Ethernet` interface
 4. create helper scripts, and mark executable
 ```
 cat << EOF > qemu-ifup.sh
