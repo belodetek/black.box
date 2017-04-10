@@ -1,6 +1,6 @@
 `black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and other[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
-> TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu-os-x) on Mac OS X
+> TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://etcher.io/static/images/product.gif" hspace="5" vspace="10" width="250">
@@ -67,9 +67,10 @@ Please visit PayPal to cancel your `black.box` subscription.
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="600">
 
-# qemu OS X
-If you don't have a compatible device, or waiting for one to arrive, you can use your Mac OS X with [QEMU](http://www.qemu-project.org/) to run `black.box`.
+# qemu
+If you don't have a compatible device, or waiting for one to arrive, you can use your PC with [QEMU](http://www.qemu-project.org/) to run `black.box`.
 
+## Mac OS X
 1. install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
 ```
 (brew install qemu || sudo port install qemu) && \
@@ -110,6 +111,72 @@ sudo qemu-system-x86_64 \
   -smp 4
 ```
 6. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
+
+## Linux
+1. [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
+2. download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
+```
+mkdir -p ~/black.box && \
+  cd ~/black.box && \
+  qemu-img resize -f raw blackbox-qemux86_64.img +2G
+```
+3. create a bridged interface `br0` (see, https://wiki.debian.org/QEMU#Networking)
+4. create helper scripts, and mark executable
+```
+cat << EOF > qemu-ifup.sh
+qemu-ifup.sh
+#!/bin/bash
+ip tuntap add $1 mode tap user `whoami`
+ip link set $1 up
+sleep 0.5s
+ip link set $1 master br0
+EOF
+
+cat << EOF > qemu-ifdown.sh
+qemu-ifdown.sh
+#!/bin/bash
+ip link delete $1
+EOF
+
+chmod +x qemu-ifup.sh qemu-ifdown.sh
+```
+
+5. start QEMU
+```
+sudo qemu-system-x86_64 \
+  -nographic \
+  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw \
+  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//') \
+  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh \
+  -machine type=pc \
+  -m 1024 \
+  -smp 4
+```
+6. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
+
+## Linux (libvirt)
+1. [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
+2. download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
+```
+mkdir -p ~/black.box && \
+  cd ~/black.box && \
+  qemu-img resize -f raw blackbox-qemux86_64.img +2G
+```
+3. start QEMU
+```
+mkdir -p /etc/qemu
+echo "allow br0" > /etc/qemu/bridge.conf
+
+sudo qemu-system-x86_64 \
+  -nographic \
+  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw \
+  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//') \
+  -net bridge,br=br0 \
+  -machine type=pc \
+  -m 1024 \
+  -smp 4
+```
+4. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
