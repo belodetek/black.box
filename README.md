@@ -120,7 +120,7 @@ mkdir -p ~/black.box && \
   cd ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
-3. create a bridged interface `br0` (see, https://wiki.debian.org/QEMU#Networking)
+3. create a bridged interface `br0` (see, [https://wiki.debian.org/QEMU#Networking](https://wiki.debian.org/QEMU#Networking))
 4. create helper scripts, and mark executable
 
 ```
