@@ -164,6 +164,7 @@ mkdir -p ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
 3. start QEMU
+
 ```
 mkdir -p /etc/qemu
 echo "allow br0" > /etc/qemu/bridge.conf
@@ -177,6 +178,7 @@ sudo qemu-system-x86_64 \
   -m 1024 \
   -smp 4
 ```
+
 4. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
 
 # technical architecture
