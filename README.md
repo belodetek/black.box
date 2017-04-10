@@ -122,6 +122,7 @@ mkdir -p ~/black.box && \
 ```
 3. create a bridged interface `br0` (see, https://wiki.debian.org/QEMU#Networking)
 4. create helper scripts, and mark executable
+
 ```
 cat << EOF > qemu-ifup.sh
 qemu-ifup.sh
