@@ -211,7 +211,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 8. Other supported devices include [Intel NUC](http://www.intel.com/content/www/us/en/nuc/overview.html), [ODROID-C1+](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143703355573) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odc1p.img.gz) and [ODROID-XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odxu4.img.gz) among [others](https://docs.resin.io/hardware/devices/). If you have a supported board, [request](mailto:blackbox@unzoner.com) an image.
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
-10. Issues with `avahi-daemon` under QEMU currently prevent `.local` name advertisement. You'll need to find the IP of your emulated `black.box` device from DHCP or similar.
+10. Issues with `avahi-daemon` under QEMU may prevent `.local` name advertisement. If this is the case, you'll need to find the IP of your emulated `black.box` device from DHCP or similar.
 
 ```
 -- v1.0
