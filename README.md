@@ -110,7 +110,7 @@ sudo qemu-system-x86_64 \
   -m 1024 \
   -smp 4
 ```
-6. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
+6. carry on from step [#3](#instructions) in LAN mode
 
 ## Linux
 1. [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
@@ -153,7 +153,7 @@ sudo qemu-system-x86_64 \
   -m 1024 \
   -smp 4
 ```
-6. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
+6. carry on from step [#3](#instructions) in LAN mode
 
 ## Linux (libvirt)
 1. [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
@@ -179,7 +179,7 @@ sudo qemu-system-x86_64 \
   -smp 4
 ```
 
-4. carry on from step [#3](#instructions) in LAN mode[[n10](#footnotes)]
+4. carry on from step [#3](#instructions) in LAN mode
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
