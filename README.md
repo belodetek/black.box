@@ -5,7 +5,7 @@
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://etcher.io/static/images/product.gif" hspace="5" vspace="10" width="250">
 2. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
-3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)], visit [http://blackbox.local/](http://blackbox.local/) URL[[n9](#footnotes)]
+3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n11]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) URL[[n9](#footnotes)]
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
 5. once subscribed, you will be redirected back to the [dash](#dashboard) where you can monitor the status of the device
 6. when the dash lights up green, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP (LAN mode) as shown on the [dash](#dashboard)
@@ -212,6 +212,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 10. Issues with `avahi-daemon` under QEMU may prevent `.local` name advertisement. If this is the case, you'll need to find the IP of your emulated `black.box` device from DHCP or similar.
+11. Not all SD cards are created equal, see http://www.pidramble.com/wiki/benchmarks/microsd-cards and get a fast one.
 
 ```
 -- v1.0
