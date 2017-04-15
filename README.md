@@ -5,11 +5,11 @@
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://etcher.io/static/images/product.gif" hspace="5" vspace="10" width="250">
 2. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
-3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n11]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) URL[[n9](#footnotes)]
+3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n10]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) URL
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
 5. once subscribed, you will be redirected back to the [dash](#dashboard) where you can monitor the status of the device
 6. when the dash lights up green, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP (LAN mode) as shown on the [dash](#dashboard)
-7. now try accessing some previously blocked Internet content[[n10](#footnotes)]
+7. now try accessing some previously blocked Internet content[[n9](#footnotes)]
 8. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dash
 9. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
 
@@ -205,14 +205,13 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 2. The radio in the Pi is weak, please try to locate as close as possible to the streaming device(s) or turn the radio off and use in LAN router mode.
 3. [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) with an [Alfa Network AWUS036NEH](https://www.amazon.co.uk/dp/B003JTM9JY) USB Wi-Fi dongle will also work and may even provide better signal due to the external Wi-Fi antenna.
 4. For performance reasons, the tunnel interface provides no additional packet encryption/authentication overheads.
-5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.boxes` on your LAN, the second device will be called `blackbox-1.local`, the third `blackbox-2.local` and so on. Maximum 5 devices supported.
+5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.box` devices on your LAN, the second device will be called `blackbox-2.local`, the third `blackbox-3.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dash will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
 8. Other supported devices include [Intel NUC](http://www.intel.com/content/www/us/en/nuc/overview.html), [ODROID-C1+](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143703355573) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odc1p.img.gz) and [ODROID-XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odxu4.img.gz) among [others](https://docs.resin.io/hardware/devices/). If you have a supported board, [request](mailto:blackbox@unzoner.com) an image.
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
-10. Issues with `avahi-daemon` under QEMU may prevent `.local` name advertisement. If this is the case, you'll need to find the IP of your emulated `black.box` device from DHCP or similar.
-11. Not all SD cards are created equal, see [microSD Card Benchmarks](http://www.pidramble.com/wiki/benchmarks/microsd-cards) and get a fast one.
+10. Not all SD cards are created equal, see [microSD Card Benchmarks](http://www.pidramble.com/wiki/benchmarks/microsd-cards) and get a fast one.
 
 ```
 -- v1.0
