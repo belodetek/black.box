@@ -212,7 +212,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 8. If you've plugged in your HDMI cable during the build, you can safely un-plug it now as the device operates in headless mode.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 10. Issues with `avahi-daemon` under QEMU may prevent `.local` name advertisement. If this is the case, you'll need to find the IP of your emulated `black.box` device from DHCP or similar.
-11. Not all SD cards are created equal, see http://www.pidramble.com/wiki/benchmarks/microsd-cards and get a fast one.
+11. Not all SD cards are created equal, see [microSD Card Benchmarks](http://www.pidramble.com/wiki/benchmarks/microsd-cards) and get a fast one.
 
 ```
 -- v1.0
