@@ -181,6 +181,9 @@ sudo qemu-system-x86_64 \
 
 4. carry on from step [#3](#instructions) in LAN mode
 
+# DD-WRT
+Support for [DD-WRT](http://flashrouters.com) flashed routers is coming soon. 
+
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
 
