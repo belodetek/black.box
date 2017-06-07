@@ -182,7 +182,13 @@ sudo qemu-system-x86_64 \
 4. carry on from step [#3](#instructions) in LAN mode
 
 # DD-WRT
-Support for [DD-WRT](http://flashrouters.com) flashed routers is coming soon. 
+Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development. To preview, obtain a router with the latest `DD-WRT` firmware, navigate to `Administration -> Commands` page and run
+```
+cd /tmp/root && curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/install/blackbox | sh
+```
+
+# Tomato
+Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
