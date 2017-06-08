@@ -184,7 +184,7 @@ sudo qemu-system-x86_64 \
 # DD-WRT
 Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development. To preview, obtain a router with the latest `DD-WRT` firmware, navigate to `Administration -> Commands` page and run
 ```
-cd /tmp/root && curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/install/blackbox | sh
+curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/install/blackbox | sh
 ```
 
 # Tomato
