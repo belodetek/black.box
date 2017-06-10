@@ -182,10 +182,13 @@ sudo qemu-system-x86_64 \
 4. carry on from step [#3](#instructions) in LAN mode
 
 # DD-WRT
-Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development. To preview, obtain a router with the latest `DD-WRT` firmware, navigate to `Administration -> Commands` page and run
+Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development. To preview:
+* obtain a router with the latest `DD-WRT` firmware
+* navigate to `Administration -> Commands` page and run
 ```
 curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/group/default/provider/blackbox/install | sh
 ```
+* navigate to `Status -> MyPage`, sign-up and connect
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
