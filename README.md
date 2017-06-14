@@ -190,6 +190,8 @@ Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd
 curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/group/default/provider/blackbox/install | sh
 ```
 
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
+
 3. enable `Native IPv6 from ISP` under `Setup -> IPv6`
 4. navigate to `Status -> MyPage`, sign-up and connect
 
