@@ -182,7 +182,11 @@ sudo qemu-system-x86_64 \
 4. carry on from step [#3](#instructions) in LAN mode
 
 # DD-WRT
-Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development. To preview:
+Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development.
+
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
+
+To install the preview:
 1. obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware
 2. navigate to `Administration -> Commands` page and run
 
@@ -192,8 +196,6 @@ curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/group/default/provider/bl
 
 3. enable `Native IPv6 from ISP` under `Setup -> IPv6`
 4. navigate to `Status -> MyPage`, sign-up and connect
-
-<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
