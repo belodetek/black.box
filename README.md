@@ -3,7 +3,7 @@
 > TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC
 
 # instructions
-1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://etcher.io/static/screenshot.gif" hspace="5" vspace="10" width="250">
+1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
 2. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n10]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) URL
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement[[n11](#footnotes)] and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
