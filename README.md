@@ -187,7 +187,7 @@ Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
 
 To install the preview:
-1. obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware
+1. obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware (`cURL` and `OpenVPN v2.4` are required to be present in the DD-WRT firmware)
 2. navigate to `Administration -> Commands` page and run
 
 ```
