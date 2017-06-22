@@ -8,7 +8,7 @@ from inspect import stack
 from time import sleep, time
 from Queue import Empty
 
-from common import retry, log
+from common import (retry, log)
 
 from api import (get_alpha, get_node_by_guid, get_node_by_country,
                  dequeue_speedtest, update_speedtest)
@@ -22,10 +22,9 @@ from vpn import (OPENVPN_BINARY, OPENVPN_VERSION, log_server_stats,
                  enqueue_output, disconnect_clients)
 
 from config import (POLL_FREQ, DEVICE_TYPE, GUID, THRESHOLD, DEBUG, UPNP,
-                    VPN_TCP_MGMT_PORT, LOOP_CYCLE, LOOP_TIMER, TUN_PROTO,
-                    TUN_MGMT, CIPHER, AUTH, SUPPRESS_TS, MGMT_IFACE, AF, AP,
-                    BITCOIN_PAYMENT_CHECK, SERVER_DEVICE_TYPES, DNS_SUB_DOMAIN,
-                    CLIENT_DEVICE_TYPES, LISTEN_ADDR, PORT)
+                    LOOP_CYCLE, LOOP_TIMER, TUN_PROTO, TUN_MGMT, SUPPRESS_TS,
+                    MGMT_IFACE, AF, AP, BITCOIN_PAYMENT_CHECK, TARGET_COUNTRY,
+                    SERVER_DEVICE_TYPES, DNS_SUB_DOMAIN, CLIENT_DEVICE_TYPES)
 
 
 def main():
@@ -50,6 +49,8 @@ def main():
     c_str = list()
     c_stq = None
     c_stp = None
+    c_remote = None
+    c_country = TARGET_COUNTRY
     w_clnts = 0
     started = [False, False] # [udp, tcp]
     starting = [False, False]
@@ -76,6 +77,10 @@ def main():
 
     if bool(re.search('^2.4.', OPENVPN_VERSION)):
         p2 = re.compile('^.*ifconfig ([\w\d]+) ([\d]+\.[\d]+\.[\d]+\.[\d]+) pointopoint ([\d]+\.[\d]+\.[\d]+\.[\d]+) mtu [\d]+$')
+
+    if DEVICE_TYPE == 5:
+        p2 = re.compile('^.*get_ping_host: route_network_[0-9]+=([\d]+\.[\d]+\.[\d]+\.[\d]+)$')
+        p3 = re.compile('^.*remote=(.*) country=(.*)$')
 
     mgmt_ipaddr = None
     if TUN_MGMT: mgmt_ipaddr = get_ip_address(MGMT_IFACE)
@@ -130,16 +135,17 @@ def main():
                                 if DEBUG: print_exc()
                                 pass
 
-                        if s_msg[idx] and p2.search(s_msg[idx]):
-                            m = p2.search(s_msg[idx]).groups()
-                            if len(m) == 3:
-                                dev = m[0]
-                                s_local[idx] = m[1]
-                                s_peer = m[2]
-                                log('%r: iface=%r local=%r peer=%r proto=%r' % (stack()[0][3],
-                                                                                dev, s_local[idx],
-                                                                                s_peer, proto))
-                                
+                        try:
+                            m2 = p2.search(s_msg[idx]).groups()
+                            dev = m2[0]
+                            s_local[idx] = m2[1]
+                            s_peer = m2[2]
+                            log('%r: iface=%r local=%r peer=%r proto=%r' % (stack()[0][3],
+                                                                            dev, s_local[idx],
+                                                                            s_peer, proto))
+                        except (TypeError, AttributeError):
+                            pass
+
                         if not started[idx] and starting[idx]:
                             if i % LOOP_CYCLE == 0 and not started[idx]:
                                 log('%r: started=%r starting=%r proto=%r s_pid=%r' % (stack()[0][3], started[idx],
@@ -192,15 +198,14 @@ def main():
                                 except AssertionError as e:
                                     print repr(e)
                                     if DEBUG: print_exc()
-
-                        if started[idx] and s_loss[idx] > THRESHOLD:
-                            log('%r: proto=%r s_local=%r s_loss=%r' % (stack()[0][3],
-                                                                       proto, s_local[idx],
-                                                                       s_loss[idx]))
-                            started[idx] = False
-                            starting[idx] = False
-                            s_proc[idx].terminate()
-                            s_loss[idx] = 0
+                                    log('%r: proto=%r s_local=%r s_loss=%r' % (stack()[0][3],
+                                                                               proto, s_local[idx],
+                                                                               s_loss[idx]))
+                                    started[idx] = False
+                                    starting[idx] = False
+                                    s_proc[idx].terminate()
+                                    s_loss[idx] = 0
+                                    break
 
                         if not (DEBUG and s_stderrq[idx]) and not s_stdoutq[idx]:
                             sleep(LOOP_TIMER)
@@ -232,15 +237,15 @@ def main():
                         c_str = list()
                         result = {'status': 1, 'down': None, 'up': None}
                         log('run_speedtest: result=%r' % result)
-                        
+
                         try:
                             res = update_speedtest(data=result)
+                            log('update_speedtest(%r): %r' % (res[0], res[1]))
                         except Exception as e:
                             print repr(e)
                             if DEBUG: print_exc()
+                            pass
                             
-                        log('update_speedtest(%r): %r' % (res[0], res[1]))
-
                     if DEBUG:
                         c_lineerr = None
                         if c_stderrq:
@@ -278,12 +283,12 @@ def main():
                         log('run_speedtest: result=%r' % result)
 
                         try:
-                            res = update_speedtest(guid=GUID, data=result)
+                            res = update_speedtest(data=result)
+                            log('update_speedtest(%r): %r' % (res[0], res[1]))
                         except Exception as e:
                             print repr(e)
                             if DEBUG: print_exc()
-                            
-                        log('update_speedtest(%r): %r' % (res[0], res[1]))
+                            pass
 
                         c_str = list()
                         c_timer = 0
@@ -315,24 +320,35 @@ def main():
                         connecting = False
 
                         try:
-                            log_client_stats(status=connected)
+                            log_client_stats(status=connected, country=c_country)
                         except Exception as e:
                             print repr(e)
                             if DEBUG: print_exc()
                             pass
 
-                    if c_msg and p2.search(c_msg):
-                        m = p2.search(c_msg).groups()
-                        if len(m) == 3:
-                            dev = m[0]
-                            c_local = m[1]
-                            c_peer = m[2]
-                            c_gwip = c_peer.split('.')
-                            c_gwip[3] = '1'
-                            c_gwip = '.'.join(c_gwip)
-                            log('%r: iface=%r local=%r peer=%r gwip=%r family=%r' % (stack()[0][3],
-                                                                                     dev, c_local,
-                                                                                     c_peer, c_gwip, AF))
+                    try:
+                        m2 = p2.search(c_msg).groups()
+                        dev = m2[0]
+                        c_local = m2[1]
+                        c_peer = m2[2]
+                        c_gwip = c_peer.split('.')
+                        c_gwip[3] = '1'
+                        c_gwip = '.'.join(c_gwip)
+                        log('%r: iface=%r local=%r peer=%r gwip=%r family=%r' % (stack()[0][3],
+                                                                                 dev, c_local,
+                                                                                 c_peer, c_gwip, AF))
+                    except (TypeError, AttributeError):
+                        pass
+                    
+                    if DEVICE_TYPE == 5:
+                        try:
+                            m3 = p3.search(c_msg).groups()
+                            c_remote = m3[0]
+                            c_country = m3[1]
+                            log('%r: remote=%r country=%r' % (stack()[0][3],
+                                                              c_remote, c_country))
+                        except (TypeError, AttributeError):
+                            pass
 
                     if not connected and connecting:
                         if i % LOOP_CYCLE == 0 and not connected:
@@ -378,18 +394,17 @@ def main():
                             except AssertionError as e:
                                 print repr(e)
                                 if DEBUG: print_exc()
-
-                    if connected and c_loss > THRESHOLD:
-                        log('%r: c_gwip=%r c_loss=%r' % (stack()[0][3], c_gwip, c_loss))
-                        connected = False
-                        connecting = False
-                        c_proc.terminate()
-                        c_loss = 0
-                        c_pid = None
+                                log('%r: c_gwip=%r c_loss=%r' % (stack()[0][3], c_gwip, c_loss))
+                                connected = False
+                                connecting = False
+                                c_proc.terminate()
+                                c_loss = 0
+                                c_pid = None
+                                break
 
                     if i % LOOP_CYCLE == 0:
                         try:
-                            log_client_stats(status=connected)
+                            log_client_stats(status=connected, country=c_country)
                         except Exception as e:
                             print repr(e)
                             if DEBUG: print_exc()

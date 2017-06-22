@@ -12,22 +12,24 @@ from Queue import Queue
 import auth, nuitka
 from common import retry, log
 
+from paypal import get_jwt_payload_from_paypal
+
 from api import (put_device, get_node_by_country, get_node_by_guid, get_alpha,
                  get_guid_by_public_ipaddr, get_device_env_by_name)
 
 from utils import (enqueue_output, resolve_dns, get_stations, run_shell_cmd,
                    run_background_shell_cmd, get_geo_location,
-                   run_shell_cmd_nowait, recv_with_timeout)
+                   run_shell_cmd_nowait, recv_with_timeout, decode_jwt_payload)
 
 from config import (WORKDIR, DEBUG, TEMPDIR, DNS_SUB_DOMAIN, CONN_TIMEOUT,
                     VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT, VPN_HOST, DEVICE_TYPE,
-                    GEOIP_OVERRIDE, LOG_SERVER_STATS, LOG_CLIENT_STATS,
-                    DOCKER_SSH_PORT, WAN_PROXY, CLIENT_DEVICE_TYPES,
-                    TARGET_COUNTRY, SERVER_DEVICE_TYPES, ADDRESS_FAMILIES,
+                    GEOIP_OVERRIDE, LOG_SERVER_STATS, LOG_CLIENT_STATS, AP,
+                    DOCKER_SSH_PORT, WAN_PROXY, CLIENT_DEVICE_TYPES, UPNP, AF,
+                    TARGET_COUNTRY, SERVER_DEVICE_TYPES, AF_INETS, SKIP_DNS,
                     TUN_PROTO, PAIRED_DEVICE_GUID, CLIENT_CONFIG, ON_POSIX,
                     DNS_HOST, STUNNEL, WAN_PROXY, CIPHER, AUTH, TUN_IFACE_UDP,
-                    TUN_IFACE_TCP, TUN_IFACE, TUN_MTU, FRAGMENT, OPENVPN_BINARY,
-                    VPN_USERNAME, VPN_PROVIDER, VPN_LOCATION, VPN_PASSWD, AF,
+                    TUN_IFACE_TCP, TUN_IFACE, TUN_MTU, FRAGMENT, VPN_LOCATION_GROUP,
+                    VPN_USERNAME, VPN_PROVIDER, VPN_LOCATION, VPN_PASSWD,
                     OPENVPN_VERSION, OPENVPN_BINARY, GUID, DATADIR)
 
 
@@ -162,7 +164,21 @@ def connect_node(family=AF):
     cmd = [OPENVPN_BINARY, '--config', CLIENT_CONFIG, '--dev', TUN_IFACE]
     port = '1194'
 
-    if DEVICE_TYPE in CLIENT_DEVICE_TYPES and not DEVICE_TYPE == 5:
+    ############
+    # VPN mode #
+    ############
+    if DEVICE_TYPE == 5 or (DEVICE_TYPE == 3 \
+                            and VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
+                            and VPN_USERNAME and VPN_PASSWD):
+        
+        log('%r: mode=%r provider=%r group=%r location=%r username=%r password=%r' % (stack()[0][3], DEVICE_TYPE,
+                                                                                      VPN_PROVIDER, VPN_LOCATION_GROUP, VPN_LOCATION,
+                                                                                      VPN_USERNAME, VPN_PASSWD))
+
+        assert VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
+               and VPN_USERNAME and VPN_PASSWD
+   
+    else:
         #########################
         # pairing mode override #
         #########################
@@ -180,7 +196,7 @@ def connect_node(family=AF):
         # unblocking mode #
         ###################
         else:
-            if family == 6:
+            if family == 6 and not SKIP_DNS:
                 try:
                     # try DNS resolution (IPv6)
                     country = get_alpha(TARGET_COUNTRY).lower()
@@ -194,16 +210,17 @@ def connect_node(family=AF):
                     if DEBUG: print_exc()
                     pass
 
-            try:
-                # try DNS resolution (IPv4)
-                country = get_alpha(TARGET_COUNTRY).lower()
-                host = '%s.%s' % (country, DNS_HOST)
-                ipaddr = resolve_dns(host=host, record=qtype, family=family)
-                assert ipaddr
-            except Exception as e:
-                log('resolve_dns: e=%r qtype=%r family=%r' % (repr(e), qtype, family))
-                if DEBUG: print_exc()
-                pass
+            if family == 4 and not SKIP_DNS:
+                try:
+                    # try DNS resolution (IPv4)
+                    country = get_alpha(TARGET_COUNTRY).lower()
+                    host = '%s.%s' % (country, DNS_HOST)
+                    ipaddr = resolve_dns(host=host, record=qtype, family=family)
+                    assert ipaddr
+                except Exception as e:
+                    log('resolve_dns: e=%r qtype=%r family=%r' % (repr(e), qtype, family))
+                    if DEBUG: print_exc()
+                    pass
 
             log('%r: qtype=%r country=%r host=%r ipaddr=%r' % (stack()[0][3],
                                                                qtype, country,
@@ -222,14 +239,15 @@ def connect_node(family=AF):
                         qtype = 'A'
                         pass
 
-                try:
-                    # fall-back to API (IPv4)
-                    ipaddr = get_node_by_country(family=family)
-                    log('get_node_by_country: ipaddr=%r af=%r' % (ipaddr, family))
-                except AssertionError as e:
-                    log('get_node_by_country: e=%r af=%r' % (repr(e), family))
-                    if DEBUG: print_exc()
-                    pass
+                if family == 4:
+                    try:
+                        # fall-back to API (IPv4)
+                        ipaddr = get_node_by_country(family=family)
+                        log('get_node_by_country: ipaddr=%r af=%r' % (ipaddr, family))
+                    except AssertionError as e:
+                        log('get_node_by_country: e=%r af=%r' % (repr(e), family))
+                        if DEBUG: print_exc()
+                        pass
             
         assert ipaddr
 
@@ -290,19 +308,9 @@ def connect_node(family=AF):
         cmd.append('--auth')
         cmd.append(AUTH)
 
-    ############
-    # VPN mode #
-    ############
-    else:
-        log('%r: mode=%r provider=%r location=%r username=%r password=%r' % (stack()[0][3], DEVICE_TYPE,
-                                                                             VPN_PROVIDER, VPN_LOCATION,
-                                                                             VPN_USERNAME, VPN_PASSWD))
-
-        assert VPN_PROVIDER and VPN_LOCATION and VPN_USERNAME and VPN_PASSWD
-   
-    log('%r: ipaddr=%r af=%r qtype=%r proto=%r port=%r country=%r guid=%r provider=%r location=%r username=%r ' % (stack()[0][3],ipaddr, family, qtype, tun_proto, port,
-                                                                                                                   TARGET_COUNTRY, PAIRED_DEVICE_GUID,
-                                                                                                                   VPN_PROVIDER, VPN_LOCATION, VPN_USERNAME))
+    log('%r: ipaddr=%r af=%r qtype=%r proto=%r port=%r country=%r guid=%r provider=%r group=%r location=%r username=%r ' % (stack()[0][3],ipaddr, family, qtype, tun_proto, port,
+                                                                                                                            TARGET_COUNTRY, PAIRED_DEVICE_GUID, VPN_PROVIDER,
+                                                                                                                            VPN_LOCATION_GROUP, VPN_LOCATION, VPN_USERNAME))
 
     if DEBUG: print '%r: cmd=%r' % (stack()[0][3], cmd)
     p = Popen(cmd, stdout=PIPE, stderr=PIPE, bufsize=1, close_fds=ON_POSIX, env=env)
@@ -427,7 +435,12 @@ def get_load_stats(host=VPN_HOST, port=VPN_UDP_MGMT_PORT):
         load_stats = run_openvpn_mgmt_cmd(host=host, port=port, cmd='load-stats')
         p = re.compile('^SUCCESS: nclients=([\d]+),bytesin=([\d]+),bytesout=([\d]+)$')
         m = p.search(load_stats[0])
-        stats = m.groups()
+        
+        try:
+            stats = m.groups()
+        except Exception:
+            pass
+
     except Exception as e:
         print repr(e)
         if DEBUG: print_exc()
@@ -508,10 +521,31 @@ def reauthenticate_clients():
         killed = list()
         print '%r: count=%r clients=%r' % (stack()[0][3], count, len(clients))
         for client in clients:
-            password = get_device_env_by_name(guid=client, name='TUN_PASSWD')
-            assert password
-            print 'get_device_env_by_name: client=%r password=%r' % (client, password)
+            # password check (resin.io Data API)
+            jwtoken = None
+            try:
+                password = get_device_env_by_name(guid=client, name='TUN_PASSWD')[:16]
+                assert password
+            except Exception as e:
+                print repr(e)
+                if DEBUG: print_exc()
+                
+                # authenticate against JWT recorded against PayPal billing agreement
+                try:
+                    jwtoken = decode_jwt_payload(encoded=get_jwt_payload_from_paypal(baid=client))
+                    password = jwtoken['p'][:16]
+                    assert password
+                except Exception as e:
+                    print repr(e)
+                    if DEBUG: print_exc()
+                    password = None
+                    pass
+                pass
+
+            if not password: break
+
             result = auth.authenticate(username=client, password=password)
+            print 'get_device_env_by_name: client=%r password=%r' % (client, password)
             if not result and client != 'UNDEF':
                 for port in [VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT]:    
                     try:
@@ -528,12 +562,12 @@ def reauthenticate_clients():
         count = count + 1
 
 
-def log_client_stats(status=False):
+def log_client_stats(status=False, country=TARGET_COUNTRY):
     if LOG_CLIENT_STATS:
-        for family in ADDRESS_FAMILIES:
+        for family in AF_INETS:
             data = get_geo_location(family=family)
             if not data: break
-            
+
             # 1 = up
             # 0 = down
             data['status'] = sum([int(el) for el in [status]])
@@ -541,7 +575,11 @@ def log_client_stats(status=False):
             data['bytesin'] = 0
             data['bytesout'] = 0
             data['conns'] = 0
-            
+            data['hostapd'] = AP
+
+            if DEVICE_TYPE == 5:
+                data['country'] = country
+                
             if GEOIP_OVERRIDE:
                 log('%r: country=%r' % (stack()[0][3], GEOIP_OVERRIDE))
                 data['country'] = GEOIP_OVERRIDE
@@ -572,7 +610,7 @@ def log_client_stats(status=False):
 
 def log_server_stats(status=[False, False]):
     if LOG_SERVER_STATS:
-        for family in ADDRESS_FAMILIES:
+        for family in AF_INETS:
             data = get_geo_location(family=family)
             if not data: break
 
@@ -584,7 +622,10 @@ def log_server_stats(status=[False, False]):
             data['conns'] = 0        
             data['bytesin'] = 0
             data['bytesout'] = 0
-            
+            data['cipher'] = CIPHER
+            data['auth'] = AUTH
+            data['upnp'] = UPNP
+
             if GEOIP_OVERRIDE:
                 log('%r: country=%r' % (stack()[0][3], GEOIP_OVERRIDE))
                 data['country'] = GEOIP_OVERRIDE
@@ -715,9 +756,6 @@ def kill_remote_pid(ipaddr=None, family=4, pid=None, ssh_port=DOCKER_SSH_PORT):
         remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
         assert remote_guid
         if DEBUG: print 'get_guid_by_public_ipaddr: ipaddr=%r family=%r remote_guid=%r' % (ipaddr, family, remote_guid)
-        
-        resin = auth_device(remote_guid)
-        if DEBUG: print 'auth_device: resin=%r' % resin
 
     result = None
     if pid and WAN_PROXY == 'SSH':

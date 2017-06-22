@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, socket, fcntl, struct, re, json
-import dns.resolver
+import os, socket, fcntl, struct, re, json, jwt, dns.resolver
 from time import time, sleep
 from ping import quiet_ping
 from inspect import stack
@@ -221,3 +220,25 @@ def run_speedtest(guid=GUID):
     thread.start()
 
     return queue, p
+
+
+@retry(Exception, cdata='method=%s()' % stack()[0][3])
+def decode_jwt_payload(encoded=None):
+    payload = dict()
+    try:
+        hdr = jwt.encode({}, '', algorithm='HS256').split('.')[0]
+        sig = jwt.encode({}, '', algorithm='HS256').split('.')[2]
+        payload = jwt.decode('%s.%s.%s' % (hdr, encoded, sig), verify=False)
+        if DEBUG: print '%r: hdr=%r sig=%r payload=%r' % (stack()[0][3], hdr, sig, payload)
+    except Exception as e:
+        print repr(e)
+        if DEBUG: print_exc()
+
+    try:
+        payload['u'] = socket.inet_ntoa(struct.pack('!L', int(payload['u'])))
+    except Exception as e:
+        print repr(e)
+        if DEBUG: print_exc()
+        pass
+    
+    return payload

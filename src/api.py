@@ -48,7 +48,7 @@ def get_node_by_guid(family=AF, guid=PAIRED_DEVICE_GUID):
 
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
-def get_device_env_by_name(guid=None, name=None, default=None):
+def get_device_env_by_name(guid=GUID, name=None, default=None):
     headers = {'X-Auth-Token': API_SECRET}
     res = requests.get('%s/api/v%s/device/%s/env/%s' % (API_HOST, API_VERSION,
                                                         guid, name),
@@ -58,21 +58,6 @@ def get_device_env_by_name(guid=None, name=None, default=None):
     
     if res.status_code == 200:
         return res.content
-
-    return default
-
-
-@retry(Exception, cdata='method=%s()' % stack()[0][3])
-def auth_device(guid=None, default=False):
-    headers = {'X-Auth-Token': API_SECRET}
-    res = requests.get('%s/api/v%s/device/%s' % (API_HOST, API_VERSION,
-                                                 guid),
-                       headers=headers)
-
-    if DEBUG: print '%s: %s' % (stack()[0][3], res)
-    
-    if res.status_code == 200:
-        return True
 
     return default
 
@@ -111,10 +96,10 @@ def get_guid_by_public_ipaddr(ipaddr=None, family=4):
 
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
-def put_device(family=AF, data=None):
+def put_device(family=AF, data=None, guid=GUID):
     headers = {'X-Auth-Token': API_SECRET}
     res = requests.put('%s/api/v%s/device/%s/%s/%d' % (API_HOST, API_VERSION,
-                                                       DEVICE_TYPE, GUID, family),
+                                                       DEVICE_TYPE, guid, family),
                        data=json.dumps(data), headers=headers)
 
     if DEBUG: print '%s: %s' % (stack()[0][3], res)
@@ -129,7 +114,7 @@ def put_device(family=AF, data=None):
 def dequeue_speedtest(guid=GUID, data=None):
     result = False
     headers = {'X-Auth-Token': API_SECRET}
-    res = requests.head('%s/api/v%s/speedtest/%s' % (API_HOST, API_VERSION, GUID),
+    res = requests.head('%s/api/v%s/speedtest/%s' % (API_HOST, API_VERSION, guid),
                         headers=headers)
 
     if DEBUG: print '%s: %s' % (stack()[0][3], res)
@@ -142,7 +127,7 @@ def dequeue_speedtest(guid=GUID, data=None):
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
 def update_speedtest(guid=GUID, data=None):
     headers = {'X-Auth-Token': API_SECRET}
-    res = requests.patch('%s/api/v%s/speedtest/%s' % (API_HOST, API_VERSION, GUID),
+    res = requests.patch('%s/api/v%s/speedtest/%s' % (API_HOST, API_VERSION, guid),
                          data=json.dumps(data), headers=headers)
 
     if DEBUG: print '%s: %s' % (stack()[0][3], res)
