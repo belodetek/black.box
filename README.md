@@ -71,19 +71,19 @@ Please visit PayPal to cancel your `black.box` subscription.
 If you don't have a compatible device, or waiting for one to arrive, you can use your PC with [QEMU](http://www.qemu-project.org/) to run `black.box`.
 
 ## Mac OS X
-1. install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
+* install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
 ```
 (brew install qemu || sudo port install qemu) && \
   (brew install tuntap || sudo port install tuntaposx)
 ```
-2. download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file and resize the image
+* download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file and resize the image
 ```
 mkdir -p ~/black.box && \
   cd ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
-3. under `System Preferences > Network > Manage Virtual Interfaces`, create `bridge1` and add `Thunderbolt Ethernet` interface to it
-4. create helper scripts, and mark executable
+* under `System Preferences > Network > Manage Virtual Interfaces`, create `bridge1` and add `Thunderbolt Ethernet` interface to it
+* create helper scripts, and mark executable
 
 ```
 cat << EOF > qemu-ifup.sh
@@ -99,7 +99,7 @@ EOF
 chmod +x qemu-ifup.sh qemu-ifdown.sh
 ```
 
-5. start QEMU
+* start QEMU
 ```
 sudo qemu-system-x86_64 \
   -nographic \
@@ -110,18 +110,18 @@ sudo qemu-system-x86_64 \
   -m 1024 \
   -smp 4
 ```
-6. carry on from step [#3](#instructions) in LAN mode
+* carry on from step [#3](#instructions) in LAN mode
 
 ## Linux
-1. [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
-2. download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
+* [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
+* download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
 ```
 mkdir -p ~/black.box && \
   cd ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
-3. create a bridged interface `br0` (see, [https://wiki.debian.org/QEMU#Networking](https://wiki.debian.org/QEMU#Networking))
-4. create helper scripts, and mark executable
+* create a bridged interface `br0` (see, [https://wiki.debian.org/QEMU#Networking](https://wiki.debian.org/QEMU#Networking))
+* create helper scripts, and mark executable
 
 ```
 cat << EOF > qemu-ifup.sh
@@ -142,7 +142,7 @@ EOF
 chmod +x qemu-ifup.sh qemu-ifdown.sh
 ```
 
-5. start QEMU
+* start QEMU
 ```
 sudo qemu-system-x86_64 \
   -nographic \
@@ -153,17 +153,17 @@ sudo qemu-system-x86_64 \
   -m 1024 \
   -smp 4
 ```
-6. carry on from step [#3](#instructions) in LAN mode
+* carry on from step [#3](#instructions) in LAN mode
 
 ## Linux (libvirt)
-1. [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
-2. download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
+* [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
+* download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
 ```
 mkdir -p ~/black.box && \
   cd ~/black.box && \
   qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
-3. start QEMU
+* start QEMU
 
 ```
 mkdir -p /etc/qemu
@@ -179,7 +179,7 @@ sudo qemu-system-x86_64 \
   -smp 4
 ```
 
-4. carry on from step [#3](#instructions) in LAN mode
+* carry on from step [#3](#instructions) in LAN mode
 
 # DD-WRT
 Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development.
@@ -187,16 +187,16 @@ Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
 
 To install the preview:
-1. obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware (ensure `cURL` and `OpenVPN v2.4` are present in the installed firmware)
-2. in Incognito/(In)Private Browsing window, navigate to [DD-WRT](http://dd-wrt.unzoner.com/) and sign-in
-3. enable `Native IPv6 from ISP` under `Setup -> IPv6`
-4. navigate to [`Administration -> Commands`](http://dd-wrt.unzoner.com/Diagnostics.asp) page and run
+* obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware (ensure `cURL` and `OpenVPN v2.4` are present in the installed firmware)
+* in Incognito/(In)Private Browsing window, navigate to [DD-WRT](http://dd-wrt.unzoner.com/) and sign-in
+* enable `Native IPv6 from ISP` under `Setup -> IPv6`
+* navigate to [`Administration -> Commands`](http://dd-wrt.unzoner.com/Diagnostics.asp) page and run
 
 ```
 curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/group/default/provider/blackbox/install | sh
 ```
 
-5. navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
+* navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
