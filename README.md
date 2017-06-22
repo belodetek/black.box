@@ -188,7 +188,7 @@ Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd
 
 To install the preview:
 1. obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware (ensure `cURL` and `OpenVPN v2.4` are present in the installed firmware)
-2. navigate to [DD-WRT](http://dd-wrt.unzoner.com/) and sign-in
+2. in Incognito/(In)Private Browsing window, navigate to [DD-WRT](http://dd-wrt.unzoner.com/) and sign-in
 3. enable `Native IPv6 from ISP` under `Setup -> IPv6`
 4. navigate to [`Administration -> Commands`](http://dd-wrt.unzoner.com/Diagnostics.asp) page and run
 
