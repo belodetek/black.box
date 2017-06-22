@@ -195,7 +195,8 @@ curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/group/default/provider/bl
 ```
 
 3. enable `Native IPv6 from ISP` under `Setup -> IPv6`
-4. navigate to `Status -> MyPage`, sign-up and connect
+4. navigate to [DD-WRT](http://dd-wrt.unzoner.com/) and sign-in
+5. navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
