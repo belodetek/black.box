@@ -29,9 +29,6 @@
 			var payeremail = get_uri_param_by_name('payeremail') || false;
 				
 			if (msg) {
-				$('[href="#info"]').tab('show');
-				$('#paypal-button').prop('disabled', true);
-				$('#flashr-button-connect').prop('disabled', true);
 				var alert = $('<div id="alert" class="alert alert-' + type + ' alert-dismissable">')
 					.append($('<a href="#" class="close" data-dismiss="alert" aria-label="close" onclick="window.location.replace(location.pathname);">')
 					.append('&times;')
