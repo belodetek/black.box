@@ -1,4 +1,4 @@
-`black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT, Kodi and other[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+`black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices and helps un-block Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
 > TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC
 
@@ -208,10 +208,10 @@ Support for [Kodi](https://kodi.tv/) is coming soon.
 To install the preview:
 * [download](https://kodi.tv/download) and intall Kodi
 * install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
-* create a PayPal [subscription](https://api-dev.belodedenko.me/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
 * record your credentials
-* select `blackbox` VPN provider
-* connect with your `black.box unzoner` credentials
+* configure Kodi VPN Manager with `blackbox` VPN provider
+* connect with your credentials
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
