@@ -1,4 +1,4 @@
-`black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and other[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+`black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT, Kodi and other[[n8](#footnotes)] devices and helps un-block popular Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
 > TL;DR find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC
 
@@ -202,6 +202,17 @@ curl --insecure https://api.flashroutersapp.com/api/v1.0/ddwrt/group/default/pro
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
 
+# Kodi
+Support for [Kodi](https://kodi.tv/) is coming soon.
+
+To install the preview:
+* [download](https://kodi.tv/download) and intall Kodi
+* install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
+* create a PayPal [subscription](https://api-dev.belodedenko.me/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* record your credentials
+* select `blackbox` VPN provider
+* connect with your `black.box unzoner` credentials
+
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
 
@@ -229,7 +240,7 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 5. The initial application image is currently around 600MB. Subsequent updates are a fraction of that. Monitor by pinging `blackbox.local` from your LAN. If you have multiple `black.box` devices on your LAN, the second device will be called `blackbox-2.local`, the third `blackbox-3.local` and so on. Maximum 5 devices supported.
 6. For the paranoid, you can locate the device in your DMZ and restrict access to your LAN, however the device needs unrestricted oubound access to the Internet. Your DMZ should also forward mDNS (avahi-daemon) broadcast packets to your LAN for discovery/dashboard access. The device communicates with a private API at AWS over HTTPS and a number of OpenVPN endpoints to enable functionality.
 7. The dash will automatically refresh after Bitcoin payment has been confirmed. This could take a number of minutes, depending on the Bitcoin network load.
-8. Other supported devices include [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) routers, [Intel NUC](http://www.intel.com/content/www/us/en/nuc/overview.html), [ODROID-C1+](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143703355573) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odc1p.img.gz) and [ODROID-XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odxu4.img.gz) among [others](https://docs.resin.io/hardware/devices/). If you have a supported board, [request](mailto:blackbox@unzoner.com) an image.
+8. Other supported devices include [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) routers, [Kodi](https://kodi.tv/), [Intel NUC](http://www.intel.com/content/www/us/en/nuc/overview.html), [ODROID-C1+](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143703355573) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odc1p.img.gz) and [ODROID-XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) [(.img)](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-odxu4.img.gz) among [others](https://docs.resin.io/hardware/devices/). If you have a supported board, [request](mailto:blackbox@unzoner.com) an image.
 9. Try disabling both `Policy Routing` and `Local DNS` on the dash if you are having issues with a particular service. If you have router(s) on your network assigning IPv6 addresses, some IPv6 enabled services may not work (i.e. Netflix). Try disabling IPv6 on your network if this is the case.
 10. Not all SD cards are created equal, see [microSD Card Benchmarks](http://www.pidramble.com/wiki/benchmarks/microsd-cards) and get a fast one. Don't get a cheap SD card since even if you get the device up and running initially, it will be very slow and will fail catastrophically shortly after.
 11. Subscriptions require PayPal support for recurring payments in the country where the buyer account is located (excludes Germany and Austria).
