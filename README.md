@@ -182,7 +182,7 @@ sudo qemu-system-x86_64 \
 * carry on from step [#3](#instructions) in LAN mode
 
 # DD-WRT
-Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development.
+Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development with reduced feature set.
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
 
@@ -199,11 +199,8 @@ curl --insecure https://api.flashroutersapp.com/api/v1.0/ddwrt/group/default/pro
 
 * navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
 
-# Tomato
-Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
-
 # Kodi
-Support for [Kodi](https://kodi.tv/) is coming soon.
+Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
 
 To install the preview:
 * [download](https://kodi.tv/download) and intall Kodi
@@ -212,6 +209,18 @@ To install the preview:
 * record your credentials
 * configure Kodi VPN Manager with `blackbox` VPN provider
 * connect with your credentials
+
+# Tunnelblick and Windows
+Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
+
+To install the preview:
+* [download](https://tunnelblick.net/) and intall OpenVPN client
+* create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* bookmark the page with your credentials
+* download `blackbox` VPN profile for your desired region and connect
+
+# Tomato
+Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
 
 # technical architecture
 `black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
