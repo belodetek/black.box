@@ -1,6 +1,8 @@
-`black.box` is a Linux based VPN `policy router` and content `un-blocker`. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> It currently runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices and helps un-block Internet content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+`black.box` is a Linux based VPN policy routing appliance, <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> which runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices.
 
-> **TL;DR** find a Raspbery Pi 3 and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
+`Unzoner` is a subscription-based service, designed specifically for Internet content unblocking. A `black.box` device, combined with the `Unzoner` subscription, unblocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+
+> **TL;DR** find a modern Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
@@ -14,19 +16,7 @@
 9. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
 
 # about
-The device includes optional obfuscation/cloaking modes (SSH and SSL), to help function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
-
-The device also supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services. VPN client mode is **free**, so no `black.box` subscription is required.
-
-Multiple `black.box(es)` can be used not only to un-block content, but to also establish private encrypted links between them (pairing). Leave one at home/office and dial back in securely when travelling or on holidays. Pairing mode is **free**, so no `black.box` subscription is required.
-
-Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access a number of [blocked Internet content](#services) from anywhere in the world or to provide privacy and anonymity.
-
-PayPal subscription or Bitcoin credit is required for un-blocking mode. The un-blocking service is offered on a rolling subscription basis, with **1 moth free trial** using PayPal. Afterwards a monthly subscription fee applies, unless the subscription is [cancelled](#cancellation) prior to the next billing cycle. The subscription fee is **€9.95 per month**.
-
-Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on EUR/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new exchange rate.
-
-For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface. With `policy routing` enabled all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
+`black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access popular streaming [services](#services) from anywhere in the world, to provide privacy and anonymity via 3rd party VPN providers or etablish private VPN links between two or more location
 
 ```
 +---------+         +-----------------+
@@ -50,6 +40,21 @@ For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4]
                                                         +----------+
 ```
 
+## unblocking mode (default)
+In the default `un-blocking` mode, coupled with an active `unzoner` subscription, it allows access to popular streaming [services](#services) from anywhere in the world. In this mode, the device supports obfuscation/cloaking via SSH and SSL, in order to function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+
+PayPal subscription or Bitcoin credit is required to create an `unzoner` subscription. Subscriptions cost **€9.95 per month**, with **1 moth free trial** (if paid by PayPal). Subscriptions can be [cancelled](#cancellation) at any time.
+
+Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on EUR/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new exchange rate.
+
+For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface. With `policy routing` enabled all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
+
+## VPN client mode
+In `VPN` client mode, the device supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services. VPN client mode is **free**, so no `unzoner` subscription is required.
+
+## server pairing mode
+In the `server/pairing` modes, multiple devcies can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays. Pairing mode is **free**, so no `unzoner` subscription is required.
+
 # dashboard
 Once the device is running, the dash is accessible by navigating to [http://blackbox.local/](http://blackbox.local/) while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
 
@@ -60,7 +65,7 @@ A live demo dashboard is available [here](https://dashboard.unzoner.com/?guid=f6
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dash](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are available in policy routing mode on [dash](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dash to request it. In the meantime, disable `Policy Routing` (and optionally `Local DNS`) so all traffic goes via the tunnel interface.
+A number of popular services are available in policy routing mode on [dash](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dash to request it. In the meantime, you can disable `Policy Routing` (and optionally `Local DNS`) so all traffic goes via the tunnel interface.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
