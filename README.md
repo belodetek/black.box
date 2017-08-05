@@ -41,19 +41,19 @@
 ```
 
 ## unblocking mode (default)
-In the default `un-blocking` mode, coupled with an active `unzoner` subscription, it allows access to popular streaming [services](#services) from anywhere in the world. In this mode, the device supports obfuscation/cloaking via SSH and SSL, in order to function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+In the default un-blocking mode, coupled with an active unzoner subscription, it allows access to popular streaming [services](#services) from anywhere in the world. In this mode, the device supports obfuscation/cloaking via SSH and SSL, in order to function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
-PayPal subscription or Bitcoin credit is required to create an `unzoner` subscription. Subscriptions cost **€9.95 per month**, with **1 moth free trial** (if paid by PayPal). Subscriptions can be [cancelled](#cancellation) at any time.
+PayPal subscription or Bitcoin credit is required to create a subscription. Subscriptions cost **€9.95 per month**, with **1 moth free trial** (if paid by PayPal). Subscriptions can be [cancelled](#cancellation) at any time.
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on EUR/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new exchange rate.
 
 For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface. With `policy routing` enabled all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
 
-## VPN client mode
-In `VPN` client mode, the device supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services. VPN client mode is **free**, so no `unzoner` subscription is required.
+## VPN mode
+In VPN mode, the device supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services.
 
 ## server pairing mode
-In the `server/pairing` modes, multiple devcies can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays. Pairing mode is **free**, so no `unzoner` subscription is required.
+In the server pairing mode, multiple devices can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays. Subscription is currently not required in this mode.
 
 # dashboard
 Once the device is running, the dash is accessible by navigating to [http://blackbox.local/](http://blackbox.local/) while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
