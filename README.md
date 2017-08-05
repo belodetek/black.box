@@ -1,6 +1,6 @@
 `black.box` is a Linux based VPN policy routing appliance, <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> which runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices.
 
-`Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. A `black.box` device, combined with an active `unzoner` [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create), un-blocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+`Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. A `black.box` device, combined with an active [unzoner subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create), un-blocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
 > **TL;DR** find a modern Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
 
