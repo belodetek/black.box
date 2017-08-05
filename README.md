@@ -1,6 +1,6 @@
 `black.box` is a Linux based VPN policy routing appliance, <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> which runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices.
 
-`Unzoner` is a subscription-based service, designed specifically for Internet content unblocking. A `black.box` device, combined with the `Unzoner` subscription, unblocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
+`Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. A `black.box` device, combined with an active `unzoner` [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create), un-blocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
 > **TL;DR** find a modern Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
 
@@ -228,13 +228,13 @@ To install the preview:
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
 
 # technical architecture
-`black.box` appliances can functions in a number of modes. In the default `client` mode, the device functions as an un-blocker. It automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
+`black.box` appliances can functions in a number of modes. In the default `un-blocking` mode, the device automatically connects to the least busy `black.box` exit-node in the target region and routes traffic through the tunnel, while advertising a local Wi-Fi AP to all consumer devices within range.
 
 In `server` mode, the device advertises its private `GUID` and listens for incoming VPN connections from paired device(s). Device(s) in `paired` mode, which have specified the private `GUID` in their configuration, locate and connect to the `server` node, while advertising a local Wi-Fi AP to all consumer devices within range. This mode is useful for establishing point to point links betwen two of more locations.
 
 In `VPN` mode, the device supports connecting to a number of popular VPN services, such as [PIA](https://www.privateinternetaccess.com/), [VPNArea](https://vpnarea.com/) and [VanishedVPN](https://www.vanishedvpn.com.au/). Additional VPN providers can be easily integrated.
 
-There are two more system modes the device can function in, namely `exit-node` and `double-vpn`. These are suitable for white-labelling of the `black.box` service and are not available via the dash. In `exit-node` mode, `black.box` devices advertise themselves to devices running in `client` mode. This mode is useful for deploying `black.box` exit-nodes anywhere in the world with an Internet connection and a power socket. In `double-vpn` mode, devices both listen for incoming VPN client connections, as well as establish a outbound connection to a down-stream VPN server.
+There are two more system modes the device can function in, namely `exit-node` and `double-vpn`. These are suitable for white-labelling of the `black.box` service and are not available via the dash. In `exit-node` mode, `black.box` devices advertise themselves to devices running in `un-blocking` mode. This mode is useful for deploying `black.box` exit-nodes anywhere in the world with an Internet connection and a power socket. In `double-vpn` mode, devices both listen for incoming VPN client connections, as well as establish a outbound connection to a down-stream VPN server.
 
 `black.box` devices run on [ResinOS](https://resinos.io/), using [resin.io](https://resin.io/) management back-end. OpenVPN 2.4 is used for building `black.box` VPN tunnels, whether encrypted or otherwise. OpenSSL is compiled with NEON support to accelerate certain cryptographic functions on the `ARMv7` CPUs and linked with OpenVPN. Stunnel and WANProxy are use for obfuscation and/or acceleration. You can expect to get anywhere from 5Mbit/s to 10Mbit/s through the Pi Ethernet interface in unblocking mode and less in VPN mode. VPN providers which use default SHA1 authentication should be a little faster, due to ARMv7 NEON optimisations.
 
