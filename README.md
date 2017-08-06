@@ -16,7 +16,7 @@
 9. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
 
 # about
-`black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can typically access popular streaming [services](#services) from anywhere in the world, to provide privacy and anonymity via 3rd party VPN providers or etablish private VPN links between two or more location
+`black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can (a) typically access popular streaming [services](#services) from anywhere in the world; (b) to provide privacy and anonymity via 3rd party VPN providers; or (c) etablish private VPN links between two or more locations.
 
 ```
 +---------+         +-----------------+
@@ -41,19 +41,19 @@
 ```
 
 ## unblocking mode (default)
-In the default un-blocking mode, coupled with an active unzoner subscription, it allows access to popular streaming [services](#services) from anywhere in the world. In this mode, the device supports obfuscation/cloaking via SSH and SSL, in order to function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
+In the default un-blocking mode, coupled with an active unzoner subscription, `black.box` device allows access to popular streaming [services](#services) in the target region from anywhere in the world. In this mode, the device additionally supports obfuscation/cloaking, in order to function in hostile deep packet inspection (DPI) environments, as well as experimental WAN acceleration mode.
 
-PayPal subscription or Bitcoin credit is required to create a subscription. Subscriptions cost **€9.95 per month**, with **1 moth free trial** (if paid by PayPal). Subscriptions can be [cancelled](#cancellation) at any time.
+PayPal subscription or Bitcoin credit is required to create a subscription. Subscriptions are priced at **€9.95** per month, with initial **1 month free** (if paid by PayPal). PayPal subscriptions can be [cancelled](#cancellation) at any time.
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on EUR/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new exchange rate.
 
-For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] tunnel/virtual interface. With `policy routing` enabled all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
+For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] network interface. With `policy routing` enabled, all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
 
 ## VPN mode
-In VPN mode, the device supports a number of popular VPN services, such as [PIA](https://privateinternetaccess.com) and [VPNArea](https://vpnarea.com). Separate subscriptions/accounts required for supported VPN services.
+In VPN mode, the device supports a number of popular VPN services, such as [VPNArea](http://vpnarea.com/front?a_aid=blackbox) and [Private Internet Access](https://privateinternetaccess.com). Separate subscriptions/accounts required to access supported VPN services.
 
-## server pairing mode
-In the server pairing mode, multiple devices can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays. Subscription is currently not required in this mode.
+## server (pairing) mode
+In the server pairing mode, multiple devices can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays. `Unzoner` subscription is currently not required in this mode.
 
 # dashboard
 Once the device is running, the dash is accessible by navigating to [http://blackbox.local/](http://blackbox.local/) while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
