@@ -121,7 +121,7 @@ def main():
                         try:
                             m1 = p1.search(s_lineout[idx])
                             if m1: s_msg[idx] = m1.group(group)
-                        except TypeError:
+                        except (IndexError, TypeError, AttributeError):
                             pass
 
                         if s_msg[idx] in ['Initialization Sequence Completed']:
@@ -143,7 +143,7 @@ def main():
                             log('%r: iface=%r local=%r peer=%r proto=%r' % (stack()[0][3],
                                                                             dev, s_local[idx],
                                                                             s_peer, proto))
-                        except (TypeError, AttributeError):
+                        except (IndexError, TypeError, AttributeError):
                             pass
 
                         if not started[idx] and starting[idx]:
@@ -300,7 +300,7 @@ def main():
                     try:
                         m1 = p1.search(c_lineout)
                         if m1: c_msg = m1.group(group)
-                    except TypeError:
+                    except (IndexError, TypeError, AttributeError):
                         pass
 
                     if c_msg in ['SIGTERM[soft,tls-error] received, process exiting',
@@ -337,7 +337,7 @@ def main():
                         log('%r: iface=%r local=%r peer=%r gwip=%r family=%r' % (stack()[0][3],
                                                                                  dev, c_local,
                                                                                  c_peer, c_gwip, AF))
-                    except (TypeError, AttributeError):
+                    except (IndexError, TypeError, AttributeError):
                         pass
                     
                     if DEVICE_TYPE == 5:
@@ -347,7 +347,7 @@ def main():
                             c_country = m3[1]
                             log('%r: remote=%r country=%r' % (stack()[0][3],
                                                               c_remote, c_country))
-                        except (TypeError, AttributeError):
+                        except (IndexError, TypeError, AttributeError):
                             pass
 
                     if not connected and connecting:

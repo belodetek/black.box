@@ -66,7 +66,7 @@ BITCOIN_PAYMENT_CHECK = int(os.getenv('BITCOIN_PAYMENT_CHECK', 1))
 POLICY_ROUTING_CHECK = int(os.getenv('POLICY_ROUTING_CHECK', 1))
 STUNNEL = int(os.getenv('STUNNEL', 0))
 PAIRED_DEVICES_FREE = int(os.getenv('PAIRED_DEVICES_FREE', 1))
-WAN_PROXY = os.getenv('WAN_PROXY', None) # proxy transports: SOCAT or SSH
+WANPROXY = os.getenv('WANPROXY', None) # proxy transports: SOCAT or SSH
 DOCKER_SSH_PORT = int(os.getenv('DOCKER_SSH_PORT', 2222))
 TUN_MTU = os.getenv('TUN_MTU', '1500')
 FRAGMENT = os.getenv('FRAGMENT', None)
@@ -75,5 +75,8 @@ VPN_PROVIDER = os.getenv('VPN_PROVIDER', None)
 VPN_LOCATION_GROUP = os.getenv('VPN_LOCATION_GROUP', None)
 VPN_LOCATION = os.getenv('VPN_LOCATION', None)
 VPN_PASSWD = os.getenv('VPN_PASSWD', None)
+OPENVPN_PORT = os.getenv('OPENVPN_PORT', '1194')
+WANPROXY_PORT= os.getenv('WANPROXY_PORT', '3300')
+SOCAT_PORT= os.getenv('SOCAT_PORT', '3302')
 
 os.environ['REQUESTS_CA_BUNDLE'] = os.getenv('REQUESTS_CA_BUNDLE', '%s/cacert.pem' % DATADIR)

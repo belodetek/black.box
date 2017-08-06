@@ -24,13 +24,14 @@ from utils import (enqueue_output, resolve_dns, get_stations, run_shell_cmd,
 from config import (WORKDIR, DEBUG, TEMPDIR, DNS_SUB_DOMAIN, CONN_TIMEOUT,
                     VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT, VPN_HOST, DEVICE_TYPE,
                     GEOIP_OVERRIDE, LOG_SERVER_STATS, LOG_CLIENT_STATS, AP,
-                    DOCKER_SSH_PORT, WAN_PROXY, CLIENT_DEVICE_TYPES, UPNP, AF,
+                    DOCKER_SSH_PORT, WANPROXY, CLIENT_DEVICE_TYPES, UPNP, AF,
                     TARGET_COUNTRY, SERVER_DEVICE_TYPES, AF_INETS, SKIP_DNS,
                     TUN_PROTO, PAIRED_DEVICE_GUID, CLIENT_CONFIG, ON_POSIX,
-                    DNS_HOST, STUNNEL, WAN_PROXY, CIPHER, AUTH, TUN_IFACE_UDP,
+                    DNS_HOST, STUNNEL, WANPROXY, CIPHER, AUTH, TUN_IFACE_UDP,
                     TUN_IFACE_TCP, TUN_IFACE, TUN_MTU, FRAGMENT, VPN_LOCATION_GROUP,
                     VPN_USERNAME, VPN_PROVIDER, VPN_LOCATION, VPN_PASSWD,
-                    OPENVPN_VERSION, OPENVPN_BINARY, GUID, DATADIR)
+                    OPENVPN_VERSION, OPENVPN_BINARY, GUID, DATADIR,
+                    OPENVPN_PORT, WANPROXY_PORT, SOCAT_PORT)
 
 
 PROTOS = list(TUN_PROTO)
@@ -162,7 +163,7 @@ def connect_node(family=AF):
             family = 4
 
     cmd = [OPENVPN_BINARY, '--config', CLIENT_CONFIG, '--dev', TUN_IFACE]
-    port = '1194'
+    port = OPENVPN_PORT
 
     ############
     # VPN mode #
@@ -276,20 +277,20 @@ def connect_node(family=AF):
         #####################
         # WANProxy override #
         #####################
-        if WAN_PROXY:
+        if WANPROXY:
             (c_wpid, s_wpid, s_wport) = start_wanproxy_server(ipaddr=ipaddr, family=family,
                                                               local_pid=c_wpid, remote_pid=s_wpid,
                                                               port=s_wport)
 
             log('start_wanproxy_server: ipaddr=%r af=%r local_pid=%r remote_pid=%r remote_port=%r transport=%r' % (ipaddr, family,
                                                                                                                    c_wpid, s_wpid,
-                                                                                                                   s_wport, WAN_PROXY))
+                                                                                                                   s_wport, WANPROXY))
 
-            port = '3300'
+            port = WANPROXY_PORT
             ipaddr = 'localhost'
             tun_proto = 'tcp'
             if family == 6: tun_proto = '%s%s' % (tun_proto, family)
-            log('%r: wan_proxy=%r proto=%r ipaddr=%r port=%r' % (stack()[0][3], WAN_PROXY,
+            log('%r: wan_proxy=%r proto=%r ipaddr=%r port=%r' % (stack()[0][3], WANPROXY,
                                                                  tun_proto, ipaddr, port))
 
         if FRAGMENT and tun_proto == 'udp':
@@ -338,7 +339,7 @@ def start_server(proto='udp'):
     config = '%s/openvpn/%s_server.conf' % (WORKDIR, proto)
     
     cmd = [OPENVPN_BINARY, '--config', config, '--dev', iface,
-           '--proto', '%s6' % proto,
+           '--proto', '%s6' % proto, '--port', OPENVPN_PORT,
            '--cipher', CIPHER, '--auth', AUTH]
 
     if FRAGMENT and proto == 'udp':
@@ -710,13 +711,13 @@ def restart_stunnel_client(stunnel_bin='/usr/bin/stunnel4',
 def start_wanproxy_server(ipaddr=None, family=4, local_pid=None,
                           remote_pid=None, port=None, ssh_port=DOCKER_SSH_PORT):
 
-    if WAN_PROXY == 'SSH':
+    if WANPROXY == 'SSH':
         remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
         assert remote_guid
         if DEBUG: print 'get_guid_by_public_ipaddr: ipaddr=%r family=%r remote_guid=%r' % (ipaddr, family, remote_guid)
 
     if not (port and remote_pid):
-        if WAN_PROXY == 'SSH':
+        if WANPROXY == 'SSH':
             # start WANProxy server instance and get remote port for forwarding
             result = run_shell_cmd(['ssh', '-i', '%s/id_rsa' % WORKDIR,
                                     '-o StrictHostKeyChecking=no',
@@ -729,7 +730,7 @@ def start_wanproxy_server(ipaddr=None, family=4, local_pid=None,
             port = result[1].split()[1]
 
     if not local_pid:
-        if WAN_PROXY == 'SSH':
+        if WANPROXY == 'SSH':
             # start SSH tunnel
             result = run_background_shell_cmd(['ssh', '-i', '%s/id_rsa' % WORKDIR,
                                                '-fN','-o StrictHostKeyChecking=no',
@@ -739,11 +740,11 @@ def start_wanproxy_server(ipaddr=None, family=4, local_pid=None,
             if DEBUG: print result.__dict__
             local_pid = str(int(result.pid) + 1)
             
-        if WAN_PROXY == 'SOCAT':
+        if WANPROXY == 'SOCAT':
             # start SOCAT local listener
             result = run_shell_cmd_nowait(['/usr/bin/socat',
                                            'TCP%s-LISTEN:3301,bind=localhost,su=nobody,fork,reuseaddr' % str(family),
-                                           'TCP%s:%s:3302' % (str(family), ipaddr)])
+                                           'TCP%s:%s:%s' % (str(family), ipaddr, SOCAT_PORT)])
 
             if DEBUG: print result.__dict__
             local_pid = str(result.pid)
@@ -752,13 +753,13 @@ def start_wanproxy_server(ipaddr=None, family=4, local_pid=None,
 
 
 def kill_remote_pid(ipaddr=None, family=4, pid=None, ssh_port=DOCKER_SSH_PORT):    
-    if WAN_PROXY == 'SSH':
+    if WANPROXY == 'SSH':
         remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
         assert remote_guid
         if DEBUG: print 'get_guid_by_public_ipaddr: ipaddr=%r family=%r remote_guid=%r' % (ipaddr, family, remote_guid)
 
     result = None
-    if pid and WAN_PROXY == 'SSH':
+    if pid and WANPROXY == 'SSH':
         # kill remote pid
         result = run_shell_cmd(['ssh', '-i', '%s/id_rsa' % WORKDIR,
                                 '-o StrictHostKeyChecking=no',
