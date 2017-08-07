@@ -2,7 +2,7 @@
 
 `Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. A `black.box` device, combined with an active [unzoner subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create), un-blocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
-> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a modern Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
+> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
 <br>
 
 # instructions
