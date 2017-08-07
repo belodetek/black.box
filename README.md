@@ -2,7 +2,8 @@
 
 `Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. A `black.box` device, combined with an active [unzoner subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create), un-blocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN.
 
-> **TL;DR** find a modern Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
+> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a modern Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
+<br>
 
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to the SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
