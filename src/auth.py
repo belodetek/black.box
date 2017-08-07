@@ -9,13 +9,20 @@ import vpn, nuitka
 from common import retry
 from config import (MAX_CONNS, DEBUG, DNS_SUB_DOMAIN, USER_AUTH_ENABLED)
 
+try:
+    plugin = __import__('plugin')
+except ImportError:
+    plugin = None
+    pass
+
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
 def authenticate(username=None, password=None):
     # user auth disabled completely (anything goes)
     if not USER_AUTH_ENABLED:
-        print '%s: plugin=%s user_auth_enabled=%d username=%s password=%s authenticated' % (stack()[0][3], DNS_SUB_DOMAIN,
-                                                                                            USER_AUTH_ENABLED, username, password)
+        print '%s: plugin=%s user_auth_enabled=%d username=%s password=%s authenticated' \
+              % (stack()[0][3], DNS_SUB_DOMAIN,
+                 USER_AUTH_ENABLED, username, password)
         return True
 
     # check number of server connections
@@ -24,29 +31,26 @@ def authenticate(username=None, password=None):
         conns = vpn.get_server_conns()
     except Exception:
         pass
-
+    
     if conns > MAX_CONNS:
-        print '%s: plugin=%s username=%s conns=%s/%s' % (stack()[0][3], DNS_SUB_DOMAIN,
-                                                         username, conns, MAX_CONNS)
+        print '%s: plugin=%s username=%s conns=%s/%s' \
+              % (stack()[0][3], DNS_SUB_DOMAIN, username, conns, MAX_CONNS)
         return False
 
     # auth plug-ins
-    plugin = None
     result = False
-    try:
-        plugin = __import__('plugin')
-    except ImportError:
-        pass
     
     if plugin and 'auth_user' in dir(plugin):
         result = plugin.auth_user(username, password)
         if result:
-            print '%s: plugin=%s user_auth_enabled=%d username=%s password=%s authenticated' % (stack()[0][3], DNS_SUB_DOMAIN,
-                                                                                                USER_AUTH_ENABLED, username, password)
+            print '%s: plugin=%s user_auth_enabled=%d username=%s password=%s authenticated' \
+                  % (stack()[0][3], DNS_SUB_DOMAIN, USER_AUTH_ENABLED,
+                     username, password)
             return True
 
-    print '%s: plugin=%s user_auth_enabled=%d username=%s password=%s authentication failed' % (stack()[0][3], DNS_SUB_DOMAIN,
-                                                                                                USER_AUTH_ENABLED, username, password)
+    print '%s: plugin=%s user_auth_enabled=%d username=%s password=%s authentication failed' \
+          % (stack()[0][3], DNS_SUB_DOMAIN, USER_AUTH_ENABLED,
+             username, password)
     return False
 
 

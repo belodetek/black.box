@@ -3,42 +3,43 @@
 
 import os, sys, importlib
 from inspect import stack
-
 import nuitka
-from common import retry
-from config import (DEBUG, DNS_SUB_DOMAIN)
 
+from common import retry
+from config import DNS_SUB_DOMAIN
+
+try:
+    plugin = __import__('plugin')
+except ImportError:
+    plugin = None
+    pass
+
+
+@retry(Exception, cdata='method=%s()' % stack()[0][3])
+def connect_disconnect(cmd=None, username=None):
+    if not cmd in ['connect', 'disconnect']: return False
+    if not username: return False
+    if cmd == 'connect':
+        if plugin and 'client_connect' in dir(plugin):
+            result = plugin.client_connect(username)
+            if result: print 'plugin=%s name=%s connected' \
+               % (DNS_SUB_DOMAIN, username)
+                
+    if cmd == 'disconnect': 
+        if plugin and 'client_disconnect' in dir(plugin):
+            result = plugin.client_disconnect(username)
+            if result: print 'plugin=%s name=%s disconnected' \
+               % (DNS_SUB_DOMAIN, username)
+
+    return True
+                
 
 if __name__ == '__main__':
     try:
         op = sys.argv[1]
     except IndexError:
         pass
-        sys.exit(0)
 
     uname = os.getenv('username')
-    plugin = None
-    result = False
-
-    try:
-        plugin = __import__('plugin')
-        
-    except ImportError:
-        pass
-        sys.exit(0)
-
-    # connect plug-ins
-    if op == 'connect':
-        if plugin and 'client_connect' in dir(plugin):
-            result = plugin.client_connect(uname)
-            if result:
-                print 'plugin=%s name=%s connected' % (DNS_SUB_DOMAIN, uname)
-                
-    # disconnect plug-ins
-    if op == 'disconnect': 
-        if plugin and 'client_disconnect' in dir(plugin):
-            result = plugin.client_disconnect(uname)
-            if result:
-                print 'plugin=%s name=%s disconnected' % (DNS_SUB_DOMAIN, uname)
-
+    if op and uname: connect_disconnect(cmd=op, username=uname)
     sys.exit(0)

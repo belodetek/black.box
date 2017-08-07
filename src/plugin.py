@@ -94,3 +94,11 @@ def auth_user(uid, pwd):
         if bitcoin: return True
 
     return False # deny ALL by default
+
+
+def client_connect():
+    pass
+
+
+def client_disconnect():
+    pass
