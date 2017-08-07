@@ -17,7 +17,7 @@
 9. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
 
 # about
-`black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can (a) typically access popular streaming [services](#services) from anywhere in the world; (b) to provide privacy and anonymity via 3rd party VPN providers; or (c) etablish private VPN links between two or more locations. Application source code is available at [https://github.com/ab77/black.box/tree/master/src](https://github.com/ab77/black.box/tree/master/src).
+`black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can (a) typically access popular streaming [services](#services) from anywhere in the world; (b) to provide privacy and anonymity via 3rd party VPN providers; or (c) etablish private VPN links between two or more locations. Application source code is available at [https://github.com/ab77/black.box/tree/master/src](https://github.com/ab77/black.box/tree/master/src) under the [MIT](https://github.com/ab77/black.box/blob/master/src/LICENSE) license.
 
 ```
 +---------+         +-----------------+
