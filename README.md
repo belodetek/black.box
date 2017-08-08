@@ -212,7 +212,10 @@ To install the preview:
 * [download](https://kodi.tv/download) and intall Kodi
 * install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
 * create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
-* record your credentials
+
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
+
+* bookmark the page and record your credentials securely
 * configure Kodi VPN Manager with `blackbox` VPN provider
 * connect with your credentials
 
@@ -222,9 +225,11 @@ Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows c
 To install the preview:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
 * create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
-* bookmark the page with your credentials
-* download `blackbox` VPN profile for your desired region and connect
+
+* bookmark the page and record your credentials securely
+* download `blackbox` VPN profile for your desired region, import it into Tunnelblick and connect
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
