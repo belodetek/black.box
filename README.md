@@ -74,7 +74,7 @@ Please visit PayPal to cancel your `black.box` subscription.
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="600">
 
 # qemu
-If you don't have a compatible device, or waiting for one to arrive, you can use your PC with [QEMU](http://www.qemu-project.org/) to run `black.box`.
+If you don't have a compatible device, or waiting for one to arrive, you can use your PC with [QEMU](http://www.qemu-project.org/) to run `black.box`. Alternatively, you can simply configure compatible software on your PC, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) for use with Unzoner.
 
 ## Mac OS X
 * install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
@@ -222,6 +222,7 @@ Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows c
 To install the preview:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
 * create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
 * bookmark the page with your credentials
 * download `blackbox` VPN profile for your desired region and connect
 
