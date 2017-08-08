@@ -364,30 +364,6 @@ def start_server(proto='udp'):
     return stdoutq, stderrq, p
 
 
-def get_openvpn_version(default='2.3.10'):
-    version = default
-    try:
-        version = run_shell_cmd(['/usr/bin/env', 'openvpn', '--version'])[1].split()[1]
-    except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
-        pass
-
-    return version
-
-    
-def get_openvpn_binary(default='/usr/sbin/openvpn'):
-    binary = default
-    try:
-        binary = run_shell_cmd(['/usr/bin/which', 'openvpn'])[1].split()[0]
-    except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
-        pass
-
-    return binary
-
-
 @retry(Exception, cdata='method=%r()' % stack()[0][3])
 def _get_client_conns(user=GUID, proto='udp'):
     conns = 0
