@@ -138,8 +138,8 @@ def connect_node(family=AF):
     c_wpid = None
 
     try:
-        log('kill_remote_pid: %r' % kill_remote_pid(ipaddr=ipaddr, family=family,
-                                                    pid=s_wpid))
+        log('kill_remote_pid: %r' \
+            % kill_remote_pid(ipaddr=ipaddr, family=family, pid=s_wpid))
     except Exception as e:
         print repr(e)
         if DEBUG: print_exc()
@@ -172,9 +172,9 @@ def connect_node(family=AF):
                             and VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
                             and VPN_USERNAME and VPN_PASSWD):
         
-        log('%r: mode=%r provider=%r group=%r location=%r username=%r password=%r' % (stack()[0][3], DEVICE_TYPE,
-                                                                                      VPN_PROVIDER, VPN_LOCATION_GROUP, VPN_LOCATION,
-                                                                                      VPN_USERNAME, VPN_PASSWD))
+        log('%r: mode=%r provider=%r group=%r location=%r username=%r password=%r' \
+            % (stack()[0][3], DEVICE_TYPE, VPN_PROVIDER,
+               VPN_LOCATION_GROUP, VPN_LOCATION,  VPN_USERNAME, VPN_PASSWD))
 
         assert VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
                and VPN_USERNAME and VPN_PASSWD
@@ -186,8 +186,8 @@ def connect_node(family=AF):
         if PAIRED_DEVICE_GUID:
             try:
                 ipaddr = get_node_by_guid(family=family)
-                log('get_node_by_guid: ipaddr=%r af=%r guid=%r' % (ipaddr, family,
-                                                                   PAIRED_DEVICE_GUID))
+                log('get_node_by_guid: ipaddr=%r af=%r guid=%r' \
+                    % (ipaddr, family, PAIRED_DEVICE_GUID))
             except AssertionError as e:
                 log('get_node_by_guid: e=%r af=%r' % (repr(e), family))
                 if DEBUG: print_exc()
@@ -205,7 +205,8 @@ def connect_node(family=AF):
                     ipaddr = resolve_dns(host=host, record=qtype, family=family)    
                     assert ipaddr
                 except Exception as e:
-                    log('resolve_dns: e=%r qtype=%r family=%r' % (repr(e), qtype, family))
+                    log('resolve_dns: e=%r qtype=%r family=%r' \
+                        % (repr(e), qtype, family))
                     family = 4
                     qtype = 'A'
                     if DEBUG: print_exc()
@@ -219,22 +220,24 @@ def connect_node(family=AF):
                     ipaddr = resolve_dns(host=host, record=qtype, family=family)
                     assert ipaddr
                 except Exception as e:
-                    log('resolve_dns: e=%r qtype=%r family=%r' % (repr(e), qtype, family))
+                    log('resolve_dns: e=%r qtype=%r family=%r' \
+                        % (repr(e), qtype, family))
                     if DEBUG: print_exc()
                     pass
 
-            log('%r: qtype=%r country=%r host=%r ipaddr=%r' % (stack()[0][3],
-                                                               qtype, country,
-                                                               host, ipaddr))
+            log('%r: qtype=%r country=%r host=%r ipaddr=%r' \
+                % (stack()[0][3], qtype, country,  host, ipaddr))
 
             if not ipaddr:
                 if family == 6:
                     try:
                         # fall-back to API (IPv6)
                         ipaddr = get_node_by_country(family=family)
-                        log('get_node_by_country: ipaddr=%r af=%r' % (stack()[0][3], ipaddr, family))
+                        log('get_node_by_country: ipaddr=%r af=%r' \
+                            % (stack()[0][3], ipaddr, family))
                     except AssertionError as e:
-                        log('get_node_by_country: e=%r af=%r' % (repr(e), family))
+                        log('get_node_by_country: e=%r af=%r' \
+                            % (repr(e), family))
                         if DEBUG: print_exc()
                         family = 4
                         qtype = 'A'
@@ -244,18 +247,20 @@ def connect_node(family=AF):
                     try:
                         # fall-back to API (IPv4)
                         ipaddr = get_node_by_country(family=family)
-                        log('get_node_by_country: ipaddr=%r af=%r' % (ipaddr, family))
+                        log('get_node_by_country: ipaddr=%r af=%r' \
+                            % (ipaddr, family))
                     except AssertionError as e:
-                        log('get_node_by_country: e=%r af=%r' % (repr(e), family))
+                        log('get_node_by_country: e=%r af=%r' \
+                            % (repr(e), family))
                         if DEBUG: print_exc()
                         pass
             
         assert ipaddr
 
         if family == 6: tun_proto = '%s%s' % (c_proto, family)
-        log('%r: mode=%r remote=%r port=%r proto=%r protos=%r cipher=%r auth=%r' % (stack()[0][3], DEVICE_TYPE,
-                                                                                    ipaddr, port, tun_proto,
-                                                                                    TUN_PROTO, CIPHER, AUTH))
+        log('%r: mode=%r remote=%r port=%r proto=%r protos=%r cipher=%r auth=%r' \
+            % (stack()[0][3], DEVICE_TYPE,  ipaddr, port, tun_proto,
+               TUN_PROTO, CIPHER, AUTH))
 
         ####################
         # stunnel override #
@@ -271,8 +276,8 @@ def connect_node(family=AF):
                 ipaddr = 'localhost'
                 tun_proto = 'tcp'
                 if family == 6: tun_proto = '%s%s' % (tun_proto, family)
-                log('%r: stunnel=%r proto=%r ipaddr=%r' % (stack()[0][3], STUNNEL,
-                                                           tun_proto, ipaddr))
+                log('%r: stunnel=%r proto=%r ipaddr=%r' \
+                    % (stack()[0][3], STUNNEL, tun_proto, ipaddr))
 
         #####################
         # WANProxy override #
