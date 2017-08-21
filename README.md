@@ -190,7 +190,7 @@ sudo qemu-system-x86_64 \
 # DD-WRT
 Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development with reduced feature set.
 
-<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/dd-wrt.png" width="600">
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connect.png" width="600">
 
 To install the preview:
 * obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware (ensure `cURL` and `OpenVPN v2.4` are present in the installed firmware)
@@ -204,6 +204,8 @@ curl --insecure https://api.flashroutersapp.com/api/v1.0/ddwrt/group/default/pro
 ```
 
 * navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
+
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png" width="200"> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png" width="200"> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png" width="100">
 
 # Kodi
 Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
