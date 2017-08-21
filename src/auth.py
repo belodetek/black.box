@@ -55,16 +55,11 @@ def authenticate(username=None, password=None):
 
 
 if __name__ == '__main__':
-    result = False
     try:
         username = os.getenv('username')
         passwd = os.getenv('password')
         result = authenticate(username=username, password=passwd)
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
-        pass
-    
+        result = None
     if result: sys.exit(0)
-    
     sys.exit(1)

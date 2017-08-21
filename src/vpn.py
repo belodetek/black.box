@@ -12,7 +12,7 @@ from Queue import Queue
 import auth, nuitka
 from common import retry, log
 
-from paypal import get_jwt_payload_from_paypal
+from paypal import get_jwt_payload
 
 from api import (put_device, get_node_by_country, get_node_by_guid, get_alpha,
                  get_guid_by_public_ipaddr, get_device_env_by_name)
@@ -50,17 +50,17 @@ def run_openvpn_mgmt_cmd(host=VPN_HOST, port=VPN_UDP_MGMT_PORT, cmd='status 2'):
     s = None
     data = str()
     header = None
-    
+
     try:
         for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
             af, socktype, proto, canonname, sa = res
-            if DEBUG: print 'getaddrinfo: res=%r af=%r socktype=%r proto=%r canonname=%r sa=%r' % (res, af, socktype,
-                                                                                                   proto, canonname, sa)
+            if DEBUG: print 'getaddrinfo: res=%r af=%r socktype=%r proto=%r canonname=%r sa=%r' \
+               % (res, af, socktype, proto, canonname, sa)
             try:
                 s = socket.socket(af, socktype, proto)
             except socket.error as msg:
-                log('socket: msg=%r af=%r socktype=%r proto=%r canonname=%r sa=%r' % (msg, af, socktype,
-                                                                                      proto, canonname, sa))
+                log('socket: msg=%r af=%r socktype=%r proto=%r canonname=%r sa=%r' \
+                    % (msg, af, socktype, proto, canonname, sa))
                 s = None
                 continue
             try:
@@ -73,20 +73,13 @@ def run_openvpn_mgmt_cmd(host=VPN_HOST, port=VPN_UDP_MGMT_PORT, cmd='status 2'):
 
         header = recv_with_timeout(s)
         if DEBUG: print header
-
         s.sendall(b'%s\n' % cmd)
-
         data = recv_with_timeout(s)
         if DEBUG: print data
-        
         s.sendall(b'quit\n')
         s.close()
-        
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-    
     return data.split('\r\n')
 
 
@@ -96,10 +89,7 @@ def get_openvpn_version(default='2.3.10'):
     try:
         version = run_shell_cmd(['/usr/bin/env', 'openvpn', '--version'])[1].split()[1]
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-
     return version
 
 
@@ -109,10 +99,7 @@ def get_openvpn_binary(default='/usr/sbin/openvpn'):
     try:
         binary = run_shell_cmd(['/usr/bin/which', 'openvpn'])[1].split()[0]
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-
     return binary
 
 
@@ -141,8 +128,6 @@ def connect_node(family=AF):
         log('kill_remote_pid: %r' \
             % kill_remote_pid(ipaddr=ipaddr, family=family, pid=s_wpid))
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
         
     s_wpid = None
@@ -400,13 +385,9 @@ def get_server_conns(status=[True, True]):
         if status[0]: stats[0] = _get_server_conns() # udp stats        
         if status[1]: stats[1] = _get_server_conns(proto='tcp') # tcp stats
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-    
     if stats[0]: conns = int(stats[0]) # udp vpn connection count
     if stats[1]: conns = conns + int(stats[1]) # udp + tcp vpn connection count
-
     return conns
 
 
@@ -417,25 +398,20 @@ def get_load_stats(host=VPN_HOST, port=VPN_UDP_MGMT_PORT):
         load_stats = run_openvpn_mgmt_cmd(host=host, port=port, cmd='load-stats')
         p = re.compile('^SUCCESS: nclients=([\d]+),bytesin=([\d]+),bytesout=([\d]+)$')
         m = p.search(load_stats[0])
-        
         try:
             stats = m.groups()
         except Exception:
             pass
-
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-    
     return stats
 
 
 @retry(Exception, cdata='method=%r()' % stack()[0][3])
 def _get_status(user=GUID, proto='udp'):
     status = list()
-    status = open('%s/openvpn.%s.status' % (DATADIR, proto)).read().split('\n')
-
+    status = open('%s/openvpn.%s.status' \
+                  % (DATADIR, proto)).read().split('\n')
     return status
 
 
@@ -443,7 +419,6 @@ def _get_status(user=GUID, proto='udp'):
 def get_status(host=VPN_HOST, port=VPN_UDP_MGMT_PORT):
     status = list()
     status = run_openvpn_mgmt_cmd(host=host, port=port)
-
     return status
 
 
@@ -451,47 +426,37 @@ def get_status(host=VPN_HOST, port=VPN_UDP_MGMT_PORT):
 def get_client_status():
     bytesin = 0
     bytesout = 0
-    
     try:
-        status = open('%s/client.status' % TEMPDIR).read().split('\n')
+        status = open('%s/client.status' \
+                      % TEMPDIR).read().split('\n')
         bytesin = [line.split(',')[1] for line in status if line.split(',')[0] == 'TCP/UDP read bytes'][0]
         bytesout = [line.split(',')[1] for line in status if line.split(',')[0] == 'TCP/UDP write bytes'][0]
     except IndexError:
         pass
-    
     return (bytesin, bytesout)
 
 
 @retry(Exception, cdata='method=%r()' % stack()[0][3])
 def get_clients():
     clients = list()
-
     udp_clients = list()
     try:
         udp_clients = _get_status()
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-    
     for lines in udp_clients:
         line = lines.split(',')
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]:
             clients.append(line[1])
-
     tcp_clients = list()
     try:
         tcp_clients = _get_status(proto='tcp')
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
-
     for lines in tcp_clients:
         line = lines.split(',')
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]:
             clients.append(line[1])
-            
     return clients
 
 
@@ -509,20 +474,13 @@ def reauthenticate_clients():
                 password = get_device_env_by_name(guid=client, name='TUN_PASSWD')[:16]
                 assert password
             except Exception as e:
-                print repr(e)
-                if DEBUG: print_exc()
-                
                 # authenticate against JWT recorded against PayPal billing agreement
                 try:
                     jwtoken = decode_jwt_payload(encoded=get_jwt_payload_from_paypal(baid=client))
                     password = jwtoken['p'][:16]
                     assert password
                 except Exception as e:
-                    print repr(e)
-                    if DEBUG: print_exc()
                     password = None
-                    pass
-                pass
 
             if not password: break
 
@@ -535,8 +493,6 @@ def reauthenticate_clients():
                         print run_openvpn_mgmt_cmd(port=port, cmd='kill %r' % client)
                         killed.append(client)
                     except Exception as e:
-                        print repr(e)
-                        if DEBUG: print_exc()
                         pass
 
         print '%r: count=%r killed=%r' % (stack()[0][3], count, len(killed))
@@ -623,15 +579,11 @@ def log_server_stats(status=[False, False]):
                     try:
                         data['bytesin'] = int(get_load_stats()[1])
                     except Exception as e:
-                        print repr(e)
-                        if DEBUG: print_exc()
                         pass
                     
                     try:
                         data['bytesout'] = int(get_load_stats()[2])
                     except Exception as e:
-                        print repr(e)
-                        if DEBUG: print_exc()
                         pass
                     
                 if stats[1]:
@@ -640,15 +592,11 @@ def log_server_stats(status=[False, False]):
                     try:
                         data['bytesin'] = data['bytesin'] + int(get_load_stats(port=VPN_TCP_MGMT_PORT)[1])
                     except Exception as e:
-                        print repr(e)
-                        if DEBUG: print_exc()
                         pass
 
                     try:
                         data['bytesout'] = data['bytesout'] + int(get_load_stats(port=VPN_TCP_MGMT_PORT)[2])
                     except Exception as e:
-                        print repr(e)
-                        if DEBUG: print_exc()
                         pass
 
             log('%r: af=%r data=%r' % (stack()[0][3], family, data))
@@ -774,8 +722,6 @@ def disconnect_clients():
                         disconnected.append(client)
                         print 'client_disconnect: client=%r result=%r' % (client, result)
                     except Exception as e:
-                        print repr(e)
-                        if DEBUG: print_exc()
                         pass
 
             if os.path.exists('%s/disconnect_clients' % DATADIR):

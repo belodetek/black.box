@@ -231,14 +231,11 @@ def decode_jwt_payload(encoded=None):
         payload = jwt.decode('%s.%s.%s' % (hdr, encoded, sig), verify=False)
         if DEBUG: print '%r: hdr=%r sig=%r payload=%r' % (stack()[0][3], hdr, sig, payload)
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
+        payload = dict()
 
     try:
         payload['u'] = socket.inet_ntoa(struct.pack('!L', int(payload['u'])))
     except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
         pass
     
     return payload

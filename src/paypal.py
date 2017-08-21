@@ -15,7 +15,12 @@ from httplib import (NO_CONTENT, UNAUTHORIZED, BAD_REQUEST, NOT_FOUND, OK,
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
 def get_paypal_billing_agreement_id_for_guid(guid=None):
-    return get_device_env_by_name(guid=guid, name='PAYPAL_BILLING_AGREEMENT')
+    try:
+        result = get_device_env_by_name(\
+            guid=guid, name='PAYPAL_BILLING_AGREEMENT')
+    except:
+        result = None
+    return result
 
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
@@ -31,12 +36,15 @@ def check_active_paypal_subscription(guid=GUID, baid=None):
     if result:
         payload = json.loads(result)
         if payload['agreement_state'] in ['active']: return baid
-
     return False
 
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
-def get_jwt_payload_from_paypal(baid=None):
+def get_jwt_payload(baid=None):
     if not baid: return None
-    result = get_jwt_payload_from_paypal(baid=baid)
-    return json.loads(result)['description']
+    try:
+        result = json.loads(\
+            get_jwt_payload_from_paypal(baid=baid))['description'] 
+    except:
+        result = None
+    return result
