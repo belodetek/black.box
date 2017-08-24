@@ -208,7 +208,7 @@ curl --insecure https://api.flashroutersapp.com/api/v1.0/ddwrt/group/default/pro
 [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png" width="197">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png" width="90">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png)
 
 # Kodi
-Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
+Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
 
 To install the preview:
 * [download](https://kodi.tv/download) and intall Kodi
@@ -222,7 +222,7 @@ To install the preview:
 * connect with your credentials
 
 # Tunnelblick and Windows
-Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
+Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is under development, without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
 
 To install the preview:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
