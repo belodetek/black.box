@@ -213,7 +213,7 @@ Support for [Kodi](https://kodi.tv/) is under development, without advanced feat
 To install the preview:
 * [download](https://kodi.tv/download) and intall Kodi
 * install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
-* create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
 
@@ -226,7 +226,7 @@ Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows c
 
 To install the preview:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
-* create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
 
