@@ -8,7 +8,7 @@
 # instructions
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to a fast 4GB+ SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
 2. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
-3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n10]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) URL
+3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n10]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) or [http://blackbox-2.local/](http://blackbox-2.local/) URL
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement[[n11](#footnotes)] and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
 5. once subscribed, you will be redirected back to the [dash](#dashboard) where you can monitor the status of the device
 6. when the dash lights up green, connect to a new Wi-Fi network called `black.box` (passphrase: `blackbox`) or set your default gateway to the `black.box` LAN IP (LAN mode) as shown on the [dash](#dashboard)
@@ -205,15 +205,15 @@ curl --insecure https://api.flashroutersapp.com/api/v1.0/ddwrt/group/default/pro
 
 * navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
 
-<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png" width="200"> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png" width="200"> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png" width="100">
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png" width="197">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png" width="90">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png)
 
 # Kodi
-Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
+Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
 
 To install the preview:
 * [download](https://kodi.tv/download) and intall Kodi
 * install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
-* create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/sub-landing.png" width="600">
 
@@ -222,11 +222,11 @@ To install the preview:
 * connect with your credentials
 
 # Tunnelblick and Windows
-Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is under development, without advanced features (e.g. PBR) enjoyed by other device types.
+Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is under development, without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
 
 To install the preview:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
-* create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
+* create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/sub-success.png" width="600">
 
