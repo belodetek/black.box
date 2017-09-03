@@ -58,6 +58,7 @@ CLIENT_CONFIG = '%s/client.ovpn' % WORKDIR
 ON_POSIX = 'posix' in sys.builtin_module_names
 TARGET_COUNTRY = os.getenv('TARGET_COUNTRY', 'United States')
 GEOIP_OVERRIDE = os.getenv('GEOIP_OVERRIDE', None)
+COUNTRY_OVERRIDE = os.getenv('COUNTRY_OVERRIDE', None)
 CIPHER = os.getenv('CIPHER', 'none') # default: BF-CBC
 AUTH = os.getenv('AUTH', 'none') # default: SHA1
 USER_AUTH_ENABLED = int(os.getenv('USER_AUTH_ENABLED', 1))

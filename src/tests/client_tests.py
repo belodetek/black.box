@@ -1,6 +1,7 @@
 from nose.tools import eq_, assert_is_not_none
 from mock import patch
 from uuid import uuid4
+import imp
 
 from client import connect_disconnect
 

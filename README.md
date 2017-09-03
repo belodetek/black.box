@@ -215,7 +215,7 @@ To install the preview:
 * install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
 * create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
 
-<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/sub-landing.png" width="600">
 
 * bookmark the page and record your credentials securely
 * configure Kodi VPN Manager with `blackbox` VPN provider
@@ -228,7 +228,7 @@ To install the preview:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
 * create a PayPal [subscription](https://api.unzoner.com/api/v1.0/paypal/billing-agreement/create) (free trial **not** available)
 
-<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/subscription.png" width="600">
+<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/sub-success.png" width="600">
 
 * bookmark the page and record your credentials securely
 * download `blackbox` VPN profile for your desired region, import it into Tunnelblick and connect

@@ -5,7 +5,7 @@ from inspect import stack
 from traceback import print_exc
 
 from common import retry
-from paypal import check_active_paypal_subscription, get_jwt_payload_from_paypal
+from paypal import check_active_paypal_subscription, get_jwt_payload
 from bitcoin import check_active_bitcoin_payment
 from api import get_device_env_by_name
 from utils import decode_jwt_payload
@@ -16,89 +16,83 @@ from config import (DEBUG, PAYPAL_SUBSCRIPTION_CHECK, BITCOIN_PAYMENT_CHECK,
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
 def auth_user(uid, pwd):
-    if not (uid and pwd): return False  
+    if not (uid and pwd): return False
+    uid = uid[:32]
+    pwd = pwd[:16]
 
     # paired device check
     if PAIRED_DEVICES_FREE:
-        paired_device = None
         try:
-            paired_device = get_device_env_by_name(guid=uid, name='PAIRED_DEVICE_GUID')
-        except AttributeError as e:
-            print repr(e)
-            if DEBUG: print_exc()
+            paired_device = get_device_env_by_name(\
+                guid=uid, name='PAIRED_DEVICE_GUID')
+        except Exception as e:
+            paired_device = None
         
-        if DEBUG: print 'paired_device=%s device=%s' % (paired_device, uid)
+        if DEBUG: print 'paired_device=%r uid=%r' % (paired_device, uid)
         if paired_device: return True
 
-    # policy routing check
+    # policy routing check (resin.io devices)
     if POLICY_ROUTING_CHECK:
         try:
             as_nums = get_device_env_by_name(guid=uid, name='AS_NUMS')
-        except AttributeError as e:
-            print repr(e)
-            if DEBUG: print_exc()
-
-        if DEBUG: print 'as_nums=%s device=%s' % (as_nums, uid)
-        if as_nums and '#' in as_nums.split(' ') : return False
-        
-    # password check (resin.io devices)
-    tun_passwd = None
-    try:
-        tun_passwd = get_device_env_by_name(guid=uid, name='TUN_PASSWD')
-    except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
-
-    # password check (DD-WRT or Tomato routers)
-    payload = None
-    if not tun_passwd:
-        try:
-            payload = get_jwt_payload_from_paypal(baid=uid)
         except Exception as e:
-            print repr(e)
-            if DEBUG: print_exc()
+            as_nums = None
 
-        if payload:
-            try:
-                tun_passwd = decode_jwt_payload(encoded=payload)['p']
-            except Exception as e:
-                print repr(e)
-                if DEBUG: print_exc()
+        if DEBUG: print 'as_nums=%r uid=%r' % (as_nums, uid)
+        if as_nums and '#' in as_nums.split() : return False
+        
+    # password check (resin.io Data API)
+    jwtoken = None
+    device_type = None
+    try:
+        tun_passwd = get_device_env_by_name(guid=uid, name='TUN_PASSWD')[:16]
+        assert tun_passwd
+    except Exception as e:
+        # authenticate against JWT recorded against PayPal billing agreement
+        try:
+            jwtoken = decode_jwt_payload(encoded=get_jwt_payload(baid=uid))
+            tun_passwd = jwtoken['p'][:16]
+            device_type = jwtoken['t']
+        except Exception as e:
+            tun_passwd = None
 
-    if not pwd == tun_passwd: return False
+    # deny all other devices with policy routing test enabled
+    if POLICY_ROUTING_CHECK:
+        if device_type and not device_type == 'RESIN':
+            if DEBUG: print 'device_type=%r uid=%r' % (device_type, uid)
+            return False
+
+    if not tun_passwd: return False
+    if not tun_passwd == pwd: return False
 
     # PayPal subscription check
     if PAYPAL_SUBSCRIPTION_CHECK:
-        paypal = None
         baid = None
-        if payload: baid = uid
+        if jwtoken: baid = uid
         try:
             paypal = check_active_paypal_subscription(guid=uid, baid=baid)
         except Exception as e:
-            print repr(e)
-            if DEBUG: print_exc()
+            paypal = None
             
-        if DEBUG: print 'paypal=%s device=%s' % (paypal, uid)
+        if DEBUG: print 'paypal=%s uid=%s' % (paypal, uid)
         if paypal: return True
     
-    # Bitcoin payment check (resin.io devices)
+    # Bitcoin payment check (resin.io Data API)
     if BITCOIN_PAYMENT_CHECK:
-        bitcoin = None
         try:
             bitcoin = check_active_bitcoin_payment(guid=uid)
         except Exception as e:
-            print repr(e)
-            if DEBUG: print_exc()
+            bitcoin = None
             
-        if DEBUG: print 'bitcoin=%s device=%s' % (bitcoin, uid)
+        if DEBUG: print 'bitcoin=%s uid=%s' % (bitcoin, uid)
         if bitcoin: return True
 
     return False # deny ALL by default
 
 
-def client_connect():
-    pass
+def client_connect(uname):
+    return True
 
 
-def client_disconnect():
-    pass
+def client_disconnect(uname):
+    return True

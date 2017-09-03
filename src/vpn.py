@@ -31,7 +31,7 @@ from config import (WORKDIR, DEBUG, TEMPDIR, DNS_SUB_DOMAIN, CONN_TIMEOUT,
                     TUN_IFACE_TCP, TUN_IFACE, TUN_MTU, FRAGMENT, VPN_LOCATION_GROUP,
                     VPN_USERNAME, VPN_PROVIDER, VPN_LOCATION, VPN_PASSWD,
                     OPENVPN_VERSION, OPENVPN_BINARY, GUID, DATADIR,
-                    OPENVPN_PORT, WANPROXY_PORT, SOCAT_PORT)
+                    OPENVPN_PORT, WANPROXY_PORT, SOCAT_PORT, COUNTRY_OVERRIDE)
 
 
 PROTOS = list(TUN_PROTO)
@@ -518,9 +518,13 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
             if DEVICE_TYPE == 5:
                 data['country'] = country
                 
+            if COUNTRY_OVERRIDE:
+                log('%r: country=%r' % (stack()[0][3], COUNTRY_OVERRIDE))
+                data['country'] = COUNTRY_OVERRIDE
+
             if GEOIP_OVERRIDE:
-                log('%r: country=%r' % (stack()[0][3], GEOIP_OVERRIDE))
-                data['country'] = GEOIP_OVERRIDE
+                log('%r: ip=%r' % (stack()[0][3], GEOIP_OVERRIDE))
+                data['ip'] = GEOIP_OVERRIDE
 
             if DEVICE_TYPE in CLIENT_DEVICE_TYPES:
                 try:
@@ -564,9 +568,13 @@ def log_server_stats(status=[False, False]):
             data['auth'] = AUTH
             data['upnp'] = UPNP
 
+            if COUNTRY_OVERRIDE:
+                log('%r: country=%r' % (stack()[0][3], COUNTRY_OVERRIDE))
+                data['country'] = COUNTRY_OVERRIDE
+
             if GEOIP_OVERRIDE:
-                log('%r: country=%r' % (stack()[0][3], GEOIP_OVERRIDE))
-                data['country'] = GEOIP_OVERRIDE
+                log('%r: ip=%r' % (stack()[0][3], GEOIP_OVERRIDE))
+                data['ip'] = GEOIP_OVERRIDE
 
             if DEVICE_TYPE in SERVER_DEVICE_TYPES:
                 stats = [None, None]
