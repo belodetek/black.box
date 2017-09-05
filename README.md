@@ -242,11 +242,11 @@ To install and connect:
 * bookmark the page and record your credentials securely
 * download `blackbox` VPN profile (TCP) for your desired region
 
-[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/profiles-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images//profiles-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png)
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/profiles-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images//profiles-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png)
 
 * import the profile into OpenVPN Connect app
 
-[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png)
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png)
 
 * connect with your credentials
 
