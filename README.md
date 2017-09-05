@@ -240,7 +240,7 @@ To install and connect:
 * [install](https://itunes.apple.com/ca/app/openvpn-connect/id590379981) OpenVPN Connect client from iTunes Store
 * create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
 * bookmark the page and record your credentials securely
-* download `blackbox` VPN profile (TCP) for your desired region
+* download `blackbox` VPN profile ([TCP](https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html)) for your desired region
 
 [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/profiles-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images//profiles-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png)
 
