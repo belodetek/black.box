@@ -208,9 +208,9 @@ curl --insecure https://api.flashroutersapp.com/api/v1.0/ddwrt/group/default/pro
 [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connected.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png" width="197">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-blackbox.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png" width="90">](https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-diags.png)
 
 # Kodi
-Support for [Kodi](https://kodi.tv/) is under development, without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
+Support for [Kodi](https://kodi.tv/) is available without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
 
-To install the preview:
+To install and connect:
 * [download](https://kodi.tv/download) and intall Kodi
 * install [VPN Manager for OpenVPN](https://github.com/Zomboided/service.vpn.manager)
 * create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
@@ -222,9 +222,9 @@ To install the preview:
 * connect with your credentials
 
 # Tunnelblick and Windows
-Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is under development, without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
+Support for [Tunnelblick](https://tunnelblick.net/) as well as OpenVPN Windows client(s) is available without advanced features (e.g. PBR) enjoyed by other device types. Requires OpenVPN v2.4 or later.
 
-To install the preview:
+To install and connect:
 * [download](https://tunnelblick.net/) and intall OpenVPN client
 * create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
 
@@ -232,6 +232,23 @@ To install the preview:
 
 * bookmark the page and record your credentials securely
 * download `blackbox` VPN profile for your desired region, import it into Tunnelblick and connect
+
+# iOS
+Support for [OpenVPN Connect](https://itunes.apple.com/ca/app/openvpn-connect/id590379981) on iOS is available without advanced features (e.g. PBR) enjoyed by other device types.
+
+To install and connect:
+* [install](https://itunes.apple.com/ca/app/openvpn-connect/id590379981) OpenVPN Connect client from iTunes Store
+* create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
+* bookmark the page and record your credentials securely
+* download `blackbox` VPN profile (TCP) for your desired region
+
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/profiles-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images//profiles-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images/download-ios.png)
+
+* import the profile into OpenVPN Connect app
+
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png" width="300">](https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png)
+
+* connect with your credentials
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
