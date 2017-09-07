@@ -357,13 +357,25 @@ def start_server(proto='udp'):
 @retry(Exception, cdata='method=%r()' % stack()[0][3])
 def _get_client_conns(user=GUID, proto='udp'):
     conns = 0
-    stats = open('%s/openvpn.%s.status' % (TEMPDIR, proto)).read().split('\n')
+    stats = open('%s/openvpn.%s.status' % (DATADIR, proto)).read().split('\n')
     for lines in stats:
         line = lines.split(',')        
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1] and line[1] == user:
             conns = conns + 1
-            
     return conns
+
+
+@retry(Exception, cdata='method=%r()' % stack()[0][3])
+def get_client_conns(user=GUID):
+    try:
+        udp_conns = _get_client_conns(user=user) # udp stats
+    except:
+        udp_conns = 0
+    try:
+        tcp_conns = _get_client_conns(user=user, proto='tcp') # tcp stats
+    except:
+        tcp_conns = 0
+    return udp_conns + tcp_conns
 
 
 @retry(Exception, cdata='method=%r()' % stack()[0][3])
@@ -373,7 +385,6 @@ def _get_server_conns(proto='udp'):
     for lines in stats:
         line = lines.split(',')        
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]: conns = conns + 1
-
     return conns
 
 

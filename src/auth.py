@@ -7,7 +7,8 @@ from traceback import print_exc
 
 import vpn, nuitka
 from common import retry
-from config import (MAX_CONNS, DEBUG, DNS_SUB_DOMAIN, USER_AUTH_ENABLED)
+from config import (MAX_CONNS_SERVER, MAX_CONNS_CLIENT, DEBUG, DNS_SUB_DOMAIN,
+                    USER_AUTH_ENABLED)
 
 try:
     plugin = __import__('plugin')
@@ -26,15 +27,25 @@ def authenticate(username=None, password=None):
         return True
 
     # check number of server connections
-    conns = 0
     try:
         conns = vpn.get_server_conns()
     except Exception:
-        pass
-    
-    if conns > MAX_CONNS:
-        print '%s: plugin=%s username=%s conns=%s/%s' \
-              % (stack()[0][3], DNS_SUB_DOMAIN, username, conns, MAX_CONNS)
+        conns = 0
+
+    if conns > MAX_CONNS_SERVER:
+        print '%s: plugin=%s username=%s server_conns=%s/%s' \
+              % (stack()[0][3], DNS_SUB_DOMAIN, username, conns, MAX_CONNS_SERVER)
+        return False
+
+    # check number of client connections
+    try:
+        conns = vpn.get_client_conns(user=username)
+    except Exception:
+        conns = 0
+
+    if conns > MAX_CONNS_CLIENT:
+        print '%s: plugin=%s username=%s client_conns=%s/%s' \
+              % (stack()[0][3], DNS_SUB_DOMAIN, username, conns, MAX_CONNS_CLIENT)
         return False
 
     # auth plug-ins
