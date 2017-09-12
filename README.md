@@ -200,7 +200,7 @@ To install the preview:
 * navigate to [`Administration -> Commands`](http://dd-wrt.unzoner.com/Diagnostics.asp) page and run
 
 ```
-curl --insecure https://api.unzoner.com/api/v1.0/ddwrt/group/default/provider/blackbox/install | sh
+curl --insecure https://api.unzoner.com/ddwrt | sh
 ```
 
 * navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect
