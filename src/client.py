@@ -3,16 +3,10 @@
 
 import os, sys, importlib
 from inspect import stack
-import nuitka
 
-from common import retry
 from config import DNS_SUB_DOMAIN
-
-try:
-    plugin = __import__('plugin')
-except ImportError:
-    plugin = None
-    pass
+from common import retry
+import plugin_loader
 
 
 @retry(Exception, cdata='method=%s()' % stack()[0][3])
@@ -20,14 +14,16 @@ def connect_disconnect(cmd=None, username=None):
     if not cmd in ['connect', 'disconnect']: return False
     if not username: return False
     if cmd == 'connect':
-        if plugin and 'client_connect' in dir(plugin):
-            result = plugin.client_connect(username)
+        if plugin_loader.plugin \
+           and 'client_connect' in dir(plugin_loader.plugin):
+            result = plugin_loader.plugin.client_connect(username)
             if result: print 'plugin=%s name=%s connected' \
                % (DNS_SUB_DOMAIN, username)
                 
     if cmd == 'disconnect': 
-        if plugin and 'client_disconnect' in dir(plugin):
-            result = plugin.client_disconnect(username)
+        if plugin_loader.plugin \
+           and 'client_disconnect' in dir(plugin_loader.plugin):
+            result = plugin_loader.plugin.client_disconnect(username)
             if result: print 'plugin=%s name=%s disconnected' \
                % (DNS_SUB_DOMAIN, username)
 

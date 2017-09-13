@@ -4,11 +4,11 @@
 from inspect import stack
 from traceback import print_exc
 
-from common import retry
 from paypal import check_active_paypal_subscription, get_jwt_payload
 from bitcoin import check_active_bitcoin_payment
 from api import get_device_env_by_name
 from utils import decode_jwt_payload
+from common import retry
 
 from config import (DEBUG, PAYPAL_SUBSCRIPTION_CHECK, BITCOIN_PAYMENT_CHECK,
                     PAIRED_DEVICES_FREE, POLICY_ROUTING_CHECK)
@@ -34,12 +34,14 @@ def auth_user(uid, pwd):
     # policy routing check (resin.io devices)
     if POLICY_ROUTING_CHECK:
         try:
-            as_nums = get_device_env_by_name(guid=uid, name='AS_NUMS')
+            policy_routing = get_device_env_by_name(\
+                guid=uid, name='POLICY_ROUTING')
         except Exception as e:
-            as_nums = None
+            policy_routing = None
 
-        if DEBUG: print 'as_nums=%r uid=%r' % (as_nums, uid)
-        if as_nums and '#' in as_nums.split() : return False
+        if DEBUG: print 'policy_routing={0} uid={1}'.\
+           format(policy_routing, uid)
+        if policy_routing and policy_routing == 0: return False
         
     # password check (resin.io Data API)
     jwtoken = None
@@ -70,22 +72,22 @@ def auth_user(uid, pwd):
         baid = None
         if jwtoken: baid = uid
         try:
-            paypal = check_active_paypal_subscription(guid=uid, baid=baid)
+            result = check_active_paypal_subscription(guid=uid, baid=baid)
         except Exception as e:
-            paypal = None
+            result = None
             
-        if DEBUG: print 'paypal=%s uid=%s' % (paypal, uid)
-        if paypal: return True
+        if DEBUG: print 'paypal=%s uid=%s' % (result, uid)
+        if result: return True
     
     # Bitcoin payment check (resin.io Data API)
     if BITCOIN_PAYMENT_CHECK:
         try:
-            bitcoin = check_active_bitcoin_payment(guid=uid)
+            result = check_active_bitcoin_payment(guid=uid)
         except Exception as e:
-            bitcoin = None
+            result = None
             
-        if DEBUG: print 'bitcoin=%s uid=%s' % (bitcoin, uid)
-        if bitcoin: return True
+        if DEBUG: print 'bitcoin=%s uid=%s' % (result, uid)
+        if result: return True
 
     return False # deny ALL by default
 

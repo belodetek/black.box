@@ -9,10 +9,9 @@ from threading  import Thread
 from subprocess import Popen, PIPE
 from Queue import Queue
 
-import auth, nuitka
-from common import retry, log
-
 from paypal import get_jwt_payload
+from common import retry, log
+import auth, plugin_loader
 
 from api import (put_device, get_node_by_country, get_node_by_guid, get_alpha,
                  get_guid_by_public_ipaddr, get_device_env_by_name)
@@ -550,15 +549,9 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
 
     # client logging plug-in(s)
     log('%r: plugin=%r' % (stack()[0][3], DNS_SUB_DOMAIN))
-    plugin = None
-    try:
-        plugin = __import__('plugin')
-        
-    except ImportError:
-        pass
-
-    if plugin and 'log_plugin_client' in dir(plugin):
-        result = plugin.log_plugin_client(status=status)
+    if plugin_loader.plugin and \
+       'log_plugin_client' in dir(plugin_loader.plugin):
+        result = plugin_loader.plugin.log_plugin_client(status=status)
        
 
 def log_server_stats(status=[False, False]):
@@ -623,15 +616,8 @@ def log_server_stats(status=[False, False]):
 
     # additional server logging plug-in(s)
     log('%r: plugin=%r' % (stack()[0][3], DNS_SUB_DOMAIN))
-    plugin = None
-    try:
-        plugin = __import__('plugin')
-        
-    except ImportError:
-        pass
-
-    if plugin and 'log_plugin_server' in dir(plugin):
-        result = plugin.log_plugin_server(status=status)
+    if plugin_loader.plugin and 'log_plugin_server' in dir(plugin_loader.plugin):
+        result = plugin_loader.plugin.log_plugin_server(status=status)
 
 
 def conf_stunnel_client(node=None, conf='/etc/stunnel/stunnel-client.conf',
@@ -724,12 +710,6 @@ def disconnect_clients():
     disconnected = list()
     while True:
         if os.path.exists('%s/disconnect_clients' % DATADIR):
-            plugin = None
-            try:
-                plugin = __import__('plugin')
-            except ImportError:
-                break
-
             if not 'client_disconnect' in dir(plugin): break
             
             clients = get_clients()
@@ -737,7 +717,7 @@ def disconnect_clients():
             for client in clients:
                 if client not in ['UNDEF']:
                     try:
-                        result = plugin.client_disconnect(client)
+                        result = plugin_loader.plugin.client_disconnect(client)
                         disconnected.append(client)
                         print 'client_disconnect: client=%r result=%r' % (client, result)
                     except Exception as e:
