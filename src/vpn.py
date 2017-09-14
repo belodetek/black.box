@@ -710,8 +710,7 @@ def disconnect_clients():
     disconnected = list()
     while True:
         if os.path.exists('%s/disconnect_clients' % DATADIR):
-            if not 'client_disconnect' in dir(plugin): break
-            
+            if not 'client_disconnect' in dir(plugin_loader.plugin): break
             clients = get_clients()
             print '%r: clients=%r' % (stack()[0][3], len(clients))
             for client in clients:
