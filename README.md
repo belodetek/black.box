@@ -161,6 +161,8 @@ sudo qemu-system-x86_64 \
 ```
 * carry on from step [#3](#instructions) in LAN mode
 
+> if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
+
 ## Linux (libvirt)
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
 * download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
