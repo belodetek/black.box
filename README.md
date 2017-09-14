@@ -48,7 +48,7 @@ PayPal subscription or Bitcoin credit is required to create a subscription. Subs
 
 Alternatively, pay up-front using Bitcoin for as much time as you need. Price quoted based on EUR/BTC exchange rate. Top-up at any point prior to the existing Bitcoin credit expiry, or after. Any unused Bitcoin credit will be rolled over if topping up prior to existing credit expiry. Topping up after credit expiry will strike a new exchange rate.
 
-For performance reasons, un-blocking traffic is routed via the un-encrypted[[n4](#footnotes)] network interface. With `policy routing` enabled, all the remaining traffic (e.g. google.com) goes out via the local Internet interface, when disabled, all traffic is sent via the tunnel. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted for gaming traffic, etc.
+For performance reasons, un-blocking traffic is not encrypted[[n4](#footnotes)]. When policy routing is enabled (default), all traffic goes out via the local Internet interface, except for selected services. When disabled, all traffic is sent via the tunnel, except for selected services. For security reasons, the tunnel interface may be restricted to only allow specific network ports[[n1](#footnotes)] for streaming, while the local interface is always unrestricted.
 
 ## VPN mode
 In VPN mode, the device supports a number of popular VPN services, such as [VPNArea](http://vpnarea.com/front?a_aid=blackbox) and [Private Internet Access](https://privateinternetaccess.com). Separate subscriptions/accounts required to access supported VPN services.
@@ -66,7 +66,7 @@ A live demo dashboard is available [here](https://dashboard.unzoner.com/?guid=f6
 If multiple regions are available to un-block, click a country flag in the top right corner of the [dash](#dashboard). The device will re-boot with the new settings and un-block the selected country.
 
 # services
-A number of popular services are available in policy routing mode on [dash](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dash to request it. In the meantime, you can disable `Policy Routing` (and optionally `Local DNS`) so all traffic goes via the tunnel interface.
+A number of popular services can be selected on the [dash](#dashboard). If the service you require is missing please, email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode or use the live chat link on the dash to request it. Also, disabling `Policy Routing` (optionally disabling `Local DNS`) as well as setting all `Services` to `none` will make unknown services work.
 
 # cancellation
 Please visit PayPal to cancel your `black.box` subscription.
