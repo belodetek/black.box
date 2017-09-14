@@ -118,6 +118,8 @@ sudo qemu-system-x86_64 \
 ```
 * carry on from step [#3](#instructions) in LAN mode
 
+> if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
+
 ## Linux
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
 * download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
@@ -188,6 +190,8 @@ sudo qemu-system-x86_64 \
 ```
 
 * carry on from step [#3](#instructions) in LAN mode
+
+> if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
 
 # DD-WRT
 Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development with reduced feature set.
