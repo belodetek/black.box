@@ -86,6 +86,12 @@ If you don't have a compatible device, or waiting for one to arrive, you can use
 (brew install qemu || sudo port install qemu) && \
   (brew install tuntap || sudo port install tuntaposx)
 ```
+
+* start TunTap (MacPorts) 
+```
+launchctl load -w /Library/LaunchDaemons/org.macports.tuntaposx.plist
+```
+
 * download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file and resize the image
 ```
 mkdir -p ~/black.box && \
