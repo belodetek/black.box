@@ -2,12 +2,12 @@
 
 # copy source
 for f in $(ls src/*.py); do
-    cp ../resin.io/${f} ../black.box/${f}
+    [ -f ../resin.io/${f} ] && cp ../resin.io/${f} ../black.box/${f}
 done
 
 # copy tests
 for f in $(ls src/tests/*.py); do
-    cp ../resin.io/${f} ../black.box/${f}
+    [ -f ../resin.io/${f} ] && cp ../resin.io/${f} ../black.box/${f}
 done
 
 # run unit tests
