@@ -1,5 +1,15 @@
 #!/bin/sh
 
+# copy source
+for f in $(ls src/*.py); do
+    cp ../resin.io/${f} ../black.box/${f}
+done
+
+# copy tests
+for f in $(ls src/tests/*.py); do
+    cp ../resin.io/${f} ../black.box/${f}
+done
+
 # run unit tests
 RESIN=1 TEMPDIR=. nosetests --verbosity=2 src/tests
 result=$?
