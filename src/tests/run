@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# run unit tests
-RESIN=1 TEMPDIR=. nosetests --verbosity=2 src/tests
-result=$?
-if [ ${result} -eq 1 ]; then
-    exit ${result}
-fi
-exit 0

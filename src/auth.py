@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys
+import os
+import sys
+from urllib import quote
 from inspect import stack
 from traceback import print_exc
 
-from common import retry
-import vpn, plugin_loader
+import vpn
+import plugin_loader
 
+from common import retry
 from config import (MAX_CONNS_SERVER, MAX_CONNS_CLIENT, DEBUG, DNS_SUB_DOMAIN,
                     USER_AUTH_ENABLED)
 
@@ -46,7 +49,8 @@ def authenticate(username=None, password=None):
 
     result = False
     if plugin_loader.plugin and 'auth_user' in dir(plugin_loader.plugin):
-        result = plugin_loader.plugin.auth_user(username, password)
+        result = plugin_loader.plugin.auth_user(
+            quote(username), quote(password))
         print '{0}: result={1} plugin={2} user_auth_enabled={3} username={4} password={5}'.\
               format(stack()[0][3], result, DNS_SUB_DOMAIN,
                      USER_AUTH_ENABLED, username, password)
