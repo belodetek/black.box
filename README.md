@@ -27,19 +27,19 @@
 +---------+         +-----------------+
 |         |  Wi-Fi  |                 |  Google, Facebook, etc.
 |   iOS   | +-----> |    black.box    | +--------------------->
-|         |         |    ---------    |
+| Android |         |    ---------    |
 +---------+         |    VPN policy   |
                     |    router       |
 +---------+         |                 |
-|         |  Wi-Fi  |                 |
+| Mac OSX |  Wi-Fi  |                 |
 | Windows | +-----> |                 |
-|         |         |                 |
+|  Linux  |   LAN   |                 |
 +---------+         |                 |
                     |                 |
 +---------+         |   Sling TV      |            +----------+
-|         |  Wi-Fi  |   Netflix       |   tunnel   |          |
-|  OS X   | +-----> |   Hulu          | +--------> | Exit US  +----+
-|         |         |   etc.          |            |          |    |
+|  Kodi   |  Wi-Fi  |   Netflix       |   tunnel   |          |
+|  QEMU   | +-----> |   Hulu          | +--------> | Exit US  +----+
+|  DD-WRT |   LAN   |   etc.          |            |          |    |
 +---------+         +-----------------+            +-----+----+ UK |
                                                         |          |
                                                         +----------+
@@ -265,6 +265,25 @@ To install and connect:
 [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/copy-ios.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/openvpn-ios.png)
 
 * connect with your credentials
+
+# Android
+Support for [OpenVPN Connect](https://play.google.com/store/apps/details?id=net.openvpn.openvpn&hl=en) on Android is available without advanced features (e.g. policy based routing) enjoyed by other device types.
+
+To install and connect:
+* [install](https://play.google.com/store/apps/details?id=net.openvpn.openvpn&hl=en) OpenVPN Connect client from Google Play Store
+* create a PayPal [subscription](https://dashboard.unzoner.com/sub) (free trial **not** available)
+* bookmark the page and record your credentials securely
+* download `blackbox` VPN profile ([TCP](https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html)) for your desired region
+
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/profiles-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images//profiles-android.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/download-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/download-android.png)
+
+* import the profile into OpenVPN Connect app
+
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/open-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/open-android.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/accept-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/accept-android.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/import-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/import-android.png)
+
+* connect with your credentials
+
+[<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/connect-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/connect-android.png) [<img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/connected-android.png" width="200">](https://raw.githubusercontent.com/ab77/black.box/master/images/connected-android.png)
 
 # Tomato
 Support for [Tomato](https://www.flashrouters.com/learn/router-basics/what-is-tomato) flashed routers is planned in the future.
