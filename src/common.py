@@ -7,8 +7,7 @@ from functools import wraps
 from traceback import print_exc
 from inspect import stack
 
-from config import (DEFAULT_TRIES, DEFAULT_DELAY, DEFAULT_BACKOFF, DEBUG,
-                    TEMPDIR, DNS_SUB_DOMAIN)
+from config import *
 
 
 PIPE = '%s/%s' % (TEMPDIR, DNS_SUB_DOMAIN)
@@ -86,8 +85,6 @@ def write_pipe(fifo=None, data=None):
 
 def log(data):
     global FIFO
-    print data
-    
     try:
         if not FIFO: FIFO = open_pipe(pipe=PIPE)
         write_pipe(fifo=FIFO, data=data)

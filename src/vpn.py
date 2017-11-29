@@ -635,7 +635,7 @@ def conf_stunnel_client(node=None, conf='/etc/stunnel/stunnel-client.conf',
     return template
 
 
-def restart_stunnel_client(stunnel_bin='/usr/bin/stunnel4',
+def restart_stunnel_client(stunnel_bin='/usr/bin/stunnel',
                            conf='/etc/stunnel/stunnel-client.conf'):
 
     print run_shell_cmd(['/usr/bin/pkill', '-f', '%s %s' % (stunnel_bin, conf)])
