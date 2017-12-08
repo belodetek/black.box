@@ -5,6 +5,7 @@ import requests
 
 from gen_hash import generate_hash_key
 from resin import blink_leds
+from config import *
 
 
 def test_generate_hash_key_returns_not_none():
@@ -14,6 +15,7 @@ def test_generate_hash_key_returns_not_none():
 
 @patch('api.requests.post')
 def test_blink_leds_returns_ok(mock_post):
+    if not RESIN: return True
     mockresponse = Mock()
     mock_post.return_value = mockresponse
     mockresponse.status_code = OK
