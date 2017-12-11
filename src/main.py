@@ -1,30 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys, os, re, inspect
+import os
+import sys
+import re
+import inspect
+
 from threading import Thread
 from traceback import print_exc
 from inspect import stack
 from time import sleep, time
 from Queue import Empty
 
-from common import (retry, log)
-
-from api import (get_alpha, get_node_by_guid, get_node_by_country,
-                 dequeue_speedtest, update_speedtest)
-
-from utils import (resolve_dns, get_stations, get_ip_address, ping_host,
-                   run_speedtest)
-
-from vpn import (OPENVPN_BINARY, OPENVPN_VERSION, log_server_stats,
-                 log_client_stats, _get_server_conns, _get_status,
-                 connect_node, start_server, reauthenticate_clients,
-                 enqueue_output, disconnect_clients)
-
-from config import (POLL_FREQ, DEVICE_TYPE, GUID, THRESHOLD, DEBUG, UPNP,
-                    LOOP_CYCLE, LOOP_TIMER, TUN_PROTO, TUN_MGMT, SUPPRESS_TS,
-                    MGMT_IFACE, AF, AP, BITCOIN_PAYMENT_CHECK, TARGET_COUNTRY,
-                    SERVER_DEVICE_TYPES, DNS_SUB_DOMAIN, CLIENT_DEVICE_TYPES)
+from common import *
+from api import *
+from utils import *
+from vpn import *
+from config import *
 
 
 def main():
@@ -117,7 +109,6 @@ def main():
                                 log('%r: %r' % (proto, s_lineout[idx]))
                             except Empty:
                                 pass
-       
                         try:
                             m1 = p1.search(s_lineout[idx])
                             if m1: s_msg[idx] = m1.group(group)
@@ -127,7 +118,6 @@ def main():
                         if s_msg[idx] in ['Initialization Sequence Completed']:
                             started[idx] = True
                             starting[idx] = False
-                            
                             try:
                                 log_server_stats(status=started)
                             except Exception as e:
@@ -211,17 +201,50 @@ def main():
                             sleep(LOOP_TIMER)
 
                     if i % LOOP_CYCLE == 0:
-                        try:
-                            log_server_stats(status=started)
-                        except Exception as e:
-                            print repr(e)
-                            if DEBUG: print_exc()
-                            pass
+                        if DEVICE_TYPE == 3:
+                            try:
+                                shell_check_output_cmd(
+                                    'ifconfig {}'.format(TUN_IFACE)
+                                )
+                                ipaddr = shell_check_output_cmd(
+                                    "ip route | grep %s | grep -E '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ via [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ dev %s' | awk '{print $1}'" % (
+                                        TUN_IFACE,
+                                        TUN_IFACE
+                                    )
+                                )
+                                ping_host(
+                                    host=ip.strip('\n'),
+                                    timeout=1,
+                                    count=5
+                                )
+                            except:
+                                try:
+                                    log_server_stats(status=[False, False])
+                                except Exception as e:
+                                    print repr(e)
+                                    if DEBUG: print_exc()
+                        else:
+                            try:
+                                log_server_stats(status=started)
+                            except Exception as e:
+                                print repr(e)
+                                if DEBUG: print_exc()
                 
-                        s_status_line = '%r: started=%r starting=%r af=%r ip=%r loss=%r pid=%r conns=%r mgmt_tun=%r hostapd=%r upnp=%r' % (stack()[0][3], started, starting,
-                                                                                                                                           AF, s_local, s_loss,
-                                                                                                                                           s_pid, s_conns,
-                                                                                                                                           mgmt_ipaddr, AP, UPNP)
+                        s_status_line = (
+                            '{}: started={} starting={} af={} ip={} loss={} pid={} conns={} mgmt_tun={} hostapd={} upnp={}'.format(
+                                stack()[0][3],
+                                started,
+                                starting,
+                                AF,
+                                s_local,
+                                s_loss,
+                                s_pid,
+                                s_conns,
+                                mgmt_ipaddr,
+                                AP,
+                                UPNP
+                            )
+                        )      
                         log(s_status_line)
                         
                 ###########################
@@ -411,11 +434,22 @@ def main():
                             pass
                         
                         w_clnts = get_stations()
-                        
-                        c_status_line = '%r: connected=%r connecting=%r af=%r ip=%r loss=%r pid=%r clients=%r proto=%r mgmt_tun=%r hostapd=%r upnp=%r' % (stack()[0][3], connected, connecting,
-                                                                                                                                                          AF, c_gwip, c_loss, c_pid,
-                                                                                                                                                          w_clnts, c_proto,
-                                                                                                                                                          mgmt_ipaddr, AP, UPNP)
+                        c_status_line = (
+                            '{}: connected={}connecting={} af={} ip=%r loss=%r pid=%r clients=%r proto={} mgmt_tun={} hostapd={} upnp={}' % (
+                                stack()[0][3],
+                                connected,
+                                connecting,
+                                AF,
+                                c_gwip,
+                                c_loss,
+                                c_pid,
+                                w_clnts,
+                                c_proto,
+                                mgmt_ipaddr,
+                                AP,
+                                UPNP
+                            )
+                        )
                         log(c_status_line)
                         now = time()
 

@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, socket, re, signal, requests, json
+import os
+import socket
+import re
+import signal
+import requests
+import json
+
 from time import sleep
 from inspect import stack
 from traceback import print_exc
@@ -9,28 +15,14 @@ from threading  import Thread
 from subprocess import Popen, PIPE
 from Queue import Queue
 
+import auth
+import plugin_loader
+
 from paypal import get_jwt_payload
 from common import retry, log
-import auth, plugin_loader
-
-from api import (put_device, get_node_by_country, get_node_by_guid, get_alpha,
-                 get_guid_by_public_ipaddr, get_device_env_by_name)
-
-from utils import (enqueue_output, resolve_dns, get_stations, run_shell_cmd,
-                   run_background_shell_cmd, get_geo_location,
-                   run_shell_cmd_nowait, recv_with_timeout, decode_jwt_payload)
-
-from config import (WORKDIR, DEBUG, TEMPDIR, DNS_SUB_DOMAIN, CONN_TIMEOUT,
-                    VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT, VPN_HOST, DEVICE_TYPE,
-                    GEOIP_OVERRIDE, LOG_SERVER_STATS, LOG_CLIENT_STATS, AP,
-                    DOCKER_SSH_PORT, WANPROXY, CLIENT_DEVICE_TYPES, UPNP, AF,
-                    TARGET_COUNTRY, SERVER_DEVICE_TYPES, AF_INETS, SKIP_DNS,
-                    TUN_PROTO, PAIRED_DEVICE_GUID, CLIENT_CONFIG, ON_POSIX,
-                    DNS_HOST, STUNNEL, WANPROXY, CIPHER, AUTH, TUN_IFACE_UDP,
-                    TUN_IFACE_TCP, TUN_IFACE, TUN_MTU, FRAGMENT, VPN_LOCATION_GROUP,
-                    VPN_USERNAME, VPN_PROVIDER, VPN_LOCATION, VPN_PASSWD,
-                    OPENVPN_VERSION, OPENVPN_BINARY, GUID, DATADIR,
-                    OPENVPN_PORT, WANPROXY_PORT, SOCAT_PORT, COUNTRY_OVERRIDE)
+from api import *
+from utils import *
+from config import *
 
 
 PROTOS = list(TUN_PROTO)
@@ -524,6 +516,7 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
             data['bytesout'] = 0
             data['conns'] = 0
             data['hostapd'] = AP
+            data['weight'] = MAX_CONNS_CLIENT
 
             if DEVICE_TYPE == 5:
                 data['country'] = country
@@ -571,7 +564,8 @@ def log_server_stats(status=[False, False]):
             data['cipher'] = CIPHER
             data['auth'] = AUTH
             data['upnp'] = UPNP
-
+            data['weight'] = MAX_CONNS_SERVER
+            
             if COUNTRY_OVERRIDE:
                 log('%r: country=%r' % (stack()[0][3], COUNTRY_OVERRIDE))
                 data['country'] = COUNTRY_OVERRIDE

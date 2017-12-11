@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, uuid
+import sys
+import os
+import uuid
 
 
 AF = int(os.getenv('AF', 4))
@@ -56,7 +58,7 @@ MAX_CONNS_SERVER = int(os.getenv('MAX_CONNS_SERVER', 100))
 MAX_CONNS_CLIENT = int(os.getenv('MAX_CONNS_CLIENT', 2))
 CONN_TIMEOUT = int(os.getenv('CONN_TIMEOUT', 5))
 CLIENT_CONFIG = '%s/client.ovpn' % WORKDIR
-ON_POSIX = 'posix' in sys.builtin_module_names
+ON_POSIX = '' in sys.builtin_module_names
 TARGET_COUNTRY = os.getenv('TARGET_COUNTRY', 'United States')
 GEOIP_OVERRIDE = os.getenv('GEOIP_OVERRIDE', None)
 COUNTRY_OVERRIDE = os.getenv('COUNTRY_OVERRIDE', None)
