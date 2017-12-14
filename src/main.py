@@ -12,7 +12,7 @@ from inspect import stack
 from time import sleep, time
 from Queue import Empty
 
-from common import *
+from common import retry, log
 from api import *
 from utils import *
 from vpn import *
@@ -61,17 +61,25 @@ def main():
     if SUPPRESS_TS:
         p1 = re.compile('^(.*)$')   
     else:
-        p1 = re.compile('^([\w]{3}) ([\w]{3}) ([\d]{1,2}) ([\d]+:[\d]+:[\d]+) ([\d]{4}) (.*)$')
+        p1 = re.compile(
+            '^([\w]{3}) ([\w]{3}) ([\d]{1,2}) ([\d]+:[\d]+:[\d]+) ([\d]{4}) (.*)$'
+        )
     group = p1.groups - 1
         
     if bool(re.search('^2.3.', OPENVPN_VERSION)):
-        p2 = re.compile('^.* dev ([\w\d]+) local ([\d]+\.[\d]+\.[\d]+\.[\d]+) peer ([\d]+\.[\d]+\.[\d]+\.[\d]+)$')
+        p2 = re.compile(
+            '^.* dev ([\w\d]+) local ([\d]+\.[\d]+\.[\d]+\.[\d]+) peer ([\d]+\.[\d]+\.[\d]+\.[\d]+)$'
+        )
 
     if bool(re.search('^2.4.', OPENVPN_VERSION)):
-        p2 = re.compile('^.*ifconfig ([\w\d]+) ([\d]+\.[\d]+\.[\d]+\.[\d]+) pointopoint ([\d]+\.[\d]+\.[\d]+\.[\d]+) mtu [\d]+$')
+        p2 = re.compile(
+            '^.*ifconfig ([\w\d]+) ([\d]+\.[\d]+\.[\d]+\.[\d]+) pointopoint ([\d]+\.[\d]+\.[\d]+\.[\d]+) mtu [\d]+$'
+        )
 
     if DEVICE_TYPE == 5:
-        p2 = re.compile('^.*get_ping_host: route_network_[0-9]+=([\d]+\.[\d]+\.[\d]+\.[\d]+)$')
+        p2 = re.compile(
+            '^.*get_ping_host: route_network_[0-9]+=([\d]+\.[\d]+\.[\d]+\.[\d]+)$'
+        )
         p3 = re.compile('^.*remote=(.*) country=(.*)$')
 
     mgmt_ipaddr = None
@@ -80,10 +88,10 @@ def main():
     while True:
         try:            
             if DEVICE_TYPE == 0:
-                log('%r: device=%r' % (stack()[0][3], GUID))
+                log('{}: device={}'.format(stack()[0][3], GUID))
                 sys.exit(0)
 
-            if DEBUG: print 'os.environ: %r' % os.environ
+            if DEBUG: print('os.environ: {}'.format(os.environ))
 
             for i in xrange(0, LOOP_CYCLE):
                 ###########################
@@ -98,15 +106,19 @@ def main():
                             s_lineerr = [None, None]
                             if s_stderrq[idx]:
                                 try:
-                                    s_lineerr[idx] = s_stderrq[idx].get(timeout=LOOP_TIMER / 4)
-                                    log('%r: %r' % (proto, s_lineerr[idx]))
+                                    s_lineerr[idx] = s_stderrq[idx].get(
+                                        timeout=LOOP_TIMER / 4
+                                    )
+                                    log('{}: {}'.format(proto, s_lineerr[idx]))
                                 except Empty:
                                     pass
                   
                         if s_stdoutq[idx]:
                             try:
-                                s_lineout[idx] = s_stdoutq[idx].get(timeout=LOOP_TIMER / 2)
-                                log('%r: %r' % (proto, s_lineout[idx]))
+                                s_lineout[idx] = s_stdoutq[idx].get(
+                                    timeout=LOOP_TIMER / 2
+                                )
+                                log('{}: {}'.format(proto, s_lineout[idx]))
                             except Empty:
                                 pass
                         try:
@@ -120,26 +132,36 @@ def main():
                             starting[idx] = False
                             try:
                                 log_server_stats(status=started)
-                            except Exception as e:
-                                print repr(e)
+                            except:
                                 if DEBUG: print_exc()
-                                pass
-
                         try:
                             m2 = p2.search(s_msg[idx]).groups()
                             dev = m2[0]
                             s_local[idx] = m2[1]
                             s_peer = m2[2]
-                            log('%r: iface=%r local=%r peer=%r proto=%r' % (stack()[0][3],
-                                                                            dev, s_local[idx],
-                                                                            s_peer, proto))
+                            log(
+                                '{}: iface={} local={} peer={} proto={}'.format(
+                                    stack()[0][3],
+                                    dev,
+                                    s_local[idx],
+                                    s_peer,
+                                    proto
+                                )
+                            )
                         except (IndexError, TypeError, AttributeError):
                             pass
 
                         if not started[idx] and starting[idx]:
                             if i % LOOP_CYCLE == 0 and not started[idx]:
-                                log('%r: started=%r starting=%r proto=%r s_pid=%r' % (stack()[0][3], started[idx],
-                                                                                      starting[idx], proto, s_pid[idx]))
+                                log(
+                                    '{}: started={} starting={} proto={} s_pid={}'.format(
+                                        stack()[0][3],
+                                        started[idx],
+                                        starting[idx],
+                                        proto,
+                                        s_pid[idx]
+                                    )
+                                )
                                 started[idx] = False
                                 starting[idx] = False
                                 s_proc[idx].terminate()
@@ -148,49 +170,84 @@ def main():
                         if not started[idx] and not starting[idx]:
                             if i % LOOP_CYCLE == 0: # once per loop
                                 starting[idx] = True
-                                log('%r: starting=%r proto=%r' % (stack()[0][3],
-                                                                  starting[idx], proto))
-                                
+                                log(
+                                    '{}: starting={} proto={}'.format(
+                                        stack()[0][3],
+                                        starting[idx],
+                                        proto
+                                    )
+                                )
+            
                                 try:
-                                    (s_stdoutq[idx], s_stderrq[idx], s_proc[idx]) = start_server(proto=proto)
+                                    (s_stdoutq[idx], s_stderrq[idx], s_proc[idx]) = start_server(
+                                        proto=proto
+                                    )
                                     s_pid[idx] = s_proc[idx].pid
                                 except Exception as e:
                                     starting[idx] = False
-                                    print repr(e)
+                                    print(repr(e))
                                     if DEBUG: print_exc()
                                    
                         if started[idx] and not starting[idx]:
                             if not kill_thread.isAlive():
-                                    kill_thread = Thread(target=disconnect_clients, args=())
+                                    kill_thread = Thread(
+                                        target=disconnect_clients,
+                                        args=()
+                                    )
                                     kill_thread.daemon = True
                                     kill_thread.start()
-                                    log('disconnect_clients: name=%r alive=%r daemon=%r' % (kill_thread.name,
-                                                                                            kill_thread.isAlive(),
-                                                                                            kill_thread.isDaemon()))
+                                    log(
+                                        'disconnect_clients: name={} alive={} daemon={}'.format(
+                                            kill_thread.name,
+                                            kill_thread.isAlive(),
+                                            kill_thread.isDaemon()
+                                        )
+                                    )
 
                             if not auth_thread.isAlive():
                                 if BITCOIN_PAYMENT_CHECK:
-                                    auth_thread = Thread(target=reauthenticate_clients, args=())
+                                    auth_thread = Thread(
+                                        target=reauthenticate_clients,
+                                        args=()
+                                    )
                                     auth_thread.daemon = True
                                     auth_thread.start()
-                                    log('reauthenticate_clients: name=%r alive=%r daemon=%r' % (auth_thread.name,
-                                                                                                auth_thread.isAlive(),
-                                                                                                auth_thread.isDaemon()))
+                                    log(
+                                        'reauthenticate_clients: name={} alive={} daemon={}'.format(
+                                            auth_thread.name,
+                                            auth_thread.isAlive(),
+                                            auth_thread.isDaemon()
+                                        )
+                                    )
                                                         
                             if i % LOOP_CYCLE == 0:
-                                if DEBUG: log('get_status(%r): %r' % (proto, _get_status(proto=proto)))
-                                s_conns[idx] = int(_get_server_conns(proto=proto))
+                                if DEBUG: log(
+                                    'get_status: proto={} status={}'.format(
+                                        proto,
+                                        get_status(proto=proto)
+                                    )
+                                )
+                                s_conns[idx] = int(
+                                    get_server_conns_by(
+                                        proto=proto
+                                    )
+                                )
                                 
                             if i % POLL_FREQ == 0 and s_local[idx]: # every x cycles per loop
                                 s_loss[idx] = 100
                                 try:
                                     s_loss[idx] = ping_host(host=s_local[idx])
                                 except AssertionError as e:
-                                    print repr(e)
+                                    print(repr(e))
                                     if DEBUG: print_exc()
-                                    log('%r: proto=%r s_local=%r s_loss=%r' % (stack()[0][3],
-                                                                               proto, s_local[idx],
-                                                                               s_loss[idx]))
+                                    log(
+                                        '{}: proto={} s_local={} s_loss={}'.format(
+                                            stack()[0][3],
+                                            proto,
+                                            s_local[idx],
+                                            s_loss[idx]
+                                        )
+                                    )
                                     started[idx] = False
                                     starting[idx] = False
                                     s_proc[idx].terminate()
@@ -201,50 +258,58 @@ def main():
                             sleep(LOOP_TIMER)
 
                     if i % LOOP_CYCLE == 0:
-                        if DEVICE_TYPE == 3:
+                        if DEVICE_TYPE == 3: # test if double-vpn is up
                             try:
                                 shell_check_output_cmd(
-                                    'ifconfig {}'.format(TUN_IFACE)
+                                    'ip link | grep %s' % TUN_IFACE
                                 )
-                                ipaddr = shell_check_output_cmd(
+                                gwip = shell_check_output_cmd(
                                     "ip route | grep %s | grep -E '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ via [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ dev %s' | awk '{print $1}'" % (
                                         TUN_IFACE,
                                         TUN_IFACE
                                     )
                                 )
-                                ping_host(
-                                    host=ip.strip('\n'),
-                                    timeout=1,
-                                    count=5
+                                log(
+                                    'iface={} gwip={}'.format(
+                                        TUN_IFACE,
+                                        gwip
+                                    )
                                 )
-                            except:
+                                ping_host(
+                                    host=gwip.strip('\n'),
+                                    timeout=1,
+                                    count=3
+                                )
                                 try:
-                                    log_server_stats(status=[False, False])
-                                except Exception as e:
-                                    print repr(e)
+                                    # server up only if double-vpn is up
+                                    log_server_stats(status=started)
+                                except:
+                                    if DEBUG: print_exc()
+                            except:
+                                if DEBUG: print_exc()
+                                log(
+                                    '{}: double-vpn not ready'.format(
+                                        stack()[0][3]
+                                    )
+                                )
+                                try:
+                                    # force server down if double-vpn is down
+                                    log_server_stats()
+                                except:
                                     if DEBUG: print_exc()
                         else:
                             try:
                                 log_server_stats(status=started)
-                            except Exception as e:
-                                print repr(e)
+                            except:
                                 if DEBUG: print_exc()
                 
-                        s_status_line = (
-                            '{}: started={} starting={} af={} ip={} loss={} pid={} conns={} mgmt_tun={} hostapd={} upnp={}'.format(
-                                stack()[0][3],
-                                started,
-                                starting,
-                                AF,
-                                s_local,
-                                s_loss,
-                                s_pid,
-                                s_conns,
-                                mgmt_ipaddr,
-                                AP,
-                                UPNP
-                            )
-                        )      
+                        s_status_line = '{}: started={} starting={} ip={} loss={} pid={} conns={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
+                            stack()[0][3],
+                            started, starting,
+                            s_local, s_loss, s_pid, s_conns,
+                            mgmt_ipaddr,
+                            AF, AP, UPNP
+                        )    
                         log(s_status_line)
                         
                 ###########################
@@ -252,22 +317,38 @@ def main():
                 ###########################
                 if DEVICE_TYPE in [2, 3, 5]:
                     if c_stp and now - c_timer > (LOOP_TIMER * LOOP_CYCLE * 5):
-                        log('%r: pid=%r elapsed=%r' % (stack()[0][3], c_stp.pid, now - c_timer))
+                        log(
+                            '{}: pid={} elapsed={}'.format(
+                                stack()[0][3],
+                                c_stp.pid,
+                                now - c_timer
+                            )
+                        )
                         c_stp.terminate()
                         c_stp = None
                         c_stq = None
                         c_timer = 0
                         c_str = list()
-                        result = {'status': 1, 'down': None, 'up': None}
-                        log('run_speedtest: result=%r' % result)
+                        
+                        result = {
+                            'status': 1,
+                            'down': None,
+                            'up': None
+                        }
+
+                        log('run_speedtest: result={}'.format(result))
 
                         try:
                             res = update_speedtest(data=result)
-                            log('update_speedtest(%r): %r' % (res[0], res[1]))
+                            log(
+                                'update_speedtest({}): {}'.format(
+                                    res[0],
+                                    res[1]
+                                )
+                            )
                         except Exception as e:
-                            print repr(e)
+                            print(repr(e))
                             if DEBUG: print_exc()
-                            pass
                             
                     if DEBUG:
                         c_lineerr = None
@@ -299,19 +380,25 @@ def main():
                         down = [el for el in c_str[-4].split(' ') if el]
                         up = [el for el in c_str[-2].split(' ') if el]
 
-                        result = {'status': 0,
-                                  'down': ' '.join([s for s in down[2:] if s]),         
-                                  'up': ' '.join([s for s in up[2:] if s])}
+                        result = {
+                            'status': 0,
+                            'down': ' '.join([s for s in down[2:] if s]),
+                            'up': ' '.join([s for s in up[2:] if s])
+                        }
 
-                        log('run_speedtest: result=%r' % result)
+                        log('run_speedtest: result={}'.format(result))
 
                         try:
                             res = update_speedtest(data=result)
-                            log('update_speedtest(%r): %r' % (res[0], res[1]))
+                            log(
+                                'update_speedtest({}): {}'.format(
+                                    res[0],
+                                    res[1]
+                                )
+                            )
                         except Exception as e:
-                            print repr(e)
+                            print(repr(e))
                             if DEBUG: print_exc()
-                            pass
 
                         c_str = list()
                         c_timer = 0
@@ -326,13 +413,14 @@ def main():
                     except (IndexError, TypeError, AttributeError):
                         pass
 
-                    if c_msg in ['SIGTERM[soft,tls-error] received, process exiting',
-                                 'SIGUSR1[soft,init_instance] received, process restarting',
-                                 'SIGUSR1[soft,connection-reset] received, process restarting',
-                                 'SIGTERM[hard,] received, process exiting',
-                                 'Exiting due to fatal error']:
-                        
-                        log('terminate: c_pid=%r' % c_pid)
+                    if c_msg in [
+                        'SIGTERM[soft,tls-error] received, process exiting',
+                        'SIGUSR1[soft,init_instance] received, process restarting',
+                        'SIGUSR1[soft,connection-reset] received, process restarting',
+                        'SIGTERM[hard,] received, process exiting',
+                        'Exiting due to fatal error'
+                    ]:
+                        log('terminate: c_pid={}'.format(c_pid))
                         connected = False
                         connecting = False
                         c_proc.terminate()
@@ -341,14 +429,13 @@ def main():
                     if c_msg in ['Initialization Sequence Completed']:
                         connected = True
                         connecting = False
-
                         try:
-                            log_client_stats(status=connected, country=c_country)
-                        except Exception as e:
-                            print repr(e)
+                            log_client_stats(
+                                status=connected,
+                                country=c_country
+                            )
+                        except:
                             if DEBUG: print_exc()
-                            pass
-
                     try:
                         m2 = p2.search(c_msg).groups()
                         dev = m2[0]
@@ -357,9 +444,16 @@ def main():
                         c_gwip = c_peer.split('.')
                         c_gwip[3] = '1'
                         c_gwip = '.'.join(c_gwip)
-                        log('%r: iface=%r local=%r peer=%r gwip=%r family=%r' % (stack()[0][3],
-                                                                                 dev, c_local,
-                                                                                 c_peer, c_gwip, AF))
+                        log(
+                            '{}: iface={} local={} peer={} gwip={} family={}'.format(
+                                stack()[0][3],
+                                dev,
+                                c_local,
+                                c_peer,
+                                c_gwip,
+                                AF
+                            )
+                        )
                     except (IndexError, TypeError, AttributeError):
                         pass
                     
@@ -368,15 +462,26 @@ def main():
                             m3 = p3.search(c_msg).groups()
                             c_remote = m3[0]
                             c_country = m3[1]
-                            log('%r: remote=%r country=%r' % (stack()[0][3],
-                                                              c_remote, c_country))
+                            log(
+                                '{}: remote={} country={}'.format(
+                                    stack()[0][3],
+                                    c_remote,
+                                    c_country
+                                )
+                            )
                         except (IndexError, TypeError, AttributeError):
                             pass
 
                     if not connected and connecting:
                         if i % LOOP_CYCLE == 0 and not connected:
-                            log('%r: connected=%r connecting=%r c_pid=%r' % (stack()[0][3], connected,
-                                                                             connecting, c_pid))
+                            log(
+                                '{}: connected={} connecting={} c_pid={}'.format(
+                                    stack()[0][3],
+                                    connected,
+                                    connecting,
+                                    c_pid
+                                )
+                            )
                             connected = False
                             connecting = False
                             c_proc.terminate()
@@ -385,15 +490,21 @@ def main():
                     if not connected and not connecting:
                         if i % LOOP_CYCLE == 0:
                             connecting = True
-                            log('%r: connecting=%r family=%r' % (stack()[0][3],
-                                                                 connecting, AF))
-
+                            log(
+                                '{}: connecting={} family={}'.format(
+                                    stack()[0][3],
+                                    connecting,
+                                    AF
+                                )
+                            )
                             try:
-                                (c_stdoutq, c_stderrq, c_proc, c_proto) = connect_node(family=AF)
+                                (c_stdoutq, c_stderrq, c_proc, c_proto) = connect_node(
+                                    family=AF
+                                )
                                 c_pid = c_proc.pid
                             except AssertionError as e:
                                 connecting = False
-                                print repr(e)
+                                print(repr(e))
                                 if DEBUG: print_exc()
 
                     if connected and not connecting:
@@ -404,20 +515,32 @@ def main():
                                     c_str = list()
                                     (c_stq, c_stp) = run_speedtest()
                             except Exception as e:
-                                print repr(e)
+                                print(repr(e))
                                 if DEBUG: print_exc()
 
                             if c_timer:
-                                log('run_speedtest: pid=%r elapsed=%r results=%r' % (c_stp.pid, now - c_timer, len(c_str)))
+                                log(
+                                    'run_speedtest: pid={} elapsed={} results={}'.format(
+                                        c_stp.pid,
+                                        now - c_timer,
+                                        len(c_str)
+                                    )
+                                )
 
                         if i % POLL_FREQ == 0 and c_gwip:
                             c_loss = 100
                             try:
                                 c_loss = ping_host(host=c_gwip)
                             except AssertionError as e:
-                                print repr(e)
+                                print(repr(e))
                                 if DEBUG: print_exc()
-                                log('%r: c_gwip=%r c_loss=%r' % (stack()[0][3], c_gwip, c_loss))
+                                log(
+                                    '{}: c_gwip={} c_loss={}'.format(
+                                        stack()[0][3],
+                                        c_gwip,
+                                        c_loss
+                                    )
+                                )
                                 connected = False
                                 connecting = False
                                 c_proc.terminate()
@@ -427,28 +550,20 @@ def main():
 
                     if i % LOOP_CYCLE == 0:
                         try:
-                            log_client_stats(status=connected, country=c_country)
-                        except Exception as e:
-                            print repr(e)
+                            log_client_stats(
+                                status=connected,
+                                country=c_country
+                            )
+                        except:
                             if DEBUG: print_exc()
-                            pass
                         
                         w_clnts = get_stations()
-                        c_status_line = (
-                            '{}: connected={}connecting={} af={} ip=%r loss=%r pid=%r clients=%r proto={} mgmt_tun={} hostapd={} upnp={}' % (
-                                stack()[0][3],
-                                connected,
-                                connecting,
-                                AF,
-                                c_gwip,
-                                c_loss,
-                                c_pid,
-                                w_clnts,
-                                c_proto,
-                                mgmt_ipaddr,
-                                AP,
-                                UPNP
-                            )
+                        c_status_line = '{}: connected={} connecting={} proto={} ip={} loss={} pid={} clients={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
+                            stack()[0][3],
+                            connected, connecting,
+                            c_proto, c_gwip, c_loss, c_pid,
+                            w_clnts, mgmt_ipaddr,
+                            AF, AP, UPNP
                         )
                         log(c_status_line)
                         now = time()
@@ -457,10 +572,9 @@ def main():
                         sleep(LOOP_TIMER)
 
         except Exception as e:
-            print repr(e)
+            print(repr(e))
             if DEBUG: print_exc()
             sleep(LOOP_CYCLE * LOOP_TIMER) # pause for full loop cycle
-            pass
 
         finally:
             pass

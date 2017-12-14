@@ -13,13 +13,85 @@ import dns.resolver
 from time import time, sleep
 from ping import quiet_ping
 from inspect import stack
-from subprocess import Popen, PIPE, check_output
+from subprocess import check_output, Popen, PIPE
 from threading import Thread
 from Queue import Queue, Empty
 from traceback import print_exc
 
-from common import *
+from common import retry
 from config import *
+
+
+def ping_host(host='localhost', timeout=PING_TIMEOUT, count=PING_COUNT):
+    ping_stats = quiet_ping(host, timeout=timeout, count=count)
+    if DEBUG: print(
+        '{}: ping_stats={}'.format(
+            stack()[0][3],
+            ping_stats
+        )
+    )
+    assert ping_stats[0] < THRESHOLD, '{}: timeout={}'.format(
+        stack()[0][3],
+        host
+    )
+    return ping_stats[0]
+
+
+def shell_check_output_cmd(cmd):
+    if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
+    return check_output(cmd, shell=True).decode('utf-8')
+
+
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
+def run_shell_cmd(cmd):
+    if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
+    p = Popen(
+        cmd,
+        stdin=PIPE,
+        stdout=PIPE,
+        stderr=PIPE,
+        bufsize=1,
+        close_fds=ON_POSIX,
+        env=os.environ.copy(),
+        shell=False
+    )
+    output, err = p.communicate()
+    return (p.returncode, output, err, p.pid)
+
+
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
+def run_background_shell_cmd(cmd):
+    if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
+    p = Popen(
+        cmd,
+        stdin=PIPE,
+        stdout=PIPE,
+        stderr=PIPE,
+        bufsize=1,
+        close_fds=ON_POSIX,
+        env=os.environ.copy(),
+        shell=False
+    )
+    stat = p.poll()
+    while stat == None:
+        stat = p.poll()
+    return p
+
+
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
+def run_shell_cmd_nowait(cmd):
+    if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
+    p = Popen(
+        cmd,
+        stdin=PIPE,
+        stdout=PIPE,
+        stderr=PIPE,
+        bufsize=1,
+        close_fds=ON_POSIX,
+        env=os.environ.copy(),
+        shell=False
+    )
+    return p
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -60,31 +132,6 @@ def recv_with_timeout(s, timeout=5):
     return ''.join(data)
 
 
-def run_shell_cmd(cmd):
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False)
-    output, err = p.communicate()
-    return p.returncode, output, err, p.pid
-
-
-def run_background_shell_cmd(cmd):
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False)
-    stat = p.poll()
-    while stat == None:
-        stat = p.poll()
-    return p
-
-
-def run_shell_cmd_nowait(cmd):
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False)
-    return p
-
-
-@retry(Exception, cdata='method={}'.format(stack()[0][3]))
-def shell_check_output_cmd(cmd):
-    out = check_output(cmd, shell=True)
-    return out.decode('utf-8')
-
-
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def enqueue_output(out, queue):
     for line in iter(out.readline, b''):
@@ -114,9 +161,11 @@ def get_geo_location(family=AF):
     ]
     
     # get the VPN server location, not the location of the device
-    if DEVICE_TYPE == 5:
+    if DEVICE_TYPE in [3, 5]:
         try:
-            get_ip_address(TUN_IFACE)
+            shell_check_output_cmd(
+                'ip link | grep %s' % TUN_IFACE
+            )
             cmd.append('--interface')
             cmd.append(TUN_IFACE)
         except:
@@ -136,7 +185,6 @@ def get_geo_location(family=AF):
                 repr(e)
             )
         )
-        if DEBUG: print_exc()
     return data
 
 
@@ -174,14 +222,6 @@ def get_default_iface():
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
-def ping_host(host='localhost', timeout=PING_TIMEOUT, count=PING_COUNT):
-    ping_stats = quiet_ping(host, timeout=timeout, count=count)
-    if DEBUG: print ping_stats
-    assert ping_stats[0] < THRESHOLD
-    return ping_stats[0]
-
-
-@retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_stations():
     stations = 0
     try:
@@ -192,9 +232,8 @@ def get_stations():
             ]
         )
         if result[0] == 0: stations = int(result[1].strip('\n'))
-    except Exception as e:
-        print repr(e)
-        if DEBUG: print_exc()
+    except:
+        pass
     return stations
 
 
@@ -229,15 +268,8 @@ def run_speedtest(guid=GUID):
         '--nodelay',
         '--dualtest'
     ]
-    if DEBUG: print cmd
-    p = Popen(
-        cmd,
-        stdout=PIPE,
-        stderr=PIPE,
-        bufsize=1,
-        close_fds=ON_POSIX,
-        env=os.environ.copy()
-    )
+    if DEBUG: print('run_speedtest: cmd={}'.format(cmd))
+    p = run_shell_cmd_nowait(cmd)
     queue = Queue()
     thread = Thread(target=enqueue_output, args=(p.stdout, queue))
     thread.daemon = True
@@ -252,12 +284,22 @@ def decode_jwt_payload(encoded=None):
         hdr = jwt.encode({}, '', algorithm='HS256').split('.')[0]
         sig = jwt.encode({}, '', algorithm='HS256').split('.')[2]
         payload = jwt.decode('%s.%s.%s' % (hdr, encoded, sig), verify=False)
-        if DEBUG: print '%r: hdr=%r sig=%r payload=%r' % (stack()[0][3], hdr, sig, payload)
-    except Exception as e:
+        if DEBUG: print(
+            '%r: hdr=%r sig=%r payload=%r'.format(
+                stack()[0][3],
+                hdr,
+                sig,
+                payload
+            )
+        )
+    except:
         payload = dict()
     try:
-        payload['u'] = socket.inet_ntoa(struct.pack('!L', int(payload['u'])))
+        payload['u'] = socket.inet_ntoa(
+            struct.pack(
+                '!L', int(payload['u'])
+            )
+        )
     except:
         pass
     return payload
-

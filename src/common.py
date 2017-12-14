@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, errno
+import os
+import errno
+
 from time import sleep
 from functools import wraps
 from traceback import print_exc
@@ -39,7 +41,14 @@ def retry(ExceptionToCheck, tries=DEFAULT_TRIES, delay=DEFAULT_DELAY, backoff=DE
                 try:
                     return f(*args, **kwargs)
                 except ExceptionToCheck, e:
-                    print '%s, retrying in %d seconds (mtries=%d): %s' % (repr(e), mdelay, mtries, str(cdata))
+                    print(
+                        '{}, retrying in {} seconds (mtries={}): {}'.format(
+                            repr(e),
+                            mdelay,
+                            mtries,
+                            str(cdata)
+                        )
+                    )
                     if DEBUG == 1: print_exc()
                     sleep(mdelay)
                     mtries -= 1
@@ -58,28 +67,19 @@ def open_pipe(pipe=None):
             if e.errno == errno.ENXIO:
                 pass
             else:
-                print repr(e)
-                if DEBUG: print_exc()
                 pass
-
-        if DEBUG: print '%r: pipe=%r fifo=%r' % (stack()[0][3], repr(pipe),
-                                                 repr(fifo))
         return fifo
-
-    except Exception as e:
-        if DEBUG: print_exc()
+    except:
         pass
 
 
 def write_pipe(fifo=None, data=None):
     try:
-        os.write(fifo, '%s\n' % data)
+        os.write(fifo, '{}'.format(data))
     except OSError as e:
         if e.errno == errno.EPIPE:
             pass
         else:
-            print repr(e)
-            if DEBUG: print_exc()
             pass
 
 
@@ -88,8 +88,8 @@ def log(data):
     try:
         if not FIFO: FIFO = open_pipe(pipe=PIPE)
         write_pipe(fifo=FIFO, data=data)
-    except Exception as e:
-        pass
+    except:
+        print('{}'.format(data))
 
 
 FIFO = open_pipe(pipe=PIPE)
