@@ -145,16 +145,16 @@ mkdir -p ~/black.box && \
 cat << EOF > qemu-ifup.sh
 qemu-ifup.sh
 #!/bin/bash
-ip tuntap add $1 mode tap user `whoami`
+ip tuntap add \$1 mode tap user `whoami`
 ip link set $1 up
 sleep 0.5s
-ip link set $1 master br0
+ip link set \$1 master br0
 EOF
 
 cat << EOF > qemu-ifdown.sh
 qemu-ifdown.sh
 #!/bin/bash
-ip link delete $1
+ip link delete \$1
 EOF
 
 chmod +x qemu-ifup.sh qemu-ifdown.sh
