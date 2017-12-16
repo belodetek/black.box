@@ -187,9 +187,11 @@ mkdir -p ~/black.box\
 * start QEMU
 
 ```
+# bridge your public interface to br0 (e.g.)
+# https://help.ubuntu.com/community/BridgingNetworkInterfaces
+
 mkdir -p /etc/qemu\
-  && echo "allow br0" > /etc/qemu/bridge.conf\
-  && brctl addbr br0
+  && echo "allow br0" > /etc/qemu/bridge.conf
 
 sudo qemu-system-x86_64 \
   -nographic \
