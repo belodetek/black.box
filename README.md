@@ -187,19 +187,17 @@ mkdir -p ~/black.box\
 * start QEMU
 
 ```
-# bridge your public interface to br0 (e.g.)
-# https://help.ubuntu.com/community/BridgingNetworkInterfaces
-
 mkdir -p /etc/qemu\
-  && echo "allow br0" > /etc/qemu/bridge.conf
+  && echo "allow virbr0" > /etc/qemu/bridge.conf
 
-sudo qemu-system-x86_64 \
-  -nographic \
-  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw \
-  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//') \
-  -net bridge,br=br0 \
-  -machine type=pc \
-  -m 1024 \
+sudo qemu-system-x86_64\
+  -nographic\
+  -curses\
+  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw\
+  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//')\
+  -net bridge,br=virbr0\
+  -machine type=pc\
+  -m 1024\
   -smp 2
 ```
 
