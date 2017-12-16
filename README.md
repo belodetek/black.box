@@ -178,6 +178,7 @@ sudo qemu-system-x86_64 \
 ## Linux (libvirt)
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
 * download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
+
 ```
 mkdir -p ~/black.box\
   && cd ~/black.box\
