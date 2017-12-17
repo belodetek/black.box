@@ -82,22 +82,28 @@ If you don't have a compatible device, or waiting for one to arrive, you can use
 
 ## Mac OS X
 * install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
+
 ```
-(brew install qemu || sudo port install qemu) && \
-  (brew install tuntap || sudo port install tuntaposx)
+(brew install qemu || sudo port install qemu)\
+  && (brew install tuntap || sudo port install tuntaposx)
 ```
 
-* start TunTap (MacPorts) 
+* start TunTap (MacPorts)
+
 ```
 launchctl load -w /Library/LaunchDaemons/org.macports.tuntaposx.plist
 ```
 
-* download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file and resize the image
+* download, uncompress and resize image
+
 ```
-mkdir -p ~/black.box && \
-  cd ~/black.box && \
-  qemu-img resize -f raw blackbox-qemux86_64.img +2G
+mkdir -p ~/black.box\
+  && cd ~/black.box\
+  && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
+  && gunzip blackbox-qemux86_64.img.gz\
+  && qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
+
 * under `System Preferences > Network > Manage Virtual Interfaces`, create `bridge1` and add `Thunderbolt Ethernet` interface to it
 * create helper scripts, and mark executable
 
@@ -117,14 +123,14 @@ chmod +x qemu-ifup.sh qemu-ifdown.sh
 
 * start QEMU
 ```
-sudo qemu-system-x86_64 \
-  -nographic \
-  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw \
-  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//') \
-  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh \
-  -machine type=pc \
-  -m 1024 \
-  -smp 4
+sudo qemu-system-x86_64\
+  -nographic\
+  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw\
+  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//')\
+  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh\
+  -machine type=pc\
+  -m 1024\
+  -smp 2
 ```
 * carry on from step [#3](#instructions) in LAN mode
 
@@ -133,11 +139,12 @@ sudo qemu-system-x86_64 \
 ## Linux
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
 * install [libvirt](https://libvirt.org/) binary for your platform
-* download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
 
 ```
 mkdir -p ~/black.box\
   && cd ~/black.box\
+  && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
+  && gunzip blackbox-qemux86_64.img.gz\
   && qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
 * start QEMU
