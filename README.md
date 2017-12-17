@@ -162,13 +162,15 @@ chmod +x qemu-ifup.sh qemu-ifdown.sh
 
 * start QEMU
 ```
-sudo qemu-system-x86_64 \
-  -nographic \
-  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw \
-  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//') \
-  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh \
-  -machine type=pc \
-  -m 1024 \
+sudo qemu-system-x86_64\
+  -daemonize\
+  -enable-kvm\
+  -display none\
+  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw\
+  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//')\
+  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh\
+  -machine type=pc\
+  -m 1024\
   -smp 2
 ```
 * carry on from step [#3](#instructions) in LAN mode
@@ -177,6 +179,7 @@ sudo qemu-system-x86_64 \
 
 ## Linux (libvirt)
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
+* install [libvirt](https://libvirt.org/) binary for your platform
 * download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
 
 ```
@@ -191,8 +194,9 @@ mkdir -p /etc/qemu\
   && echo "allow virbr0" > /etc/qemu/bridge.conf
 
 sudo qemu-system-x86_64\
-  -nographic\
-  -curses\
+  -daemonize\
+  -enable-kvm\
+  -display none\
   -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw\
   -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//')\
   -net bridge,br=virbr0\
