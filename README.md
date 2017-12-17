@@ -132,53 +132,6 @@ sudo qemu-system-x86_64 \
 
 ## Linux
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
-* download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
-```
-mkdir -p ~/black.box && \
-  cd ~/black.box && \
-  qemu-img resize -f raw blackbox-qemux86_64.img +2G
-```
-* create a bridged interface `br0` (see, [https://wiki.debian.org/QEMU#Networking](https://wiki.debian.org/QEMU#Networking))
-* create helper scripts, and mark executable
-
-```
-cat << EOF > qemu-ifup.sh
-qemu-ifup.sh
-#!/bin/bash
-ip tuntap add \$1 mode tap user `whoami`
-ip link set $1 up
-sleep 0.5s
-ip link set \$1 master br0
-EOF
-
-cat << EOF > qemu-ifdown.sh
-qemu-ifdown.sh
-#!/bin/bash
-ip link delete \$1
-EOF
-
-chmod +x qemu-ifup.sh qemu-ifdown.sh
-```
-
-* start QEMU
-```
-sudo qemu-system-x86_64\
-  -daemonize\
-  -enable-kvm\
-  -display none\
-  -drive file=blackbox-qemux86_64.img,media=disk,cache=none,format=raw\
-  -net nic,model=virtio,macaddr=$(echo -n "06:" ; openssl rand -hex 5 | sed 's/\(..\)/\1:/g; s/.$//')\
-  -net tap,script=qemu-ifup.sh,downscript=qemu-ifdown.sh\
-  -machine type=pc\
-  -m 1024\
-  -smp 2
-```
-* carry on from step [#3](#instructions) in LAN mode
-
-> if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
-
-## Linux (libvirt)
-* [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
 * install [libvirt](https://libvirt.org/) binary for your platform
 * download, uncompress an resize the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz) file
 
