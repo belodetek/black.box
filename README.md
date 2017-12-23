@@ -122,6 +122,7 @@ chmod +x qemu-ifup.sh qemu-ifdown.sh
 ```
 
 * start QEMU
+
 ```
 sudo qemu-system-x86_64\
   -nographic\
@@ -132,6 +133,7 @@ sudo qemu-system-x86_64\
   -m 1024\
   -smp 2
 ```
+
 * carry on from step [#3](#instructions) in LAN mode
 
 > if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
@@ -147,6 +149,7 @@ mkdir -p ~/black.box\
   && gunzip blackbox-qemux86_64.img.gz\
   && qemu-img resize -f raw blackbox-qemux86_64.img +2G
 ```
+
 * start QEMU
 
 ```
