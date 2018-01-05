@@ -9,8 +9,22 @@ AF = int(os.getenv('AF', 4))
 AP = int(os.getenv('AP', 1))
 UPNP = int(os.getenv('UPNP', 0))
 AF_INETS = [int(af) for af in os.getenv('AF_INETS', '4 6').split()]
-SERVER_DEVICE_TYPES = [int(sdt) for sdt in os.getenv('SERVER_DEVICE_TYPES', '1 3 4').split()]
-CLIENT_DEVICE_TYPES = [int(cdt) for cdt in os.getenv('CLIENT_DEVICE_TYPES', '2 3 5').split()]
+
+# 1=public server; 3=mixed; 4=private server
+SERVER_DEVICE_TYPES = [
+    int(sdt) for sdt in os.getenv('SERVER_DEVICE_TYPES', '1 3 4').split()
+]
+
+# 2=unblocking; 5=VPN; 6=Tor
+CLIENT_DEVICE_TYPES = [
+    int(cdt) for cdt in os.getenv('CLIENT_DEVICE_TYPES', '2 3 5').split()
+]
+
+# 0=buffered read; 1=cached read; 2=write
+IOTESTS = [
+    int(iot) for iot in os.getenv('IOTESTS', '0 1 2').split()
+]
+
 OPENVPN_BINARY = os.getenv('OPENVPN_BINARY', None)
 OPENVPN_VERSION = os.getenv('OPENVPN_VERSION', None)
 DEFAULT_TRIES = int(os.getenv('DEFAULT_TRIES', 3))
@@ -58,7 +72,6 @@ MAX_CONNS_SERVER = int(os.getenv('MAX_CONNS_SERVER', 100))
 MAX_CONNS_CLIENT = int(os.getenv('MAX_CONNS_CLIENT', 2))
 CONN_TIMEOUT = int(os.getenv('CONN_TIMEOUT', 5))
 CLIENT_CONFIG = '%s/client.ovpn' % WORKDIR
-ON_POSIX = '' in sys.builtin_module_names
 TARGET_COUNTRY = os.getenv('TARGET_COUNTRY', 'United States')
 GEOIP_OVERRIDE = os.getenv('GEOIP_OVERRIDE', None)
 COUNTRY_OVERRIDE = os.getenv('COUNTRY_OVERRIDE', None)
@@ -82,5 +95,10 @@ VPN_PASSWD = os.getenv('VPN_PASSWD', None)
 OPENVPN_PORT = os.getenv('OPENVPN_PORT', '1194')
 WANPROXY_PORT= os.getenv('WANPROXY_PORT', '3300')
 SOCAT_PORT= os.getenv('SOCAT_PORT', '3302')
+EXPLICIT_EXIT_NOTIFY = int(os.getenv('EXPLICIT_EXIT_NOTIFY', 1))
 
-os.environ['REQUESTS_CA_BUNDLE'] = os.getenv('REQUESTS_CA_BUNDLE', '%s/cacert.pem' % DATADIR)
+ON_POSIX = '' in sys.builtin_module_names
+
+os.environ['REQUESTS_CA_BUNDLE'] = os.getenv(
+    'REQUESTS_CA_BUNDLE', '{}/cacert.pem'.format(DATADIR)
+)
