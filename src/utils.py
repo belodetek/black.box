@@ -13,7 +13,7 @@ import dns.resolver
 from time import time, sleep
 from ping import quiet_ping
 from inspect import stack
-from subprocess import check_output, Popen, PIPE
+from subprocess import check_output, Popen, PIPE, STDOUT
 from threading import Thread
 from Queue import Queue, Empty
 from traceback import print_exc
@@ -39,7 +39,11 @@ def ping_host(host='localhost', timeout=PING_TIMEOUT, count=PING_COUNT):
 
 def shell_check_output_cmd(cmd):
     if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
-    return check_output(cmd, shell=True).decode('utf-8')
+    return check_output(
+        cmd,
+        stderr=STDOUT,
+        shell=True
+    ).decode('utf-8')
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -238,7 +242,7 @@ def get_stations():
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
-def resolve_dns(host='us.%s' % DNS_HOST, record='A', family=4):
+def resolve_dns(host='us.{}'.format(DNS_HOST), record='A', family=4):
     res = None
     try:
         resolver = dns.resolver.Resolver()
@@ -258,8 +262,14 @@ def resolve_dns(host='us.%s' % DNS_HOST, record='A', family=4):
     
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
-def run_speedtest(guid=GUID):
-    server = '%s.1' % '.'.join(get_ip_address(TUN_IFACE).split('.')[:-1])
+def run_speedtest():
+    server = '{}.1'.format(
+        '.'.join(
+            get_ip_address(
+                TUN_IFACE
+            ).split('.')[:-1]
+        )
+    )
     cmd = [
         '/usr/bin/iperf',
         '--client',
@@ -268,7 +278,7 @@ def run_speedtest(guid=GUID):
         '--nodelay',
         '--dualtest'
     ]
-    if DEBUG: print('run_speedtest: cmd={}'.format(cmd))
+    if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
     p = run_shell_cmd_nowait(cmd)
     queue = Queue()
     thread = Thread(target=enqueue_output, args=(p.stdout, queue))
@@ -283,9 +293,16 @@ def decode_jwt_payload(encoded=None):
     try:
         hdr = jwt.encode({}, '', algorithm='HS256').split('.')[0]
         sig = jwt.encode({}, '', algorithm='HS256').split('.')[2]
-        payload = jwt.decode('%s.%s.%s' % (hdr, encoded, sig), verify=False)
+        payload = jwt.decode(
+            '{}.{}.{}'.format(
+                hdr,
+                encoded,
+                sig
+            ),
+            verify=False
+        )
         if DEBUG: print(
-            '%r: hdr=%r sig=%r payload=%r'.format(
+            '{}: hdr={} sig={} payload={}'.format(
                 stack()[0][3],
                 hdr,
                 sig,
@@ -303,3 +320,30 @@ def decode_jwt_payload(encoded=None):
     except:
         pass
     return payload
+
+
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
+def run_iotest(test=0):
+    data_vol = shell_check_output_cmd(
+        'mount | grep "%s" | head -n 1 | awk \'{print $1}\'' % DATADIR
+    ).strip('\n')
+    cmd = [
+        'hdparm'
+    ]
+    if test == 0:
+        cmd.append('-t')
+    if test == 1:
+        cmd.append('-T')
+    cmd.append(data_vol)
+    if test == 2:
+        cmd = [
+            '/bin/bash',
+            '{}/scripts/dd-write-test.sh'.format(WORKDIR)
+        ]
+    if DEBUG: print('{}: cmd={}'.format(stack()[0][3], cmd))
+    p = run_shell_cmd_nowait(cmd)
+    queue = Queue()
+    thread = Thread(target=enqueue_output, args=(p.stdout, queue))
+    thread.daemon = True
+    thread.start()
+    return queue, p

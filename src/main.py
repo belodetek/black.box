@@ -35,12 +35,17 @@ def main():
     c_lineout = None
     c_lineerr = None
     c_status_line = None
-    c_timer = 0
+    c_stimer = 0
+    c_iotimer = 0
     now = time()
     c_stl = None
     c_str = list()
     c_stq = None
     c_stp = None
+    c_iotl = None
+    c_iotq = None
+    c_iotp = None
+    c_iott = None
     c_remote = None
     c_country = TARGET_COUNTRY
     w_clnts = 0
@@ -82,6 +87,16 @@ def main():
         )
         p3 = re.compile('^.*remote=(.*) country=(.*)$')
 
+    # hdparm tests
+    p4 = re.compile(
+        '^\s+(.*):\s+(\d+\s+.*)\s+in\s+([\d\.]+\s+.*)\s+=\s+(.*)\n$'
+    )
+
+    # dd write
+    p5 = re.compile(
+        '^(\d+\s+.*)\s+\((.*),.*\)\s+.*,\s+(.*),\s+(.*)$'
+    )
+
     mgmt_ipaddr = None
     if TUN_MGMT: mgmt_ipaddr = get_ip_address(MGMT_IFACE)
 
@@ -112,6 +127,10 @@ def main():
                                     log('{}: {}'.format(proto, s_lineerr[idx]))
                                 except Empty:
                                     pass
+                        else:
+                            if s_stderrq[idx]:
+                                with s_stderrq[idx].mutex:
+                                    s_stderrq[idx].queue.clear()
                   
                         if s_stdoutq[idx]:
                             try:
@@ -254,7 +273,13 @@ def main():
                                     s_loss[idx] = 0
                                     break
 
-                        if not (DEBUG and s_stderrq[idx]) and not s_stdoutq[idx]:
+                        # flush the stderr queue if not debugging
+                        if not DEBUG and s_stderrq[idx]:
+                            with s_stderrq[idx].mutex:
+                                s_stderrq[idx].queue.clear()
+
+                        if not (DEBUG and s_stderrq[idx])\
+                           and not s_stdoutq[idx]:
                             sleep(LOOP_TIMER)
 
                     if i % LOOP_CYCLE == 0:
@@ -316,18 +341,19 @@ def main():
                 # client mode(s) or mixed #
                 ###########################
                 if DEVICE_TYPE in [2, 3, 5]:
-                    if c_stp and now - c_timer > (LOOP_TIMER * LOOP_CYCLE * 5):
+                    # iperf timeout
+                    if c_stp and now - c_stimer > (LOOP_TIMER * LOOP_CYCLE * 5):
                         log(
                             '{}: pid={} elapsed={}'.format(
                                 stack()[0][3],
                                 c_stp.pid,
-                                now - c_timer
+                                now - c_stimer
                             )
                         )
                         c_stp.terminate()
                         c_stp = None
                         c_stq = None
-                        c_timer = 0
+                        c_stimer = 0
                         c_str = list()
                         
                         result = {
@@ -335,9 +361,7 @@ def main():
                             'down': None,
                             'up': None
                         }
-
                         log('run_speedtest: result={}'.format(result))
-
                         try:
                             res = update_speedtest(data=result)
                             log(
@@ -349,7 +373,40 @@ def main():
                         except Exception as e:
                             print(repr(e))
                             if DEBUG: print_exc()
-                            
+
+                    # hdparm or dd timeout
+                    if c_iotp and now - c_iotimer > (LOOP_TIMER * LOOP_CYCLE * 3):
+                        log(
+                            '{}: pid={} elapsed={} test={}'.format(
+                                stack()[0][3],
+                                c_iotp.pid,
+                                now - c_iotimer,
+                                c_iott
+                            )
+                        )
+                        try:
+                            result = {
+                                'status': 1,
+                                'test': c_iott,
+                                'result': None
+                            }
+                            log('run_iotest: result={}'.format(result))
+                            res = update_iotest(data=result)
+                            log(
+                                'update_iotest({}): {}'.format(
+                                    res[0],
+                                    res[1]
+                                )
+                            )
+                        except Exception as e:
+                            print(repr(e))
+                            if DEBUG: print_exc()
+                        c_iotp.terminate()
+                        c_iotp = None
+                        c_iotq = None
+                        c_iotimer = 0
+                        c_iott = None
+
                     if DEBUG:
                         c_lineerr = None
                         if c_stderrq:
@@ -358,6 +415,10 @@ def main():
                                 log(c_lineerr)
                             except Empty:
                                 pass
+                    else:
+                        if c_stderrq:
+                            with c_stderrq.mutex:
+                                c_stderrq.queue.clear()
 
                     c_lineout = None
                     if c_stdoutq:
@@ -376,7 +437,8 @@ def main():
                         except Empty:
                             pass
 
-                    if len(c_str) == 15: # hack (iperf --dualtest)
+                    # speedtest result
+                    if len(c_str) == 15: # lines of output hack (iperf --dualtest)
                         down = [el for el in c_str[-4].split(' ') if el]
                         up = [el for el in c_str[-2].split(' ') if el]
 
@@ -401,12 +463,42 @@ def main():
                             if DEBUG: print_exc()
 
                         c_str = list()
-                        c_timer = 0
+                        c_stimer = 0
                         c_stp = None
                         c_stq = None
-     
-                    c_msg = None
-                                    
+
+                    # hdparm or dd result
+                    c_iotl = None
+                    if c_iotq:
+                        try:
+                            c_iotl = c_iotq.get(timeout=LOOP_TIMER / 2)
+                            log(c_iotl)
+                            if p4.search(c_iotl) or p5.search(c_iotl):
+                                result = {
+                                    'status': 0,
+                                    'test': c_iott,
+                                    'result': c_iotl.lstrip().rstrip().strip('\n')
+                                }
+                                log('run_iotest: result={}'.format(result))
+                                try:
+                                    res = update_iotest(data=result)
+                                    log(
+                                        'update_iotest({}): {}'.format(
+                                            res[0],
+                                            res[1]
+                                        )
+                                    )
+                                except Exception as e:
+                                    print(repr(e))
+                                    if DEBUG: print_exc()
+                                c_iotimer = 0
+                                c_iott = None
+                                c_iotp = None
+                                c_iotq = None
+                        except Empty:
+                            pass
+
+                    c_msg = None                
                     try:
                         m1 = p1.search(c_lineout)
                         if m1: c_msg = m1.group(group)
@@ -509,21 +601,45 @@ def main():
 
                     if connected and not connecting:
                         if i % LOOP_CYCLE == 0:
+                            # run speedtest
                             try:
-                                if not c_timer and dequeue_speedtest():
-                                    c_timer = now
+                                if not c_stimer and dequeue_speedtest():
+                                    c_stimer = now
                                     c_str = list()
                                     (c_stq, c_stp) = run_speedtest()
                             except Exception as e:
                                 print(repr(e))
                                 if DEBUG: print_exc()
-
-                            if c_timer:
+                            if c_stimer:
                                 log(
                                     'run_speedtest: pid={} elapsed={} results={}'.format(
                                         c_stp.pid,
-                                        now - c_timer,
+                                        now - c_stimer,
                                         len(c_str)
+                                    )
+                                )
+
+                            # run hdparm or dd
+                            try:
+                                try:
+                                    c_iott = dequeue_iotest()
+                                except:
+                                    c_iott = None
+                                if DEBUG:
+                                    log('dequeue_iotest: test={}'.format(c_iott))
+                                if not c_iotimer and c_iott in IOTESTS:
+                                    c_iotimer = now
+                                    (c_iotq, c_iotp) = run_iotest(test=c_iott)
+                            except Exception as e:
+                                print(repr(e))
+                                if DEBUG: print_exc()
+                            if c_iotimer:
+                                log(
+                                    'run_iotest: pid={} elapsed={} test={} result={}'.format(
+                                        c_iotp.pid,
+                                        now - c_iotimer,
+                                        c_iott,
+                                        c_iotl
                                     )
                                 )
 
@@ -568,7 +684,13 @@ def main():
                         log(c_status_line)
                         now = time()
 
-                    if not (DEBUG and c_stderrq) and not (c_stdoutq and c_stq):
+                    # flush the stderr queue if not debugging
+                    if not DEBUG and c_stderrq:
+                        with c_stderrq.mutex:
+                            c_stderrq.queue.clear()
+
+                    if not (DEBUG and c_stderrq)\
+                       and not c_stdoutq and not c_stq and not c_iotq:
                         sleep(LOOP_TIMER)
 
         except Exception as e:

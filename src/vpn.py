@@ -382,6 +382,10 @@ def connect_node(family=AF):
             cmd.append('--fragment')
             cmd.append(FRAGMENT)
 
+        if EXPLICIT_EXIT_NOTIFY in [1, 2] and tun_proto == 'udp':
+            cmd.append('--explicit-exit-notify')
+            cmd.append(str(EXPLICIT_EXIT_NOTIFY))
+
         cmd.append('--remote')
         cmd.append(ipaddr)
         cmd.append(port)
@@ -442,6 +446,12 @@ def start_server(proto='udp'):
         cmd.append('--mssfix')
         cmd.append('--fragment')
         cmd.append(FRAGMENT)
+
+    if EXPLICIT_EXIT_NOTIFY in [1, 2]\
+       and proto == 'udp'\
+       and bool(re.search('^2.4.', OPENVPN_VERSION)):
+        cmd.append('--explicit-exit-notify')
+        cmd.append(str(EXPLICIT_EXIT_NOTIFY)) 
 
     p = run_shell_cmd_nowait(cmd)
     stdoutq = Queue()
