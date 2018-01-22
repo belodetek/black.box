@@ -166,10 +166,14 @@ def connect_node(family=AF):
     ############
     # VPN mode #
     ############
-    if DEVICE_TYPE == 5 or (DEVICE_TYPE == 3 \
-                            and VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
-                            and VPN_USERNAME and VPN_PASSWD):
-        
+    if DEVICE_TYPE == 5 or (\
+        DEVICE_TYPE == 3\
+        and VPN_PROVIDER\
+        and VPN_LOCATION_GROUP\
+        and VPN_LOCATION\
+        and VPN_USERNAME\
+        and VPN_PASSWD\
+    ):
         log(
             '{}: mode={} provider={} group={} location={} username={} password={}'.format(
                 stack()[0][3],
@@ -198,14 +202,28 @@ def connect_node(family=AF):
                         PAIRED_DEVICE_GUID
                     )
                 )
+                assert ipaddr
             except AssertionError as e:
-                log(
-                    'get_node_by_guid: e={} af={}'.format(
-                        repr(e),
-                        family
-                    )
-                )
                 if DEBUG: print_exc()
+                try:
+                    assert family == 6 # fall-back to IPv4 if not already
+                    ipaddr = get_node_by_guid(family=4)
+                    log(
+                        'get_node_by_guid: ipaddr={} af={} guid={}'.format(
+                            ipaddr,
+                            4,
+                            PAIRED_DEVICE_GUID
+                        )
+                    )
+                    assert ipaddr
+                except AssertionError as e:
+                    if DEBUG: print_exc()
+                    log(
+                        'get_node_by_guid: e={} af={}'.format(
+                            repr(e),
+                            family
+                        )
+                    )
 
         ###################
         # unblocking mode #
