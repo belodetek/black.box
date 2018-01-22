@@ -1,6 +1,6 @@
 <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> `black.box` is a VPN policy routing appliance, which runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices.
 
-<img align="left" src="https://api-dev.belodedenko.me/api/v1.0/countries/available/flags.png" width="64">
+<a href="https://dashboard.unzoner.com/sub" <img align="left" src="https://api-dev.belodedenko.me/api/v1.0/countries/available/flags.png" width="32"></a>
 <br>
 
 `Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. A `black.box` device, combined with an active subscription, automatically un-blocks video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN. Unzoner subscriptions can also be created manually for use with compatible software, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) and [Kodi](http://unzoner.com/#kodi).
