@@ -791,13 +791,16 @@ def log_server_stats(status=[False, False]):
 
     # additional server logging plug-in(s)
     log('{}: plugin={}'.format(stack()[0][3], DNS_SUB_DOMAIN))
-    if plugin_loader.plugin and 'log_plugin_server' in dir(plugin_loader.plugin):
+    if plugin_loader.plugin\
+       and 'log_plugin_server' in dir(plugin_loader.plugin):
         result = plugin_loader.plugin.log_plugin_server(status=status)
 
 
-def conf_stunnel_client(node=None, conf='/etc/stunnel/stunnel-client.conf',
-                        template='/etc/stunnel/stunnel-client.template.conf'):
-    
+def conf_stunnel_client(
+    node=None,
+    conf='/etc/stunnel/stunnel-client.conf',
+    template='/etc/stunnel/stunnel-client.template.conf'
+):
     if not node: return None
     f = open(template, 'r')
     template = f.read()

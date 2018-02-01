@@ -330,10 +330,16 @@ def main():
                 
                         s_status_line = '{}: started={} starting={} ip={} loss={} pid={} conns={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
                             stack()[0][3],
-                            started, starting,
-                            s_local, s_loss, s_pid, s_conns,
+                            started,
+                            starting,
+                            s_local,
+                            s_loss,
+                            s_pid,
+                            s_conns,
                             mgmt_ipaddr,
-                            AF, AP, UPNP
+                            AF,
+                            AP,
+                            UPNP
                         )    
                         log(s_status_line)
                         
@@ -676,10 +682,17 @@ def main():
                         w_clnts = get_stations()
                         c_status_line = '{}: connected={} connecting={} proto={} ip={} loss={} pid={} clients={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
                             stack()[0][3],
-                            connected, connecting,
-                            c_proto, c_gwip, c_loss, c_pid,
-                            w_clnts, mgmt_ipaddr,
-                            AF, AP, UPNP
+                            connected,
+                            connecting,
+                            c_proto,
+                            c_gwip,
+                            c_loss,
+                            c_pid,
+                            w_clnts,
+                            mgmt_ipaddr,
+                            AF,
+                            AP,
+                            UPNP
                         )
                         log(c_status_line)
                         now = time()
