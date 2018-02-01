@@ -14,7 +14,7 @@ from config import (DEBUG, PAYPAL_SUBSCRIPTION_CHECK, BITCOIN_PAYMENT_CHECK,
                     PAIRED_DEVICES_FREE, POLICY_ROUTING_CHECK)
 
 
-@retry(Exception, cdata='method=%s()' % stack()[0][3])
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def auth_user(uid, pwd):
     if not (uid and pwd): return False
     uid = uid[:32]
@@ -28,7 +28,7 @@ def auth_user(uid, pwd):
         except Exception as e:
             paired_device = None
         
-        if DEBUG: print 'paired_device=%r uid=%r' % (paired_device, uid)
+        if DEBUG: print('paired_device={} uid={}'.format(paired_device, uid))
         if paired_device: return True
 
     # policy routing check (resin.io devices)
@@ -39,8 +39,12 @@ def auth_user(uid, pwd):
         except Exception as e:
             policy_routing = None
 
-        if DEBUG: print 'policy_routing={0} uid={1}'.\
-           format(policy_routing, uid)
+        if DEBUG: print(
+            'policy_routing={} uid={}'.format(
+                policy_routing,
+                uid
+            )
+        )
         if policy_routing and policy_routing == 0: return False
         
     # password check (resin.io Data API)
@@ -61,7 +65,7 @@ def auth_user(uid, pwd):
     # deny all other devices with policy routing test enabled
     if POLICY_ROUTING_CHECK:
         if device_type and not device_type == 'RESIN':
-            if DEBUG: print 'device_type=%r uid=%r' % (device_type, uid)
+            if DEBUG: print('device_type={} uid={}'.format(device_type, uid))
             return False
 
     if not tun_passwd: return False
@@ -76,7 +80,7 @@ def auth_user(uid, pwd):
         except Exception as e:
             result = None
             
-        if DEBUG: print 'paypal=%s uid=%s' % (result, uid)
+        if DEBUG: print('paypal={} uid={}'.format(result, uid))
         if result: return True
     
     # Bitcoin payment check (resin.io Data API)
@@ -86,7 +90,7 @@ def auth_user(uid, pwd):
         except Exception as e:
             result = None
             
-        if DEBUG: print 'bitcoin=%s uid=%s' % (result, uid)
+        if DEBUG: print('bitcoin={} uid={}'.format(result, uid))
         if result: return True
 
     return False # deny ALL by default
