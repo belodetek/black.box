@@ -4,7 +4,7 @@
 
 `Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. Together, they un-block video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN. Unzoner subscriptions can also be created manually for use with compatible software, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) and [Kodi](http://unzoner.com/#kodi).
 
-> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu) on a PC or [router](#dd-wrt)
+> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
 <br>
 
 # instructions
@@ -27,23 +27,23 @@
 
 ```
 +---------+         +-----------------+
-|         |  Wi-Fi  |                 |  Google, Facebook, etc.
-|   iOS   | +-----> |    black.box    | +--------------------->
-| Android |         |    ---------    |
+| iOS     |  Wi-Fi  |                 |  Google, Facebook, etc.
+| Android | +-----> |    black.box    | +--------------------->
+|         |         |    ---------    |
 +---------+         |    VPN policy   |
                     |    router       |
 +---------+         |                 |
-| Mac OSX |  Wi-Fi  |                 |
+| macOS   |  Wi-Fi  |                 |
 | Windows | +-----> |                 |
-|  Linux  |   LAN   |                 |
+| Linux   |   LAN   |                 |
 +---------+         |                 |
                     |                 |
 +---------+         |   Sling TV      |            +----------+
 |  Kodi   |  Wi-Fi  |   Netflix       |   tunnel   |          |
 |  QEMU   | +-----> |   Hulu          | +--------> | Exit US  +----+
 |  DD-WRT |   LAN   |   etc.          |            |          |    |
-+---------+         +-----------------+            +-----+----+ UK |
-                                                        |          |
+|  VBox   |         |                 |            +-----+----+ UK |
++---------+         +-----------------+                 |          |
                                                         +----------+
 ```
 
@@ -79,10 +79,29 @@ Please visit PayPal to cancel your `black.box` subscription.
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/paypal.png" width="600">
 
-# qemu
-If you don't have a compatible device, or waiting for one to arrive, you can use your PC with [QEMU](http://www.qemu-project.org/) to run `black.box`. Alternatively, you can simply configure compatible software on your PC, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) for use with Unzoner.
+# QEMU or VirtualBox
+If you don't have a compatible device, or waiting for one to arrive, you can use your PC with [QEMU](http://www.qemu-project.org/) or Oracle [VirtualBox](https://www.virtualbox.org/) to run `black.box`.
 
-## Mac OS X
+> You can always configure compatible software on your PC, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) for use with Unzoner without advanced features, such as policy based routing.
+
+## VirtualBox (macOS)
+* install QEMU using `Homebrew` or `MacPorts` (we just need the `qemu-img` tool)
+* download, uncompress, resize and convert the image
+
+```
+mkdir -p ~/black.box\
+  && cd ~/black.box\
+  && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
+  && gunzip blackbox-qemux86_64.img.gz\
+  && qemu-img resize -f raw blackbox-qemux86_64.img +2G\
+  && qemu-img convert -f raw -O vdi blackbox-qemux86_64.img blackbox-qemux86_64.vdi\
+  && rm blackbox-qemux86_64.img
+```
+
+* open VirtualBox, create a new `Linux 2.6 / 3.x / 4.x (64-bit)` VM called `black.box` and select the `blackbox-qemux86_64.vdi` image
+* start the VM and carry on from step [#3](#instructions) in LAN mode
+
+## QEMU (macOS)
 * install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
 
 ```
@@ -140,7 +159,7 @@ sudo qemu-system-x86_64\
 
 > if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
 
-## Linux
+## QEMU (Linux)
 * [download](http://www.qemu-project.org/download/) and install QEMU for your distribution
 * install [libvirt](https://libvirt.org/) binary for your platform
 
