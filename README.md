@@ -100,7 +100,7 @@ mkdir -p ~/black.box\
   && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
   && gunzip blackbox-qemux86_64.img.gz\
   && qemu-img resize -f raw blackbox-qemux86_64.img +2G\
-  && qemu-img convert -f raw -O vdi blackbox-qemux86_64.img blackbox-qemux86_64.vdi\
+  && VBoxManage convertfromraw blackbox-qemux86_64.img blackbox-qemux86_64.vdi --variant Fixed\
   && rm blackbox-qemux86_64.img
 ```
 
