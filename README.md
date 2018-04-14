@@ -86,6 +86,12 @@ If you don't have a compatible device, or waiting for one to arrive, you can use
 
 ## VirtualBox (macOS)
 * install QEMU using `Homebrew` or `MacPorts` (we just need the `qemu-img` tool)
+
+```
+brew install qemu || sudo port install qemu
+```
+
+* install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 * download, uncompress, resize and convert the image
 
 ```
