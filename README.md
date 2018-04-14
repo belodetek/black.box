@@ -105,6 +105,7 @@ mkdir -p ~/black.box\
 ```
 
 * open VirtualBox, create a new `Linux 2.6 / 3.x / 4.x (64-bit)` VM called `black.box` and select the `blackbox-qemux86_64.vdi` image
+* set `Network` to `Bridged Adapter` mode and select appropriate uplink
 * start the VM and carry on from step [#3](#instructions) in LAN mode
 
 ## QEMU (macOS)
