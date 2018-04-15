@@ -60,7 +60,7 @@ For performance reasons, un-blocking traffic is not encrypted[[n4](#footnotes)].
 In VPN mode, the device supports a number of popular VPN services, such as [VPNArea](http://vpnarea.com/front?a_aid=blackbox) and [Private Internet Access](https://privateinternetaccess.com). Separate subscriptions/accounts required to access supported VPN services.
 
 ## server (pairing) mode
-In the server pairing mode, multiple devices can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays. `Unzoner` subscription is currently not required in this mode.
+In the server pairing mode, multiple devices can be used to establish private encrypted links. Leave one at home/office and dial back in securely when travelling or on holidays to access the Internet via the device in server mode. `Unzoner` subscription is currently not required in this mode. LAN(s) behind server devices are not accessible (WAN only).
 
 # dashboard
 Once the device is running, the dash is accessible by navigating to [http://blackbox.local/](http://blackbox.local/) while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
