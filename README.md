@@ -32,18 +32,19 @@
 |         |         |    ---------    |
 +---------+         |    VPN policy   |
                     |    router       |
-+---------+         |                 |
-| macOS   |  Wi-Fi  |                 |
-| Windows | +-----> |                 |
-| Linux   |   LAN   |                 |
-+---------+         |                 |
-                    |                 |
-+---------+         |   Sling TV      |            +----------+
-|  Kodi   |  Wi-Fi  |   Netflix       |   tunnel   |          |
-|  QEMU   | +-----> |   Hulu          | +--------> | Exit US  +----+
-|  DD-WRT |   LAN   |   etc.          |            |          |    |
-|  VBox   |         |                 |            +-----+----+ UK |
-+---------+         +-----------------+                 |          |
++---------+         |    ---------    |
+| macOS   |  Wi-Fi  |    VirtualBox   |
+| Windows | +-----> |    DD-WRT       |
+| Linux   |   LAN   |    QEMU         |
+| Kodi    |         |    Raspberry Pi |
++---------+         |    etc.         |
+                    |    ---------    |
+                    |    Sling TV     |            +----------+
+                    |    Netflix      |   tunnel   |          |
+                    |    Hulu         | +--------> | Exit US  +----+
+                    |    etc.         |            |          |    |
+                    |                 |            +-----+----+ UK |
+                    +-----------------+                 |          |
                                                         +----------+
 ```
 
