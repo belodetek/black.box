@@ -145,6 +145,7 @@ def connect_node(family=AF):
         
     s_wpid = None
     s_wport = None
+    ipaddr = None
 
     if len(PROTOS) <= 0: PROTOS = list(TUN_PROTO) # start again
     c_proto = PROTOS.pop()
@@ -166,13 +167,13 @@ def connect_node(family=AF):
     ############
     # VPN mode #
     ############
-    if DEVICE_TYPE == 5 or (\
-        DEVICE_TYPE == 3\
-        and VPN_PROVIDER\
-        and VPN_LOCATION_GROUP\
-        and VPN_LOCATION\
-        and VPN_USERNAME\
-        and VPN_PASSWD\
+    if DEVICE_TYPE == 5 or (
+        DEVICE_TYPE == 3
+        and VPN_PROVIDER
+        and VPN_LOCATION_GROUP
+        and VPN_LOCATION
+        and VPN_USERNAME
+        and VPN_PASSWD
     ):
         log(
             '{}: mode={} provider={} group={} location={} username={} password={}'.format(
@@ -203,7 +204,7 @@ def connect_node(family=AF):
                     )
                 )
                 assert ipaddr
-            except AssertionError as e:
+            except:
                 if DEBUG: print_exc()
                 try:
                     assert family == 6 # fall-back to IPv4 if not already
@@ -337,7 +338,7 @@ def connect_node(family=AF):
         # stunnel override #
         ####################
         if STUNNEL:
-            result = conf_stunnel_client(ipaddr)
+            result = conf_stunnel_client(node=ipaddr)
             if DEBUG: print(result)
 
             result = restart_stunnel_client()
@@ -809,7 +810,6 @@ def conf_stunnel_client(
     f = open(conf, 'w')
     f.write(template)
     f.close()
-    
     return template
 
 
@@ -829,9 +829,14 @@ def restart_stunnel_client(
     return run_shell_cmd(['%s' % stunnel_bin, '%s' % conf])
 
 
-def start_wanproxy_server(ipaddr=None, family=4, local_pid=None,
-                          remote_pid=None, port=None, ssh_port=DOCKER_SSH_PORT):
-
+def start_wanproxy_server(
+    ipaddr=None,
+    family=4,
+    local_pid=None,
+    remote_pid=None,
+    port=None,
+    ssh_port=DOCKER_SSH_PORT
+):
     if WANPROXY == 'SSH':
         remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
         assert remote_guid

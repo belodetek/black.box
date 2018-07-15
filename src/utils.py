@@ -251,11 +251,15 @@ def resolve_dns(host='us.{}'.format(DNS_HOST), record='A', family=4):
         answers = dns.resolver.query(host, record)
         for rdata in answers:
             res = rdata.to_text() # always last record
-        # fudge to make dns.resolver work with Nuitka compiled code
-        pat = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
-        if not pat.match(res):
-            addr_long = int(res.split(' ')[2], 16)
-            res = socket.inet_ntoa(struct.pack('>L', addr_long))
+        try:
+            if family == 4:
+                # fudge to make dns.resolver work with Nuitka compiled code
+                pat = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+                if not pat.match(res):
+                    addr_long = int(res.split(' ')[2], 16)
+                    res = socket.inet_ntoa(struct.pack('>L', addr_long))
+        except:
+            pass
         return res
     except dns.resolver.NoAnswer:
         return None

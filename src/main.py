@@ -108,7 +108,7 @@ def main():
 
             if DEBUG: print('os.environ: {}'.format(os.environ))
 
-            for i in xrange(0, LOOP_CYCLE):
+            for i in xrange(1, LOOP_CYCLE + 1):
                 ###########################
                 # server mode(s) or mixed #
                 ###########################
@@ -122,7 +122,7 @@ def main():
                             if s_stderrq[idx]:
                                 try:
                                     s_lineerr[idx] = s_stderrq[idx].get(
-                                        timeout=LOOP_TIMER / 4
+                                        timeout=LOOP_TIMER
                                     )
                                     log('{}: {}'.format(proto, s_lineerr[idx]))
                                 except Empty:
@@ -135,7 +135,7 @@ def main():
                         if s_stdoutq[idx]:
                             try:
                                 s_lineout[idx] = s_stdoutq[idx].get(
-                                    timeout=LOOP_TIMER / 2
+                                    timeout=LOOP_TIMER
                                 )
                                 log('{}: {}'.format(proto, s_lineout[idx]))
                             except Empty:
@@ -173,8 +173,9 @@ def main():
                         if not started[idx] and starting[idx]:
                             if i % LOOP_CYCLE == 0 and not started[idx]:
                                 log(
-                                    '{}: started={} starting={} proto={} s_pid={}'.format(
+                                    '{}: cycle={} started={} starting={} proto={} s_pid={}'.format(
                                         stack()[0][3],
+                                        i,
                                         started[idx],
                                         starting[idx],
                                         proto,
@@ -187,11 +188,12 @@ def main():
                                 s_pid[idx] = None
                                 
                         if not started[idx] and not starting[idx]:
-                            if i % LOOP_CYCLE == 0: # once per loop
+                            if i == 1: # once per loop (start)
                                 starting[idx] = True
                                 log(
-                                    '{}: starting={} proto={}'.format(
+                                    '{}: cycle={} starting={} proto={}'.format(
                                         stack()[0][3],
+                                        i,
                                         starting[idx],
                                         proto
                                     )
@@ -239,9 +241,10 @@ def main():
                                         )
                                     )
                                                         
-                            if i % LOOP_CYCLE == 0:
+                            if i == 1 or i % LOOP_CYCLE == 0: # twice per loop (start and end)
                                 if DEBUG: log(
-                                    'get_status: proto={} status={}'.format(
+                                    'get_status: cycle={} proto={} status={}'.format(
+                                        i,
                                         proto,
                                         get_status(proto=proto)
                                     )
@@ -260,7 +263,8 @@ def main():
                                     print(repr(e))
                                     if DEBUG: print_exc()
                                     log(
-                                        '{}: proto={} s_local={} s_loss={}'.format(
+                                        '{}: cycle={} proto={} s_local={} s_loss={}'.format(
+                                            i,
                                             stack()[0][3],
                                             proto,
                                             s_local[idx],
@@ -280,7 +284,7 @@ def main():
 
                         if not (DEBUG and s_stderrq[idx])\
                            and not s_stdoutq[idx]:
-                            sleep(LOOP_TIMER)
+                            sleep(LOOP_TIMER / 2)
 
                     if i % LOOP_CYCLE == 0:
                         if DEVICE_TYPE == 3: # test if double-vpn is up
@@ -328,8 +332,9 @@ def main():
                             except:
                                 if DEBUG: print_exc()
                 
-                        s_status_line = '{}: started={} starting={} ip={} loss={} pid={} conns={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
+                        s_status_line = '{}: cycle={} started={} starting={} ip={} loss={} pid={} conns={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
                             stack()[0][3],
+                            i,
                             started,
                             starting,
                             s_local,
@@ -429,7 +434,7 @@ def main():
                     c_lineout = None
                     if c_stdoutq:
                         try:
-                            c_lineout = c_stdoutq.get(timeout=LOOP_TIMER / 2)
+                            c_lineout = c_stdoutq.get(timeout=LOOP_TIMER)
                             log(c_lineout)
                         except Empty:
                             pass
@@ -437,7 +442,7 @@ def main():
                     c_stl = None
                     if c_stq:
                         try:
-                            c_stl = c_stq.get(timeout=LOOP_TIMER / 2)
+                            c_stl = c_stq.get(timeout=LOOP_TIMER)
                             log(c_stl)
                             c_str.append(c_stl)
                         except Empty:
@@ -477,7 +482,7 @@ def main():
                     c_iotl = None
                     if c_iotq:
                         try:
-                            c_iotl = c_iotq.get(timeout=LOOP_TIMER / 2)
+                            c_iotl = c_iotq.get(timeout=LOOP_TIMER)
                             log(c_iotl)
                             if p4.search(c_iotl) or p5.search(c_iotl):
                                 result = {
@@ -573,8 +578,9 @@ def main():
                     if not connected and connecting:
                         if i % LOOP_CYCLE == 0 and not connected:
                             log(
-                                '{}: connected={} connecting={} c_pid={}'.format(
+                                '{}: cycle={} connected={} connecting={} c_pid={}'.format(
                                     stack()[0][3],
+                                    i,
                                     connected,
                                     connecting,
                                     c_pid
@@ -586,11 +592,12 @@ def main():
                             c_pid = None
                             
                     if not connected and not connecting:
-                        if i % LOOP_CYCLE == 0:
+                        if i == 1:
                             connecting = True
                             log(
-                                '{}: connecting={} family={}'.format(
+                                '{}: cycle={} connecting={} family={}'.format(
                                     stack()[0][3],
+                                    i,
                                     connecting,
                                     AF
                                 )
@@ -680,8 +687,9 @@ def main():
                             if DEBUG: print_exc()
                         
                         w_clnts = get_stations()
-                        c_status_line = '{}: connected={} connecting={} proto={} ip={} loss={} pid={} clients={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
+                        c_status_line = '{}: cycle={} connected={} connecting={} proto={} ip={} loss={} pid={} clients={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
                             stack()[0][3],
+                            i,
                             connected,
                             connecting,
                             c_proto,
@@ -703,7 +711,9 @@ def main():
                             c_stderrq.queue.clear()
 
                     if not (DEBUG and c_stderrq)\
-                       and not c_stdoutq and not c_stq and not c_iotq:
+                       and not c_stdoutq\
+                       and not c_stq\
+                       and not c_iotq:
                         sleep(LOOP_TIMER)
 
         except Exception as e:
