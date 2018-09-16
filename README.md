@@ -7,7 +7,7 @@
 > <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
 <br>
 
-# instructions
+# instructions 
 
 > Due to a [PayPal](https://developer.paypal.com/docs/classic/express-checkout/integration-guide/ECRecurringPayments/) [limitation](https://stackoverflow.com/questions/22682410/express-checkout-for-recurring-payments-does-not-work-for-german-payers), subscriptions are not available in Germany (and China), please use Bitcoin instead or find a way to create PayPal accounts in other region(s).
 
@@ -21,6 +21,9 @@
 8. now try accessing some previously blocked Internet content[[n9](#footnotes)]
 9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dash
 10. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
+
+#
+https://privacyapp.flashrouters.com/
 
 # about
 `black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can (a) typically access popular streaming [services](#services) from anywhere in the world; (b) to provide privacy and anonymity via 3rd party VPN providers; or (c) etablish private VPN links between two or more locations. Application source code is available at [https://github.com/ab77/black.box/tree/master/src](https://github.com/ab77/black.box/tree/master/src) under the [MIT](https://github.com/ab77/black.box/blob/master/src/LICENSE) license.
@@ -202,7 +205,7 @@ sudo qemu-system-x86_64\
 > if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
 
 # DD-WRT
-Support for [DD-WRT](https://www.flashrouters.com/learn/router-basics/what-is-dd-wrt) flashed routers is currently under development with reduced feature set.
+> [Order](https://privacyapp.flashrouters.com/) your router with the FlashRouters Privacy App pre-installed
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connect.png" width="600">
 
