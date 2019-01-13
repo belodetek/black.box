@@ -69,7 +69,7 @@ In the server pairing mode, multiple devices can be used to establish private en
 # dashboard
 Once the device is running, the dash is accessible by navigating to [http://blackbox.local/](http://blackbox.local/) while connected to the `black.box` Wi-Fi network or from the LAN. Please do not share your device GUID(s) (the long alpa-numeric string you see in the dash URL) as they are effectively credentials for anyone to access your devices settings and modify them. So, keep them secret.
 
-A live demo dashboard is available [here](https://dashboard.unzoner.com/?guid=c20b8e96dcc78b316ea18c872e99fc6d).
+A live demo dashboard is available [here](https://dashboard.unzoner.com/?guid=b55b561ea8fcc9b11105f05f1e8b5095).
 
 ![black.box dashboard](https://raw.githubusercontent.com/ab77/black.box/master/images/dashboard.png)
 
@@ -302,7 +302,7 @@ There are two more system modes the device can function in, namely `exit-node` a
 
 Python 2.7 is used for the main application, together with Linux Bash shell scripts to help interface with the operating system. All Python code is compiled into executables using Nuitka on dynamically provisioned Digital Ocean Droplets for both `armv7l` (QEMU) and `x86_64` architectures and shipped to devices in a secure manner, by first encrypting the payload using OpenSSL. Devices are managed using `resin.io` IoT infrastructure, which runs the `black.box` code inside Docker containers on custom ResinOS images. All runtime code is unpacked onto encrypted disk partitions inside Docker containers with all transient data stored in memory only and disk encryption keys never recorded.
 
-Amazon AWS (EBS) is used to host both the `black.box` API ([demo](https://api.unzoner.com/api/v1.0/ping)) and the device dashboard ([demo](https://dashboard.unzoner.com/?guid=c20b8e96dcc78b316ea18c872e99fc6d)), which are implemented in Python-Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, and Redis is used for caching.
+Amazon AWS (EBS) is used to host both the `black.box` API ([demo](https://api.unzoner.com/api/v1.0/ping)) and the device dashboard ([demo](https://dashboard.unzoner.com/?guid=b55b561ea8fcc9b11105f05f1e8b5095)), which are implemented in Python-Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, and Redis is used for caching.
 
 For subscriptions, the `black.box` API talks to the PayPal Subscriptions API to set-up monthly subscriptions. For Bitcoin payments, the BlockCypher API provides nesessary WebHooks to advise the `black.box` API when a payment has been received as well as a WebSocket notification for the dashboard. No Bitcoin payment provider (middle-man) is used in the Bitcoin payment flow.
 
