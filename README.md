@@ -1,6 +1,6 @@
 <a href="https://dashboard.unzoner.com/sub"><img align="left" src="https://api.unzoner.com/api/v1.0/countries/available/flags.png"></a><br><br>
 
-<img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> `black.box` is a VPN policy routing appliance, which runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), DD-WRT routers and other[[n8](#footnotes)] devices.
+<img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125"> `black.box` is a VPN policy routing appliance, which runs on `ARMv7` CPU equipped [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), [DD-WRT](https://privacyapp.flashrouters.com/) routers and other[[n8](#footnotes)] devices.
 
 `Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. Together, they un-block video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN. Unzoner subscriptions can also be created manually for use with compatible software, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) and [Kodi](http://unzoner.com/#kodi).
 
@@ -21,9 +21,6 @@
 8. now try accessing some previously blocked Internet content[[n9](#footnotes)]
 9. for issues, please email [support](mailto:blackbox@unzoner.com), IRC channel [#netflix-proxy](https://webchat.freenode.net/?channels=#netflix-proxy) on Freenode, or use the live chat link on the dash
 10. to be advised when important stuff happens, subscribe to push notifications on the [dash](#dashboard)
-
-#
-https://privacyapp.flashrouters.com/
 
 # about
 `black.box` devices operate in three distinct modes. Devices connected to the `black.box` Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can (a) typically access popular streaming [services](#services) from anywhere in the world; (b) to provide privacy and anonymity via 3rd party VPN providers; or (c) etablish private VPN links between two or more locations. Application source code is available at [https://github.com/ab77/black.box/tree/master/src](https://github.com/ab77/black.box/tree/master/src) under the [MIT](https://github.com/ab77/black.box/blob/master/src/LICENSE) license.
