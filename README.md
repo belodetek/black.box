@@ -202,10 +202,6 @@ sudo qemu-system-x86_64\
 > if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
 
 # DD-WRT
-> **TL;DR** SSH/telnet to your router and run
-
-    curl --insecure https://dd-wrt.unzoner.com/ddwrt | sh
-
 Support for DD-WRT is available without advanced features (e.g. policy based routing) enjoyed by other device types. Requires compatible router board and firmware version.
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connect.png" width="600">
