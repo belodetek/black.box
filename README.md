@@ -202,12 +202,14 @@ sudo qemu-system-x86_64\
 > if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
 
 # DD-WRT
+> tl;dr run `curl --insecure https://dd-wrt.unzoner.com/ddwrt | sh` on your router
+
 Support for DD-WRT is available without advanced features (e.g. policy based routing) enjoyed by other device types. Requires compatible router board and firmware version.
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connect.png" width="600">
 
-To install the preview:
-* obtain a router with the [latest](http://www.dd-wrt.com/site/support/other-downloads?path=betas%2F2017%2F06-01-2017-r32170%2F) `DD-WRT` firmware (ensure `cURL` and `OpenVPN v2.4` are present in the installed firmware)
+To install black.box Unzoner MyPage extension:
+* obtain a router with the [latest](https://dd-wrt.com/support/other-downloads/?path=betas%2F) `DD-WRT` firmware (ensure `cURL` and `OpenVPN v2.4` are present in the installed firmware)
 * connect to your DD-WRT router using LAN or Wi-Fi
 * in Incognito/(In)Private Browsing window, navigate to [DD-WRT](http://dd-wrt.unzoner.com/) and sign-in
 * enable `Native IPv6 from ISP` under `Setup -> IPv6`
