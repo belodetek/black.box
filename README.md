@@ -202,7 +202,6 @@ sudo qemu-system-x86_64\
 > if your screen devices are on the same L2 bridge as the QEMU VM, ensure DNS is pointing to the gateway IP.
 
 # DD-WRT
-> [Order](https://privacyapp.flashrouters.com/) your router with the FlashRouters Privacy App pre-installed
 
 <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/ddwrt-connect.png" width="600">
 
