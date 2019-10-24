@@ -4,14 +4,16 @@
 
 `Unzoner` is a subscription-based service, designed specifically for Internet content un-blocking. Together, they un-block video streaming content across tablets, smartphones, desktops, laptops and TVs over Wi-Fi or LAN. Unzoner subscriptions can also be created manually for use with compatible software, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) and [Kodi](http://unzoner.com/#kodi).
 
-> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [this](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
+🎁 Raspberry Pi 4 (aarch64) BETA support is out now, [get](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) your Pi!
+
+> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [RPi3/armv7hf](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-273905.img.gz) or [RPi4/aarch64](https://belodetech.s3.eu-central-1.amazonaws.com/blackbox-1531298.img.gz) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
 <br>
 
-# instructions 
+# instructions
 
 > Due to a [PayPal](https://developer.paypal.com/docs/classic/express-checkout/integration-guide/ECRecurringPayments/) [limitation](https://stackoverflow.com/questions/22682410/express-checkout-for-recurring-payments-does-not-work-for-german-payers), subscriptions are not available in Germany (and China), please use Bitcoin instead or find a way to create PayPal accounts in other region(s).
 
-1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) starter kit, download and uncompress the [.img](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox.img.gz) file, burn it to a fast 4GB+ SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
+1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) or [RPi4](https://www.amazon.com/CanaKit-Raspberry-4GB-Basic-Kit/dp/B07TXKY4Z9) starter kit, download and uncompress the [armv7hf](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-273905.img.gz) or [aarch64](https://belodetech.s3.eu-central-1.amazonaws.com/blackbox-1531298.img.gz) file, burn it to a fast 4GB+ SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
 2. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)] and a 2.5A+ power supply[[n2](#footnotes)]
 3. after initial initialisation of around 10-20 minutes depending on your bandwidth[[n5](#footnotes)] and SD card speed[[n10]](#footnotes), visit [http://blackbox.local/](http://blackbox.local/) or [http://blackbox-2.local/](http://blackbox-2.local/) URL
 4. click subscribe (if un-blocking) to setup up a PayPal billing agreement[[n11](#footnotes)] and claim your **1 month free** trial or PAYG using Bitcoin[[n7](#footnotes)]
