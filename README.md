@@ -216,7 +216,7 @@ To install black.box Unzoner MyPage extension:
 * navigate to [`Administration -> Commands`](http://dd-wrt.unzoner.com/Diagnostics.asp) page and run
 
 ```
-curl --insecure https://dd-wrt.unzoner.com/ddwrt | sh
+curl --silent https://dd-wrt.unzoner.com/ddwrt | sh
 ```
 
 * navigate to [`Status -> MyPage`](http://dd-wrt.unzoner.com/MyPage.asp), sign-up and connect

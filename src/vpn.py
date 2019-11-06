@@ -502,15 +502,14 @@ def _get_client_conns(user=GUID, proto='udp'):
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_client_conns(user=GUID):
-    try:
-        udp_conns = _get_client_conns(user=user) # udp stats
-    except:
-        udp_conns = 0
-    try:
-        tcp_conns = _get_client_conns(user=user, proto='tcp') # tcp stats
-    except:
-        tcp_conns = 0
-    return udp_conns + tcp_conns
+    total_conns = 0
+    for proto in TUN_PROTO:
+        try:
+            proto_conns = _get_client_conns(user=user, proto=proto)
+            total_conns = total_conns + proto_conns
+        except:
+            proto_conns = 0
+    return total_conns
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -525,37 +524,37 @@ def get_server_conns_by(proto='udp'):
     for lines in stats:
         line = lines.split(',')        
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]: conns = conns + 1
-    return conns
+    return int(conns)
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_server_conns(status=[True, True]):
-    conns = 0
-    stats = [None, None]
-    try:
-        if status[0]: stats[0] = get_server_conns_by() # udp stats        
-        if status[1]: stats[1] = get_server_conns_by(proto='tcp') # tcp stats
-    except:
-        pass
-    if stats[0]: conns = int(stats[0]) # udp vpn connection count
-    if stats[1]: conns = conns + int(stats[1]) # udp + tcp vpn connection count
-    return conns
+    total_conns = 0
+    for proto in TUN_PROTO:
+        try:
+            proto_conns = int(get_server_conns_by(proto=proto))
+            total_conns = total_conns + proto_conns
+        except:
+            proto_conns = 0
+    return int(total_conns)
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
-def get_load_stats(host=VPN_HOST, port=VPN_UDP_MGMT_PORT):
-    stats = (0, 0, 0)
-    try:
-        load_stats = run_openvpn_mgmt_cmd(host=host, port=port, cmd='load-stats')
-        p = re.compile('^SUCCESS: nclients=([\d]+),bytesin=([\d]+),bytesout=([\d]+)$')
-        m = p.search(load_stats[0])
+def get_load_stats(host=VPN_HOST):
+    total_stats = (0, 0, 0)
+    for port in [VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT]:
         try:
-            stats = m.groups()
+            load_stats = run_openvpn_mgmt_cmd(host=host, port=port, cmd='load-stats')
+            p = re.compile('^SUCCESS: nclients=([\d]+),bytesin=([\d]+),bytesout=([\d]+)$')
+            m = p.search(load_stats[0])
+            try:
+                port_stats = m.groups()
+            except:
+                port_stats = (0, 0, 0)
         except:
-            pass
-    except:
-        pass
-    return stats
+            port_stats = (0, 0, 0)
+        total_stats = list(map(lambda x,y:int(x)+int(y), total_stats, port_stats))
+    return total_stats
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -596,25 +595,16 @@ def get_client_status():
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_clients():
-    clients = list()
-    udp_clients = list()
-    try:
-        udp_clients = get_status()
-    except:
-        pass
-    for lines in udp_clients:
-        line = lines.split(',')
-        if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]:
-            clients.append(line[1])
-    tcp_clients = list()
-    try:
-        tcp_clients = get_status(proto='tcp')
-    except:
-        pass
-    for lines in tcp_clients:
-        line = lines.split(',')
-        if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]:
-            clients.append(line[1])
+    clients = []
+    for proto in TUN_PROTO:
+        try:
+            status_lines = get_status(proto=proto)
+            for lines in status_lines:
+                line = lines.split(',')
+                if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]:
+                    clients.append(line[1])
+        except:
+            status_lines = []
     return clients
 
 
@@ -757,35 +747,9 @@ def log_server_stats(status=[False, False]):
                 data['ip'] = GEOIP_OVERRIDE
 
             if DEVICE_TYPE in SERVER_DEVICE_TYPES:
-                stats = [None, None]
-                if status[0]: stats[0] = int(get_server_conns_by()) # udp stats
-                if status[1]: stats[1] = int(get_server_conns_by(proto='tcp')) # tcp stats
-                
-                if stats[0]:
-                    data['conns'] = int(stats[0]) # udp vpn connection count
-
-                    try:
-                        data['bytesin'] = int(get_load_stats()[1])
-                    except:
-                        pass
-                    
-                    try:
-                        data['bytesout'] = int(get_load_stats()[2])
-                    except:
-                        pass
-                    
-                if stats[1]:
-                    data['conns'] = data['conns'] + int(stats[1]) # udp + tcp vpn connection count
-
-                    try:
-                        data['bytesin'] = data['bytesin'] + int(get_load_stats(port=VPN_TCP_MGMT_PORT)[1])
-                    except:
-                        pass
-
-                    try:
-                        data['bytesout'] = data['bytesout'] + int(get_load_stats(port=VPN_TCP_MGMT_PORT)[2])
-                    except:
-                        pass
+                data['conns'] = int(get_server_conns())
+                data['bytesin'] = int(get_load_stats()[1])
+                data['bytesout'] = int(get_load_stats()[2])
 
             log('{}: af={} data={}'.format(stack()[0][3], family, data))
             print(put_device(family=family, data=data))
