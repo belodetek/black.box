@@ -10,9 +10,10 @@ from traceback import print_exc
 from inspect import stack
 
 from config import *
+from hashlib import md5
 
 
-PIPE = '%s/%s' % (TEMPDIR, DNS_SUB_DOMAIN)
+PIPE = '{}/{}'.format(TEMPDIR, DNS_SUB_DOMAIN)
 if not os.path.exists(PIPE): os.mkfifo(PIPE)
 
 
@@ -40,7 +41,7 @@ def retry(ExceptionToCheck, tries=DEFAULT_TRIES, delay=DEFAULT_DELAY, backoff=DE
             while mtries >= 1:
                 try:
                     return f(*args, **kwargs)
-                except ExceptionToCheck, e:
+                except ExceptionToCheck as e:
                     print(
                         '{}, retrying in {} seconds (mtries={}): {}'.format(
                             repr(e),
@@ -58,16 +59,23 @@ def retry(ExceptionToCheck, tries=DEFAULT_TRIES, delay=DEFAULT_DELAY, backoff=DE
     return deco_retry
 
 
+def get_md5(s):
+    s = unicode(s)
+    s = s.encode('utf-8')
+    try:
+        return md5(s).hexdigest()
+    except:
+        return s
+
+
 def open_pipe(pipe=None):
     try:
         fifo = None
         try:
             fifo = os.open(pipe, os.O_WRONLY | os.O_NONBLOCK)
         except OSError as e:
-            if e.errno == errno.ENXIO:
-                pass
-            else:
-                pass
+            if e.errno == errno.ENXIO: pass
+            else: pass
         return fifo
     except:
         pass
@@ -75,21 +83,22 @@ def open_pipe(pipe=None):
 
 def write_pipe(fifo=None, data=None):
     try:
-        os.write(fifo, '{}'.format(data))
+        os.write(fifo, data)
     except OSError as e:
-        if e.errno == errno.EPIPE:
-            pass
-        else:
-            pass
+        if e.errno == errno.EPIPE: pass
+        else: pass
 
 
 def log(data):
     global FIFO
     try:
         if not FIFO: FIFO = open_pipe(pipe=PIPE)
-        write_pipe(fifo=FIFO, data=data)
+        write_pipe(fifo=FIFO, data=data.encode())
     except:
-        print('{}'.format(data))
+        try:
+            print(data.decode())
+        except:
+            print(data)
 
 
 FIFO = open_pipe(pipe=PIPE)

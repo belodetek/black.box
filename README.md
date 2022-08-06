@@ -299,7 +299,7 @@ There are two more system modes the device can function in, namely `exit-node` a
 
 `black.box` devices run on [ResinOS](https://resinos.io/), using [resin.io](https://resin.io/) management back-end. OpenVPN 2.4 is used for building `black.box` VPN tunnels, whether encrypted or otherwise. OpenSSL is compiled with NEON support to accelerate certain cryptographic functions on the `ARMv7` CPUs and linked with OpenVPN. Stunnel and WANProxy are use for obfuscation and/or acceleration. You can expect to get anywhere from 5Mbit/s to 10Mbit/s through the Pi Ethernet interface in unblocking mode and less in VPN mode. VPN providers which use default SHA1 authentication should be a little faster, due to ARMv7 NEON optimisations.
 
-Python 2.7 is used for the main application, together with Linux Bash shell scripts to help interface with the operating system. All Python code is compiled into executables using Nuitka on dynamically provisioned Digital Ocean Droplets for both `armv7l` (QEMU) and `x86_64` architectures and shipped to devices in a secure manner, by first encrypting the payload using OpenSSL. Devices are managed using `resin.io` IoT infrastructure, which runs the `black.box` code inside Docker containers on custom ResinOS images. All runtime code is unpacked onto encrypted disk partitions inside Docker containers with all transient data stored in memory only and disk encryption keys never recorded.
+Python 3.9 is used for the main application, together with Linux Bash shell scripts to help interface with the operating system. All Python code is (optionally) compiled into executables using Nuitka on dynamically provisioned Digital Ocean Droplets for both `armv7l` (QEMU) and `x86_64` architectures and shipped to devices in a secure manner, by first encrypting the payload using OpenSSL. Devices are managed using `resin.io` IoT infrastructure, which runs the `black.box` code inside Docker containers on custom ResinOS images. All runtime code is unpacked onto encrypted disk partitions inside Docker containers with all transient data stored in memory only and disk encryption keys never recorded.
 
 Amazon AWS (EBS) is used to host both the `black.box` API ([demo](https://api.unzoner.com/api/v1.0/ping)) and the device dashboard ([demo](https://dashboard.unzoner.com/?guid=b55b561ea8fcc9b11105f05f1e8b5095)), which are implemented in Python-Flask and Bootstrap. Amazon RDS is used for transient data storage, persisting for no longer than one hour, and Redis is used for caching.
 
@@ -322,9 +322,9 @@ Additional management VPS is used to provide `ipinfo` support services as well a
 
 
 ```
--- v1.0
+-- v2.0
 ```
 
 <hr>
-<p align="center">&copy; 2016 <a href="http://ab77.github.io/">Unzoner</a></p>
+<p align="center">&copy; 2022 <a href="http://ab77.github.io/">Unzoner</a></p>
 <p align="center"><a href="http://anton.belodedenko.me/"><img src="https://avatars2.githubusercontent.com/u/2033996?v=3&s=50"></a></p>

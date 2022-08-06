@@ -2,7 +2,13 @@
 
 import pyasn, os, sys
 from traceback import print_exc
-from ipaddr import (IPNetwork, IPv4Network, IPv6Network, collapse_address_list)
+
+from ipaddr import (
+    IPNetwork,
+    IPv4Network,
+    IPv6Network,
+    collapse_address_list
+)
 
 
 DEBUG = bool(int(os.getenv('DEBUG', False)))
@@ -16,7 +22,7 @@ if __name__ == '__main__':
         af = int(sys.argv[1])
     except Exception:
         pass
-    
+
     try:
         assert af in [4, 6]
         db = pyasn.pyasn('%s/%s' % (DATADIR, IPASN_DB))
@@ -24,11 +30,11 @@ if __name__ == '__main__':
         asns = os.getenv('AS_NUMS')
         asns = asns.split()
         assert asns
-        
+
     except Exception:
         if DEBUG: print_exc()
         sys.exit(1)
-    
+
     asns = [asn.replace('AS', '') for asn in asns]
 
     nets = list()
@@ -44,9 +50,9 @@ if __name__ == '__main__':
                         nets.append(IPv6Network(net))
 
             collapsed = [str(net) for net in collapse_address_list(nets)]
-            
+
         except Exception:
             if DEBUG: print_exc()
             pass
 
-    if collapsed: print '\n'.join(collapsed)
+    if collapsed: print('\n'.join(collapsed))

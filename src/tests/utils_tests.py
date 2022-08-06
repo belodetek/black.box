@@ -1,6 +1,6 @@
 from nose.tools import ok_, eq_, assert_is_not_none
 from mock import patch, Mock
-from httplib import OK
+from http.client import OK
 import requests
 
 from gen_hash import generate_hash_key

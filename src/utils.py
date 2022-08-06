@@ -9,13 +9,13 @@ import re
 import json
 import jwt
 import dns.resolver
+import pingparsing
 
 from time import time, sleep
-from ping import quiet_ping
 from inspect import stack
 from subprocess import check_output, Popen, PIPE, STDOUT
 from threading import Thread
-from Queue import Queue, Empty
+from queue import Queue, Empty
 from traceback import print_exc
 
 from common import retry
@@ -23,18 +23,23 @@ from config import *
 
 
 def ping_host(host='localhost', timeout=PING_TIMEOUT, count=PING_COUNT):
-    ping_stats = quiet_ping(host, timeout=timeout, count=count)
+    ping_parser = pingparsing.PingParsing()
+    transmitter = pingparsing.PingTransmitter()
+    transmitter.destination = host
+    transmitter.count = count
+    result = transmitter.ping()
+    ping_stats = ping_parser.parse(result).as_dict()
     if DEBUG: print(
         '{}: ping_stats={}'.format(
             stack()[0][3],
             ping_stats
         )
     )
-    assert ping_stats[0] < THRESHOLD, '{}: timeout={}'.format(
+    assert ping_stats['packet_loss_rate'] < THRESHOLD, '{}: timeout={}'.format(
         stack()[0][3],
         host
     )
-    return ping_stats[0]
+    return ping_stats['packet_loss_rate']
 
 
 def shell_check_output_cmd(cmd):
@@ -104,21 +109,21 @@ def recv_with_timeout(s, timeout=5):
     try:
         # make socket non blocking
         s.setblocking(False)
-         
+
         buffer = ''
-         
+
         # set begin time
         begin = time()
-        
+
         while True:
             # if you got some data, then break after timeout
             if data and time() - begin > timeout:
                 break
-             
+
             # if you got no data at all, wait a little longer, twice the timeout
             elif time() - begin > timeout * 2:
                 break
-             
+
             # receive some data
             try:
                 buffer = s.recv(1024)
@@ -163,7 +168,7 @@ def get_geo_location(family=AF):
         '--max-time', '{}'.format(CONN_TIMEOUT * 2),
         '{}/json'.format(MGMT_HOST)
     ]
-    
+
     # get the VPN server location, not the location of the device
     if DEVICE_TYPE in [3, 5]:
         try:
@@ -179,7 +184,7 @@ def get_geo_location(family=AF):
         result = run_shell_cmd(cmd)
         if DEBUG: print('run_shell_cmd: {}'.format(result))
         assert result[0] == 0
-        data = json.loads(result[1])     
+        data = json.loads(result[1])
     except Exception as e:
         print(
             '{}: family={} data={} e={}'.format(
@@ -203,7 +208,7 @@ def get_ip_address(ifname):
             fcntl.ioctl(
                 s.fileno(),
                 0x8915,
-                struct.pack('256s', ifname[:15])
+                struct.pack('256s', ifname[:15].encode())
             )[20:24]
         )
     except:
@@ -263,7 +268,7 @@ def resolve_dns(host='us.{}'.format(DNS_HOST), record='A', family=4):
         return res
     except dns.resolver.NoAnswer:
         return None
-    
+
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def run_speedtest():
@@ -351,3 +356,36 @@ def run_iotest(test=0):
     thread.daemon = True
     thread.start()
     return queue, p
+
+
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
+def get_container_id():
+    cmd = [
+        '/usr/bin/dig',
+        '+short',
+        '-x',
+        get_ip_address(get_default_iface())
+    ]
+    try:
+        result = run_shell_cmd(cmd)
+        if DEBUG: print('run_shell_cmd: {}'.format(result))
+        assert result[0] == 0
+        assert result[1]
+    except Exception as e:
+        print('{}: e={}'.format(
+            stack()[0][3],
+            repr(e)
+        ))
+    return result[1].strip('\n')
+
+
+@retry(Exception, cdata='method={}'.format(stack()[0][3]))
+def get_container_name():
+    ipaddr = get_ip_address(get_default_iface())
+    hosts = open('/etc/hosts').read().split('\n')
+    host = [h for h in hosts if h.startswith(ipaddr)]
+    try:
+        container_name = host[0].split('\t')[1]
+    except:
+        container_name = 'localhost'
+    return container_name

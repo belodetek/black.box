@@ -1,21 +1,36 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# copy source
-for f in $(ls src/*.py); do
-    [ -f ../resin.io/${f} ] && cp ../resin.io/${f} ../black.box/${f}
-done
+[[ $VERBOSE =~ true|True|On|on|1 ]] && set -x
 
-# copy tests
-for f in $(ls src/tests/*.py); do
-    [ -f ../resin.io/${f} ] && cp ../resin.io/${f} ../black.box/${f}
-done
+set -aeu
+
+RUN_TESTS=${RUN_TESTS:-1}
+TEMPDIR=${TEMPDIR:-.}
+RESIN=${RESIN:-0}
+
+function finish() {
+    rm -rf src/tests/venv
+}
+trap finish EXIT
+
+function install_venv() {
+    python3.9 -m venv src/tests/venv
+
+    export PATH="$(pwd)/src/tests/venv/bin:${PATH}"
+
+    pip install --upgrade pip setuptools wheel
+    pip install --upgrade -r src/tests/requirements.txt
+}
+
+function run_tests() {
+    install_venv
+
+    nosetests --verbosity=2 src/tests
+}
+
+find . -name *.py -name requirements.txt -name run | xargs -I{} cp ../resin.io/{} {} || true
 
 # run unit tests
 if [[ "${RUN_TESTS}" == '1' ]]; then
-    RESIN=1 TEMPDIR=. nosetests --verbosity=2 src/tests
-    result=$?
-    if [ ${result} -eq 1 ]; then
-        exit ${result}
-    fi
+    run_tests
 fi
-exit 0

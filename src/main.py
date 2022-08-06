@@ -10,8 +10,7 @@ from threading import Thread
 from traceback import print_exc
 from inspect import stack
 from time import sleep, time
-from Queue import Empty
-
+from queue import Empty
 from common import retry, log
 from api import *
 from utils import *
@@ -62,15 +61,15 @@ def main():
     s_lineout = [None, None]
     s_lineerr = [None, None]
     s_status_line = None
-    
+
     if SUPPRESS_TS:
-        p1 = re.compile('^(.*)$')   
+        p1 = re.compile('^(.*)$')
     else:
         p1 = re.compile(
             '^([\w]{3}) ([\w]{3}) ([\d]{1,2}) ([\d]+:[\d]+:[\d]+) ([\d]{4}) (.*)$'
         )
     group = p1.groups - 1
-        
+
     if bool(re.search('^2.3.', OPENVPN_VERSION)):
         p2 = re.compile(
             '^.* dev ([\w\d]+) local ([\d]+\.[\d]+\.[\d]+\.[\d]+) peer ([\d]+\.[\d]+\.[\d]+\.[\d]+)$'
@@ -101,18 +100,18 @@ def main():
     if TUN_MGMT: mgmt_ipaddr = get_ip_address(MGMT_IFACE)
 
     while True:
-        try:            
+        try:
             if DEVICE_TYPE == 0:
                 log('{}: device={}'.format(stack()[0][3], GUID))
                 sys.exit(0)
 
             if DEBUG: print('os.environ: {}'.format(os.environ))
 
-            for i in xrange(1, LOOP_CYCLE + 1):
+            for i in range(1, LOOP_CYCLE + 1):
                 ###########################
                 # server mode(s) or mixed #
                 ###########################
-                if DEVICE_TYPE in [1, 3, 4]:                    
+                if DEVICE_TYPE in [1, 3, 4]:
                     s_lineout = [None, None]
                     s_msg[0] = None
                     s_msg[1] = None
@@ -123,7 +122,7 @@ def main():
                                 try:
                                     s_lineerr[idx] = s_stderrq[idx].get(
                                         timeout=LOOP_TIMER
-                                    )
+                                    ).decode()
                                     log('{}: {}'.format(proto, s_lineerr[idx]))
                                 except Empty:
                                     pass
@@ -131,12 +130,12 @@ def main():
                             if s_stderrq[idx]:
                                 with s_stderrq[idx].mutex:
                                     s_stderrq[idx].queue.clear()
-                  
+
                         if s_stdoutq[idx]:
                             try:
                                 s_lineout[idx] = s_stdoutq[idx].get(
                                     timeout=LOOP_TIMER
-                                )
+                                ).decode()
                                 log('{}: {}'.format(proto, s_lineout[idx]))
                             except Empty:
                                 pass
@@ -186,7 +185,7 @@ def main():
                                 starting[idx] = False
                                 s_proc[idx].terminate()
                                 s_pid[idx] = None
-                                
+
                         if not started[idx] and not starting[idx]:
                             if i == 1: # once per loop (start)
                                 starting[idx] = True
@@ -198,7 +197,7 @@ def main():
                                         proto
                                     )
                                 )
-            
+
                                 try:
                                     (s_stdoutq[idx], s_stderrq[idx], s_proc[idx]) = start_server(
                                         proto=proto
@@ -208,7 +207,7 @@ def main():
                                     starting[idx] = False
                                     print(repr(e))
                                     if DEBUG: print_exc()
-                                   
+
                         if started[idx] and not starting[idx]:
                             if not kill_thread.isAlive():
                                     kill_thread = Thread(
@@ -240,7 +239,7 @@ def main():
                                             auth_thread.isDaemon()
                                         )
                                     )
-                                                        
+
                             if i == 1 or i % LOOP_CYCLE == 0: # twice per loop (start and end)
                                 if DEBUG: log(
                                     'get_status: cycle={} proto={} status={}'.format(
@@ -254,7 +253,7 @@ def main():
                                         proto=proto
                                     )
                                 )
-                                
+
                             if i % POLL_FREQ == 0 and s_local[idx]: # every x cycles per loop
                                 s_loss[idx] = 100
                                 try:
@@ -331,7 +330,7 @@ def main():
                                 log_server_stats(status=started)
                             except:
                                 if DEBUG: print_exc()
-                
+
                         s_status_line = '{}: cycle={} started={} starting={} ip={} loss={} pid={} conns={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
                             stack()[0][3],
                             i,
@@ -345,9 +344,9 @@ def main():
                             AF,
                             AP,
                             UPNP
-                        )    
+                        )
                         log(s_status_line)
-                        
+
                 ###########################
                 # client mode(s) or mixed #
                 ###########################
@@ -366,7 +365,7 @@ def main():
                         c_stq = None
                         c_stimer = 0
                         c_str = list()
-                        
+
                         result = {
                             'status': 1,
                             'down': None,
@@ -375,12 +374,7 @@ def main():
                         log('run_speedtest: result={}'.format(result))
                         try:
                             res = update_speedtest(data=result)
-                            log(
-                                'update_speedtest({}): {}'.format(
-                                    res[0],
-                                    res[1]
-                                )
-                            )
+                            log('update_speedtest: {}'.format(res))
                         except Exception as e:
                             print(repr(e))
                             if DEBUG: print_exc()
@@ -422,7 +416,7 @@ def main():
                         c_lineerr = None
                         if c_stderrq:
                             try:
-                                c_lineerr = c_stderrq.get(timeout=LOOP_TIMER)
+                                c_lineerr = c_stderrq.get(timeout=LOOP_TIMER).decode()
                                 log(c_lineerr)
                             except Empty:
                                 pass
@@ -434,7 +428,7 @@ def main():
                     c_lineout = None
                     if c_stdoutq:
                         try:
-                            c_lineout = c_stdoutq.get(timeout=LOOP_TIMER)
+                            c_lineout = c_stdoutq.get(timeout=LOOP_TIMER).decode()
                             log(c_lineout)
                         except Empty:
                             pass
@@ -442,7 +436,7 @@ def main():
                     c_stl = None
                     if c_stq:
                         try:
-                            c_stl = c_stq.get(timeout=LOOP_TIMER)
+                            c_stl = c_stq.get(timeout=LOOP_TIMER).decode()
                             log(c_stl)
                             c_str.append(c_stl)
                         except Empty:
@@ -463,12 +457,7 @@ def main():
 
                         try:
                             res = update_speedtest(data=result)
-                            log(
-                                'update_speedtest({}): {}'.format(
-                                    res[0],
-                                    res[1]
-                                )
-                            )
+                            log('update_speedtest: {}'.format(res))
                         except Exception as e:
                             print(repr(e))
                             if DEBUG: print_exc()
@@ -482,7 +471,7 @@ def main():
                     c_iotl = None
                     if c_iotq:
                         try:
-                            c_iotl = c_iotq.get(timeout=LOOP_TIMER)
+                            c_iotl = c_iotq.get(timeout=LOOP_TIMER).decode()
                             log(c_iotl)
                             if p4.search(c_iotl) or p5.search(c_iotl):
                                 result = {
@@ -509,7 +498,7 @@ def main():
                         except Empty:
                             pass
 
-                    c_msg = None                
+                    c_msg = None
                     try:
                         m1 = p1.search(c_lineout)
                         if m1: c_msg = m1.group(group)
@@ -559,7 +548,7 @@ def main():
                         )
                     except (IndexError, TypeError, AttributeError):
                         pass
-                    
+
                     if DEVICE_TYPE == 5:
                         try:
                             m3 = p3.search(c_msg).groups()
@@ -590,7 +579,7 @@ def main():
                             connecting = False
                             c_proc.terminate()
                             c_pid = None
-                            
+
                     if not connected and not connecting:
                         if i == 1:
                             connecting = True
@@ -685,7 +674,7 @@ def main():
                             )
                         except:
                             if DEBUG: print_exc()
-                        
+
                         w_clnts = get_stations()
                         c_status_line = '{}: cycle={} connected={} connecting={} proto={} ip={} loss={} pid={} clients={} mgmt_tun={} af={} hostapd={} upnp={}'.format(
                             stack()[0][3],
@@ -724,6 +713,6 @@ def main():
         finally:
             pass
 
-    
+
 if __name__ == '__main__':
     main()

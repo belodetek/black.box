@@ -13,7 +13,7 @@ from inspect import stack
 from traceback import print_exc
 from threading  import Thread
 from subprocess import Popen, PIPE
-from Queue import Queue
+from queue import Queue
 
 import auth
 import plugin_loader
@@ -142,7 +142,7 @@ def connect_node(family=AF):
         )
     except:
         pass
-        
+
     s_wpid = None
     s_wport = None
     ipaddr = None
@@ -150,7 +150,7 @@ def connect_node(family=AF):
     if len(PROTOS) <= 0: PROTOS = list(TUN_PROTO) # start again
     c_proto = PROTOS.pop()
     tun_proto = c_proto
-    
+
     env = os.environ.copy()
     if DEBUG: print(env)
 
@@ -188,7 +188,7 @@ def connect_node(family=AF):
         )
         assert VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
                and VPN_USERNAME and VPN_PASSWD
-   
+
     else:
         #########################
         # pairing mode override #
@@ -235,7 +235,7 @@ def connect_node(family=AF):
                     # try DNS resolution (IPv6)
                     country = get_alpha(TARGET_COUNTRY).lower()
                     host = '{}.{}'.format(country, DNS_HOST)
-                    ipaddr = resolve_dns(host=host, record=qtype, family=family)    
+                    ipaddr = resolve_dns(host=host, record=qtype, family=family)
                     assert ipaddr
                 except Exception as e:
                     log(
@@ -275,7 +275,7 @@ def connect_node(family=AF):
                     ipaddr
                 )
             )
-  
+
             if not ipaddr:
                 if family == 6:
                     try:
@@ -317,7 +317,7 @@ def connect_node(family=AF):
                             )
                         )
                         if DEBUG: print_exc()
-            
+
         assert ipaddr
 
         if family == 6: tun_proto = '{}{}'.format(c_proto, family)
@@ -396,7 +396,7 @@ def connect_node(family=AF):
 
         if FRAGMENT and tun_proto == 'udp':
             cmd.append('--tun-mtu')
-            cmd.append(TUN_MTU) 
+            cmd.append(TUN_MTU)
             cmd.append('--mssfix')
             cmd.append('--fragment')
             cmd.append(FRAGMENT)
@@ -447,9 +447,9 @@ def connect_node(family=AF):
 def start_server(proto='udp'):
     iface = TUN_IFACE_UDP
     if proto == 'tcp': iface = TUN_IFACE_TCP
-    
+
     config = '{}/openvpn/{}_server.conf'.format(WORKDIR, proto)
-    
+
     cmd = [
         OPENVPN_BINARY,
         '--config', config,
@@ -461,7 +461,7 @@ def start_server(proto='udp'):
 
     if FRAGMENT and proto == 'udp':
         cmd.append('--tun-mtu')
-        cmd.append(TUN_MTU) 
+        cmd.append(TUN_MTU)
         cmd.append('--mssfix')
         cmd.append('--fragment')
         cmd.append(FRAGMENT)
@@ -470,7 +470,7 @@ def start_server(proto='udp'):
        and proto == 'udp'\
        and bool(re.search('^2.4.', OPENVPN_VERSION)):
         cmd.append('--explicit-exit-notify')
-        cmd.append(str(EXPLICIT_EXIT_NOTIFY)) 
+        cmd.append(str(EXPLICIT_EXIT_NOTIFY))
 
     p = run_shell_cmd_nowait(cmd)
     stdoutq = Queue()
@@ -494,7 +494,7 @@ def _get_client_conns(user=GUID, proto='udp'):
         )
     ).read().split('\n')
     for lines in stats:
-        line = lines.split(',')        
+        line = lines.split(',')
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1] and line[1] == user:
             conns = conns + 1
     return conns
@@ -522,7 +522,7 @@ def get_server_conns_by(proto='udp'):
         )
     ).read().split('\n')
     for lines in stats:
-        line = lines.split(',')        
+        line = lines.split(',')
         if 'CLIENT_LIST' in line and line[0] in ['CLIENT_LIST'] and line[-1]: conns = conns + 1
     return int(conns)
 
@@ -646,7 +646,7 @@ def reauthenticate_clients():
                 )
             )
             if not result and client != 'UNDEF':
-                for port in [VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT]:    
+                for port in [VPN_UDP_MGMT_PORT, VPN_TCP_MGMT_PORT]:
                     try:
                         print(
                             'run_openvpn_mgmt_cmd: port={} cmd=kill client={} result={}'.format(
@@ -686,7 +686,7 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
             # 1 = up
             # 0 = down
             data['status'] = sum([int(el) for el in [status]])
-            
+
             data['bytesin'] = 0
             data['bytesout'] = 0
             data['conns'] = 0
@@ -695,7 +695,7 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
 
             if DEVICE_TYPE == 5:
                 data['country'] = country
-                
+
             if COUNTRY_OVERRIDE:
                 log('{}: country={}'.format(stack()[0][3], COUNTRY_OVERRIDE))
                 data['country'] = COUNTRY_OVERRIDE
@@ -720,7 +720,7 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
     if plugin_loader.plugin and \
        'log_plugin_client' in dir(plugin_loader.plugin):
         result = plugin_loader.plugin.log_plugin_client(status=status)
-       
+
 
 def log_server_stats(status=[False, False]):
     if LOG_SERVER_STATS:
@@ -730,14 +730,14 @@ def log_server_stats(status=[False, False]):
 
             # 2 = udp+tcp; 1 = udp or tcp; 0 = down
             data['status'] = sum([int(el) for el in status])
-            data['conns'] = 0        
+            data['conns'] = 0
             data['bytesin'] = 0
             data['bytesout'] = 0
             data['cipher'] = CIPHER
             data['auth'] = AUTH
             data['upnp'] = UPNP
             data['weight'] = MAX_CONNS_SERVER
-            
+
             if COUNTRY_OVERRIDE:
                 log('{}: country={}'.format(stack()[0][3], COUNTRY_OVERRIDE))
                 data['country'] = COUNTRY_OVERRIDE
@@ -847,7 +847,7 @@ def start_wanproxy_server(
             )
             if DEBUG: print(result.__dict__)
             local_pid = str(int(result.pid) + 1)
-            
+
         if WANPROXY == 'SOCAT':
             # start SOCAT local listener
             result = run_shell_cmd_nowait(
@@ -861,11 +861,11 @@ def start_wanproxy_server(
             )
             if DEBUG: print(result.__dict__)
             local_pid = str(result.pid)
-            
+
     return (local_pid, remote_pid, port)
 
 
-def kill_remote_pid(ipaddr=None, family=4, pid=None, ssh_port=DOCKER_SSH_PORT):    
+def kill_remote_pid(ipaddr=None, family=4, pid=None, ssh_port=DOCKER_SSH_PORT):
     if WANPROXY == 'SSH':
         remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
         assert remote_guid

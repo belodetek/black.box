@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib, requests, json
+import requests
+import json
+import urllib.parse
+
 from inspect import stack
 from common import retry
 from traceback import print_exc
-from httplib import OK, NO_CONTENT
+from http.client import OK, NO_CONTENT
 
 from config import *
 
@@ -21,7 +24,8 @@ def get_jwt_payload_from_paypal(baid=None):
             API_VERSION,
             baid
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -44,7 +48,8 @@ def get_paypal_billing_agreement(baid=None):
             API_VERSION,
             baid
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -61,7 +66,7 @@ def get_node_by_country(family=AF):
     headers = {
         'X-Auth-Token': API_SECRET
     }
-    country = urllib.quote(TARGET_COUNTRY)
+    country = urllib.parse.quote(TARGET_COUNTRY)
     if GEOIP_OVERRIDE:
         print('override={}'.format(GEOIP_OVERRIDE))
         country = GEOIP_OVERRIDE
@@ -72,7 +77,8 @@ def get_node_by_country(family=AF):
             family,
             country
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -97,7 +103,8 @@ def get_node_by_guid(family=AF, guid=PAIRED_DEVICE_GUID):
             family,
             guid
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -106,7 +113,7 @@ def get_node_by_guid(family=AF, guid=PAIRED_DEVICE_GUID):
             res.content
         )
     )
-    if res.status_code in [OK]: return res.content
+    if res.status_code in [OK]: return res.content.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -121,7 +128,8 @@ def get_device_env_by_name(guid=GUID, name=None, default=None):
             guid,
             name
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -130,14 +138,13 @@ def get_device_env_by_name(guid=GUID, name=None, default=None):
             res.content
         )
     )
-    if res.status_code in [OK]: default = res.content
-    return default
+    if res.status_code in [OK]: return res.content.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_alpha(country):
     if not country: country = TARGET_COUNTRY
-    country = urllib.quote(country)
+    country = urllib.parse.quote(country)
     headers = {
         'X-Auth-Token': API_SECRET
     }
@@ -147,7 +154,8 @@ def get_alpha(country):
             API_VERSION,
             country
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -156,7 +164,7 @@ def get_alpha(country):
             res.content
         )
     )
-    if res.status_code in [OK]: return res.content
+    if res.status_code in [OK]: return res.content.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -171,7 +179,8 @@ def get_guid_by_public_ipaddr(ipaddr=None, family=4):
             ipaddr,
             str(family)
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -180,7 +189,7 @@ def get_guid_by_public_ipaddr(ipaddr=None, family=4):
             res.content
         )
     )
-    if res.status_code in [OK]: return res.content
+    if res.status_code in [OK]: return res.content.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -197,7 +206,8 @@ def put_device(family=AF, data=None, guid=GUID):
             family
         ),
         data=json.dumps(data),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -206,7 +216,7 @@ def put_device(family=AF, data=None, guid=GUID):
             res.content
         )
     )
-    if res.status_code in [OK]: return (res.status_code, res.content)
+    if res.status_code in [OK]: return res.content.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -221,7 +231,8 @@ def dequeue_speedtest(guid=GUID):
             API_VERSION,
             guid
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -246,7 +257,8 @@ def update_speedtest(guid=GUID, data=None):
             guid
         ),
         data=json.dumps(data),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -255,7 +267,7 @@ def update_speedtest(guid=GUID, data=None):
             res.content
         )
     )
-    if res.status_code in [OK]: return (res.status_code, res.content)
+    if res.status_code in [OK]: return res.content.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -269,7 +281,8 @@ def dequeue_iotest(guid=GUID):
             API_VERSION,
             guid
         ),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -297,7 +310,8 @@ def update_iotest(guid=GUID, data=None):
             guid
         ),
         data=json.dumps(data),
-        headers=headers
+        headers=headers,
+        verify=REQUESTS_VERIFY
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -306,5 +320,5 @@ def update_iotest(guid=GUID, data=None):
             res.content
         )
     )
-    if res.status_code in [OK]: return (res.status_code, res.content)
+    if res.status_code in [OK]: return (res.status_code, res.content.decode())
 

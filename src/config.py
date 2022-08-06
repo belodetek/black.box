@@ -25,6 +25,7 @@ IOTESTS = [
     int(iot) for iot in os.getenv('IOTESTS', '0 1 2').split()
 ]
 
+REQUESTS_VERIFY = bool(int(os.getenv('REQUESTS_VERIFY', 1)))
 OPENVPN_BINARY = os.getenv('OPENVPN_BINARY', None)
 OPENVPN_VERSION = os.getenv('OPENVPN_VERSION', None)
 DEFAULT_TRIES = int(os.getenv('DEFAULT_TRIES', 3))
@@ -56,7 +57,7 @@ DNS6_SERVERS = os.getenv('DNS6_SERVERS', '2606:4700:4700::1111 2606:4700:4700::1
 MGMT_HOST = os.getenv('MGMT_HOST', 'http://mgmt.%s' % DNS_DOMAIN)
 API_HOST = os.getenv('API_HOST', 'https://api-dev.%s' % DNS_DOMAIN)
 DNS_HOST = os.getenv('DNS_HOST', '%s.%s' % (DNS_SUB_DOMAIN, DNS_DOMAIN))
-POLL_FREQ = int(os.getenv('POLL_FREQ', 150)) # every X cycles
+POLL_FREQ = int(os.getenv('POLL_FREQ', 150)) # X times per cycle (e.g. LOOP_CYCLE / POLL_FREQ = 4)
 LOOP_CYCLE = int(os.getenv('LOOP_CYCLE', 600)) # cycles
 LOOP_TIMER = float(os.getenv('LOOP_TIMER', 0.1)) # seconds per cycle
 DEVICE_TYPE = int(os.getenv('DEVICE_TYPE', 2))
