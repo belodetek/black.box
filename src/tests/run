@@ -5,11 +5,12 @@
 set -aeu
 
 RUN_TESTS=${RUN_TESTS:-1}
-TEMPDIR=${TEMPDIR:-.}
+DATADIR=${DATADIR:-src/tests/data}
+TEMPDIR=${TEMPDIR:-src/tests/temp}
 RESIN=${RESIN:-0}
 
 function finish() {
-    rm -rf src/tests/venv
+    rm -rf src/tests/venv "${DATADIR}" "${TEMPDIR}"
 }
 trap finish EXIT
 
@@ -25,12 +26,12 @@ function install_venv() {
 function run_tests() {
     install_venv
 
+    mkdir -p "${DATADIR}" "${TEMPDIR}"
+
     nosetests --verbosity=2 src/tests
 }
 
-find . -name *.py -name requirements.txt -name run | xargs -I{} cp ../resin.io/{} {} || true
-
 # run unit tests
-if [[ "${RUN_TESTS}" == '1' ]]; then
+if [[ $RUN_TESTS == 1 ]]; then
     run_tests
 fi
