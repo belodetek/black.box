@@ -9,8 +9,8 @@ from config import DNS_SUB_DOMAIN, DEBUG
 try:
     import plugin
 except ImportError as e:
-    print(repr(e))
     if DEBUG: print_exc()
+
     try:
         from imp import load_source
         source = '{0}/{1}.plugin'.format(
@@ -23,6 +23,5 @@ except ImportError as e:
         ))
         plugin = load_source('plugin', source)
     except ImportError as e:
-        print(repr(e))
         if DEBUG: print_exc()
         plugin = None

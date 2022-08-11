@@ -21,7 +21,8 @@ def blink_leds():
             os.getenv('RESIN_SUPERVISOR_API_KEY')
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
 
     if DEBUG: print(res.status_code, res.content)

@@ -50,7 +50,7 @@ def retry(ExceptionToCheck, tries=DEFAULT_TRIES, delay=DEFAULT_DELAY, backoff=DE
                             str(cdata)
                         )
                     )
-                    if DEBUG == 1: print_exc()
+                    print_exc()
                     sleep(mdelay)
                     mtries -= 1
                     mdelay *= backoff
@@ -61,7 +61,7 @@ def retry(ExceptionToCheck, tries=DEFAULT_TRIES, delay=DEFAULT_DELAY, backoff=DE
 
 def get_md5(s):
     s = unicode(s)
-    s = s.encode('utf-8')
+    s = s.encode()
     try:
         return md5(s).hexdigest()
     except:
@@ -72,10 +72,13 @@ def open_pipe(pipe=None):
     try:
         fifo = None
         try:
-            fifo = os.open(pipe, os.O_WRONLY | os.O_NONBLOCK)
+            fifo = os.open(pipe, os.O_WRONLY | os.O_NONBLOCK, 0)
         except OSError as e:
-            if e.errno == errno.ENXIO: pass
-            else: pass
+            # https://stackoverflow.com/a/24973075/1559300
+            if e.errno == errno.ENXIO:
+                pass
+            else:
+                if DEBUG: print_exc()
         return fifo
     except:
         pass
@@ -85,8 +88,7 @@ def write_pipe(fifo=None, data=None):
     try:
         os.write(fifo, data)
     except OSError as e:
-        if e.errno == errno.EPIPE: pass
-        else: pass
+        if DEBUG: print_exc()
 
 
 def log(data):

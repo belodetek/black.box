@@ -25,7 +25,8 @@ def get_jwt_payload_from_paypal(baid=None):
             baid
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -49,7 +50,8 @@ def get_paypal_billing_agreement(baid=None):
             baid
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -78,7 +80,8 @@ def get_node_by_country(family=AF):
             country
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -104,7 +107,8 @@ def get_node_by_guid(family=AF, guid=PAIRED_DEVICE_GUID):
             guid
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -129,7 +133,8 @@ def get_device_env_by_name(guid=GUID, name=None, default=None):
             name
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -155,7 +160,8 @@ def get_alpha(country):
             country
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -180,7 +186,8 @@ def get_guid_by_public_ipaddr(ipaddr=None, family=4):
             str(family)
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -207,7 +214,8 @@ def put_device(family=AF, data=None, guid=GUID):
         ),
         data=json.dumps(data),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -232,7 +240,8 @@ def dequeue_speedtest(guid=GUID):
             guid
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -258,7 +267,8 @@ def update_speedtest(guid=GUID, data=None):
         ),
         data=json.dumps(data),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -282,7 +292,8 @@ def dequeue_iotest(guid=GUID):
             guid
         ),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(
@@ -311,7 +322,8 @@ def update_iotest(guid=GUID, data=None):
         ),
         data=json.dumps(data),
         headers=headers,
-        verify=REQUESTS_VERIFY
+        verify=REQUESTS_VERIFY,
+        timeout=CONN_TIMEOUT
     )
     if DEBUG: print(
         '{}: status_code={} content={}'.format(

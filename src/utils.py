@@ -48,7 +48,7 @@ def shell_check_output_cmd(cmd):
         cmd,
         stderr=STDOUT,
         shell=True
-    ).decode('utf-8')
+    ).decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -59,7 +59,7 @@ def run_shell_cmd(cmd):
         stdin=PIPE,
         stdout=PIPE,
         stderr=PIPE,
-        bufsize=1,
+        bufsize=0,
         close_fds=ON_POSIX,
         env=os.environ.copy(),
         shell=False
@@ -76,7 +76,7 @@ def run_background_shell_cmd(cmd):
         stdin=PIPE,
         stdout=PIPE,
         stderr=PIPE,
-        bufsize=1,
+        bufsize=0,
         close_fds=ON_POSIX,
         env=os.environ.copy(),
         shell=False
@@ -95,7 +95,7 @@ def run_shell_cmd_nowait(cmd):
         stdin=PIPE,
         stdout=PIPE,
         stderr=PIPE,
-        bufsize=1,
+        bufsize=0,
         close_fds=ON_POSIX,
         env=os.environ.copy(),
         shell=False

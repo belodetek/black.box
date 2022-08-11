@@ -7,6 +7,7 @@ set -aeu
 RUN_TESTS=${RUN_TESTS:-1}
 DATADIR=${DATADIR:-src/tests/data}
 TEMPDIR=${TEMPDIR:-src/tests/temp}
+DNS_SUB_DOMAIN=${DNS_SUB_DOMAIN:-blackbox}
 RESIN=${RESIN:-0}
 
 function finish() {
@@ -27,6 +28,8 @@ function run_tests() {
     install_venv
 
     mkdir -p "${DATADIR}" "${TEMPDIR}"
+
+    touch ${DATADIR}/openvpn.{tcp,udp}.status
 
     nosetests --verbosity=2 src/tests
 }

@@ -468,7 +468,7 @@ def start_server(proto='udp'):
 
     if EXPLICIT_EXIT_NOTIFY in [1, 2]\
        and proto == 'udp'\
-       and bool(re.search('^2.4.', OPENVPN_VERSION)):
+       and bool(re.search('^(2\.4\.|2\.5\.)', OPENVPN_VERSION)):
         cmd.append('--explicit-exit-notify')
         cmd.append(str(EXPLICIT_EXIT_NOTIFY))
 
