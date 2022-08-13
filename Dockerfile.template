@@ -1,0 +1,2 @@
+# https://hub.balena.io/organizations/belodetek/blocks
+FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%

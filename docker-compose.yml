@@ -1,0 +1,33 @@
+version: '2.4'
+
+volumes:
+  resin-data: {}
+
+services:
+  main:
+    # https://www.balena.io/blog/improving-device-image-management-workflow-balenaHub-Container-Registry/
+    build: .
+    privileged: true
+    tty: true
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - resin-data:/data
+    tmpfs:
+      - /run
+      - /sys/fs/cgroup
+    security_opt:
+      - apparmor:unconfined
+      - seccomp:unconfined
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+    labels:
+      io.balena.features.balena-api: 1
+      io.balena.features.firmware: 1
+      io.balena.features.procfs: 0
+      io.balena.features.sysfs: 1
+      io.resin.features.dbus: 1
+      io.resin.features.kernel-modules: 1
+      io.resin.features.supervisor-api: 1

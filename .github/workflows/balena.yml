@@ -1,0 +1,92 @@
+---
+name: publish to balenaCloud
+
+on:
+ pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - master
+
+env:
+  ENVIRONMENT: balena-cloud.com
+  BLOCK_PREFIX: belodetek/unzoner
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        arch:
+          - aarch64
+          - amd64
+          - armv7hf
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install additional dependencies
+        run: |
+          sudo apt install -y git-secret
+
+      - name: import GPG key
+        id: import-gpg-key
+        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: imported GPG key
+        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        run: |
+          echo 'fingerprint: ${{ steps.import-gpg-key.outputs.fingerprint }}'
+          echo 'keyid:       ${{ steps.import-gpg-key.outputs.keyid }}'
+          echo 'name:        ${{ steps.import-gpg-key.outputs.name }}'
+          echo 'email:       ${{ steps.import-gpg-key.outputs.email }}'
+
+      - name: reveal secrets
+        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        run: |
+          git secret reveal -fp '${{ secrets.GPG_PASSPHRASE }}'
+
+      # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/188
+      - name: remove composition
+        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        run: |
+          rm docker-compose.yml
+
+      - name: push draft or finalise release
+        uses: balena-io/balena-ci@master
+        with:
+          balena_token: ${{ secrets.BALENA_API_KEY }}
+          environment: ${{ env.ENVIRONMENT }}
+          fleet: ${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source: unzoner
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: publish
+    strategy:
+      fail-fast: true
+      matrix:
+        fleet:
+          - belodetek/bbqemudev
+          - belodetek/bbrpi3dev
+          - belodetek/bbrpi4dev
+          - belodetek/bbnucdev
+          - belodetek/bbnuclive
+          - belodetek/bbqemulive
+          - belodetek/bbrpi3live
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: push draft or finalise release
+        uses: balena-io/balena-ci@master
+        with:
+          balena_token: ${{ secrets.BALENA_API_KEY }}
+          environment: ${{ env.ENVIRONMENT }}
+          fleet: ${{ matrix.fleet }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

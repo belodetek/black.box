@@ -1,0 +1,8 @@
+Pyjwt
+pyasn
+ipaddr
+requests[security]
+pingparsing
+dnspython
+passlib
+mysqlclient

@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
   <url>
-    <loc>http://unzoner.com/#instructions</loc> 
+    <loc>http://unzoner.com/#instructions</loc>
   </url>
   <url>
-    <loc>http://unzoner.com/#dd-wrt</loc> 
+    <loc>http://unzoner.com/#dd-wrt</loc>
   </url>
   <url>
-    <loc>http://unzoner.com/#qemu</loc> 
+    <loc>http://unzoner.com/#qemu-or-virtualbox</loc>
   </url>
   <url>
-    <loc>http://unzoner.com/#kodi</loc> 
+    <loc>http://unzoner.com/#kodi</loc>
   </url>
   <url>
-    <loc>http://unzoner.com/#tunnelblick-and-windows</loc> 
+    <loc>http://unzoner.com/#tunnelblick-and-windows</loc>
+  </url>
+  <url>
+    <loc>http://unzoner.com/#ios</loc>
+  </url>
+  <url>
+    <loc>http://unzoner.com/#android</loc>
   </url>
 </urlset>

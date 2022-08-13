@@ -1,0 +1,42 @@
+name: black.box Unzoner
+type: sw.application
+description: VPN policy-based router
+
+fleetcta: Copy pasta!
+post-provisioning: |
+  [![balena](https://github.com/ab77/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/ab77/black.box/actions/workflows/balena.yml)
+
+  > 📜 Your unblocking journey starts [here](http://unzoner.com/#instructions)...
+
+  ## Technical
+  > ⏳ (coming soon...) [build and run](unzoner/README.md) your own Unzoner
+  
+  * Unzoner API [repository](https://bitbucket.org/belodedenko/api)
+  * Dashboard [repository](https://bitbucket.org/belodedenko/dashboard)
+  * Management server [repository](https://bitbucket.org/belodedenko/mgmt)
+  * Deployment automation [repository]](https://bitbucket.org/belodedenko/cloudformation)
+
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url: 'https://github.com/ab77/black.box'
+  logo:
+    type: blob.asset
+    data:
+      url: 'https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png'
+data:
+  defaultDeviceType: raspberrypi4-64
+  supportedDeviceTypes:
+    - fincm3
+    - generic-amd64
+    - genericx86-64-ext
+    - intel-nuc
+    - qemux86
+    - qemux86-64
+    - raspberry-pi
+    - raspberry-pi2
+    - raspberrypi3
+    - raspberrypi3-64
+    - raspberrypi4-64
+version: 1.2.0

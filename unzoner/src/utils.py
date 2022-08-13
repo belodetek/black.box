@@ -283,7 +283,6 @@ def run_speedtest():
         '/usr/bin/iperf',
         '--client',
         server,
-        '--print_mss',
         '--nodelay',
         '--dualtest'
     ]
