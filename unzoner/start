@@ -761,7 +761,7 @@ fi
 
 if [[ "${STUNNEL}" == "1" ]]; then
     if [[ "${DEVICE_TYPE}" == "1" ]] || [[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "4" ]]; then
-        log 'generating certificate...'
+        log 'generating stunnel certificate...'
         openssl req -new -newkey rsa:4096\
           -config /etc/ssl/openssl.cnf\
           -days 365 -nodes -x509 -subj "/C=US/CN=black.box"\

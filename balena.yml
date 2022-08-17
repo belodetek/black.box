@@ -1,7 +1,6 @@
 name: black.box Unzoner
-type: sw.application
+type: sw.block
 description: VPN policy-based router
-
 fleetcta: Copy pasta!
 post-provisioning: |
   [![balena](https://github.com/ab77/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/ab77/black.box/actions/workflows/balena.yml)
