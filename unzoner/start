@@ -1,0 +1,946 @@
+#!/usr/bin/env bash
+
+function finish() {
+    sleep "$(((RANDOM%30)+30))s"
+}
+trap finish EXIT
+
+[ -e "/root/functions" ] && . /root/functions
+
+declare -x LINK_MTU=${LINK_MTU:-1500}
+declare -x LINK_MTU_SERVER=${LINK_MTU_SERVER:-1500}
+declare -x LINK_MTU_CLIENT=${LINK_MTU_CLIENT:-1500}
+declare -x AF=${AF}
+declare -x AP=${AP}
+declare -x UPNP=${UPNP:-0}
+declare -x AF_INETS=${AF_INETS:-4 6}
+declare -x CURL_OPTS=${CURL_OPTS:-'--silent --fail --location --retry 3'}
+declare -x ARCH=$(uname -m)
+declare -x API_HOST=${API_HOST:-https://api-blackbox-dev.unzoner.com}
+declare -x DASHBOARD_HOST=${DASHBOARD_HOST:-https://dash-blackbox-dev.unzoner.com}
+declare -x NETCAT_PORT=${NETCAT_PORT:-80}
+declare -x API_SECRET=${API_SECRET}
+declare -x AUTH_TOKEN=${API_SECRET}
+declare -x API_VERSION=${API_VERSION:-1.0}
+declare -x MGMT_HOST=${MGMT_HOST:-mgmt.unzoner.com}
+declare -x DEVICE_TYPE=${DEVICE_TYPE:-2}
+declare -x DEBUG=${DEBUG:-0}
+declare -x EXT_IFACE=${EXT_IFACE:-$(get_iface)}
+declare -x DHCP_ENABLED=${DHCP_ENABLED:-1}
+declare -x SOCKS_ENABLED=${SOCKS_ENABLED:-0}
+declare -x SOCKS_PORT=${SOCKS_PORT:-1080}
+declare -x SNIPROXY_ENABLED=${SNIPROXY_ENABLED:-0}
+declare -x SNIPROXY_HTTP_PORT=${SNIPROXY_HTTP_PORT:-8080}
+declare -x SNIPROXY_HTTPS_PORT=${SNIPROXY_HTTPS_PORT:-8443}
+declare -x SNIPROXY_MODE=${SNIPROXY_MODE:-ipv4_only}
+declare -x SNIPROXY_DNS_RESOLVER=${SNIPROXY_DNS_RESOLVER:-127.0.0.1}
+declare -x WIP4=${WIP4:-172.24.255.254}
+declare -x WIP6=${WIP6:-fde4:8dba:82e1:2000::1}
+declare -x DHCP_SCOPE=${DHCP_SCOPE:-172.24.1.50,172.24.1.150,12h}
+declare -x DNS_SERVERS=${DNS_SERVERS:-1.1.1.1 1.0.0.1}
+declare -x DNS6_SERVERS=${DNS6_SERVERS:-2606:4700:4700::1111 2606:4700:4700::1001}
+declare -x TUN_PROTO=${TUN_PROTO:-udp tcp}
+declare -x TUN_IPV6=${TUN_IPV6:-0}
+declare -x IPADDRSV4=${IPADDRSV4}
+declare -x IPADDRSV6=${IPADDRSV6}
+declare -x TUN_MGMT=${TUN_MGMT:-0}
+declare -x CONN_TIMEOUT=${CONN_TIMEOUT:-5}
+declare -x RESIN=${RESIN:-0}
+declare -x RESIN_SUPERVISOR_ADDRESS=${RESIN_SUPERVISOR_ADDRESS}
+declare -x RESIN_SUPERVISOR_API_KEY=${RESIN_SUPERVISOR_API_KEY}
+declare -x RESIN_APP_ID=${RESIN_APP_ID}
+declare -x SUPPRESS_TS=${SUPPRESS_TS:-1}
+declare -x MAX_RATE=${MAX_RATE:-0}
+declare -x MAX_BANDWDTH=${MAX_BANDWDTH:-0}
+declare -x MAX_CONNS_SERVER=${MAX_CONNS_SERVER:-100}
+declare -x MAX_CONNS_CLIENT=${MAX_CONNS_CLIENT:-2}
+declare -x MGMT_IFACE=${MGMT_IFACE:-tun1}
+declare -x TUN_IFACE_TCP=${TUN_IFACE_TCP:-tun3}
+declare -x TUN_IFACE_UDP=${TUN_IFACE_UDP:-tun2}
+declare -x TUN_IFACE=${TUN_IFACE:-tun4}
+declare -x UPNP_ENABLED=${UPNP_ENABLED:-0}
+declare -x GUID=${RESIN_DEVICE_UUID:-$(cat /proc/sys/kernel/random/uuid | sed "s/-//g")}
+declare -x POLICY_ROUTING=${POLICY_ROUTING:-1}
+declare -x TARGET_COUNTRY=${TARGET_COUNTRY:-United States}
+declare -x TCP_PORTS=${TCP_PORTS:-80 443} && strip_quotes TCP_PORTS
+declare -x UDP_PORTS=${UDP_PORTS:-53} && strip_quotes UDP_PORTS
+declare -x INT_IFACES=${INT_IFACES:-$(get_wiface) $(get_iface)} && strip_quotes INT_IFACES
+declare -x DNS_SUB_DOMAIN=${DNS_SUB_DOMAIN:-blackbox}
+declare -x WORKDIR=${WORKDIR:-/mnt/${DNS_SUB_DOMAIN}}
+declare -x TEMPDIR=${TEMPDIR:-/dev/shm} # hardcoded in OpenVPN scripts and config
+declare -x DATADIR=${DATADIR:-/data}
+strip_quotes TARGET_COUNTRY && declare -x ALPHA_2=$(country2alpha "${TARGET_COUNTRY}")
+declare -x SERVICES=${SERVICES:-$(get_services ${ALPHA_2})} && strip_quotes SERVICES
+declare -x AS_NUMS=${AS_NUMS:-$(get_asns ${ALPHA_2} ${SERVICES})} && strip_quotes AS_NUMS
+declare -x DOMAINS=${DOMAINS:-$(get_domains ${ALPHA_2} ${SERVICES})} && strip_quotes DOMAINS
+declare -x OPENVPN_PORT=${OPENVPN_PORT:-1194}
+declare -x OPENVPN_PORTS_EXTRA=${OPENVPN_PORTS_EXTRA} # optional iptables DNATs to OPENVPN_PORT (tcp/udp)
+declare -x OPENVPN_VERBOSITY=${OPENVPN_VERBOSITY:-1}
+declare -x OPENVPN_CONFIG_EXTRA=${OPENVPN_CONFIG_EXTRA}
+declare -x USER_AUTH_ENABLED=${USER_AUTH_ENABLED:-1}
+declare -x PAYPAL_SUBSCRIPTION_CHECK=${PAYPAL_SUBSCRIPTION_CHECK:-1}
+declare -x BITCOIN_PAYMENT_CHECK=${BITCOIN_PAYMENT_CHECK:-1}
+declare -x PAYPAL_BILLING_AGREEMENT=${PAYPAL_BILLING_AGREEMENT}
+declare -x TUN_PASSWD=${TUN_PASSWD:-$(${WORKDIR}/scripts/pyboot.sh gen_hash)}
+declare -x REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-${DATADIR}/cacert.pem}
+declare -x STUNNEL=${STUNNEL:-0}
+declare -x STUNNEL_PORT=${STUNNEL_PORT:-443}
+declare -x WANPROXY=${WANPROXY}
+declare -x WANPROXY_PORT=${WANPROXY_PORT:-3300}
+declare -x SOCAT_PORT=${SOCAT_PORT:-3302}
+declare -x UPNP_TCP_PORT_FORWARD=${UPNP_TCP_PORT_FORWARD:-${OPENVPN_PORT} ${STUNNEL_PORT} ${SOCAT_PORT}}
+declare -x UPNP_UDP_PORT_FORWARD=${UPNP_UDP_PORT_FORWARD:-${OPENVPN_PORT}}
+declare -x IPASN_DB=${IPASN_DB:-ipasn_20170201.1600.dat.gz}
+declare -x AUTH=${AUTH:-none}
+declare -x CIPHER=${CIPHER:-none}
+declare -x CLIENT_CERT=${CLIENT_CERT:-0}
+declare -x OPENVPN_VERSION=${OPENVPN_VERSION:-$($(which openvpn) --version | head -n 1 | awk '{print $2}')}
+declare -x OPENVPN_COMPRESS=${OPENVPN_COMPRESS}
+declare -x LOCAL_DNS=${LOCAL_DNS:-1}
+declare -x VPN_PROVIDER=${VPN_PROVIDER}
+declare -x VPN_LOCATION_GROUP=${VPN_LOCATION_GROUP}
+declare -x VPN_LOCATION=${VPN_LOCATION}
+declare -x VPN_USERNAME=${VPN_USERNAME}
+declare -x VPN_PASSWD=${VPN_PASSWD}
+declare -x VPN_USER_CERT=${VPN_USER_CERT}
+declare -x VPN_USER_KEY=${VPN_USER_KEY}
+declare -x SPEEDTEST=${SPEEDTEST:-1}
+declare -x RESIN_SUPERVISOR_ADDRESS=${RESIN_SUPERVISOR_ADDRESS}
+declare -x RESIN_SUPERVISOR_API_KEY=${RESIN_SUPERVISOR_API_KEY}
+declare -x IPV4_SNAT=${IPV4_SNAT}
+declare -x IPV6_SNAT=${IPV6_SNAT}
+declare -x LIVE_LOGS=${LIVE_LOGS:-0}
+declare -x BLOCK_TORRENTS=${BLOCK_TORRENTS:-1}
+declare -x DBUS_SYSTEM_BUS_ADDRESS=${DBUS_SYSTEM_BUS_ADDRESS:-unix:path=/host/run/dbus/system_bus_socket}
+declare -x CUSTOM_COMMANDS=${CUSTOM_COMMANDS}
+declare -x BIRD=${BIRD:-0}
+declare -x BIRD_CONFIG=${BIRD_CONFIG}
+declare -x BIRD_IFACE_CMDS=${BIRD_IFACE_CMDS}
+declare -x REMOTE_OVERRIDE=${REMOTE_OVERRIDE}
+
+
+# plugin configuration
+source ${WORKDIR}/.env-${DNS_SUB_DOMAIN}-plugin
+
+if [[ "${DEBUG}" == "1" ]]; then
+    set -x
+    env
+fi
+
+printf 'updating ca cert bundle...\n'
+if ! [ -f ${REQUESTS_CA_BUNDLE} ]; then
+    with_backoff curl ${CURL_OPTS} -${AF} \
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2)) \
+      "http://curl.haxx.se/ca/cacert.pem" -o ${REQUESTS_CA_BUNDLE}
+fi
+
+if [[ $LIVE_LOGS == '1' ]]; then
+	printf 'starting log app...\n'
+	pushd ${WORKDIR}/app && ("${WORKDIR}/scripts/pyboot.sh" application &) && popd
+fi
+
+pushd ${WORKDIR}
+
+if [[ ${RESIN} == "1" ]]; then
+    log 'starting dashboard redirection service...'
+    qs="guid=${GUID}"
+    if [[ "${RESIN_APP_ID}" ]]; then
+        qs="guid=${GUID}&appid=${RESIN_APP_ID}"
+    fi
+
+    while true; do echo -ne "HTTP/1.1 302 Found\r\nLocation: ${DASHBOARD_HOST}/?${qs}\r\nConnection: close\r\n\r\n" | nc -l -p ${NETCAT_PORT} -q 0; sleep 1; done &
+fi
+
+log 'dumping env vars...'
+if [ -f ${TEMPDIR}/.env ]; then
+    rm ${TEMPDIR}/.env
+fi
+
+for ev in $(printenv | awk -F'=' '{print $1}' | head -n -1); do
+    if [ ! -z ${ev} ]; then
+        printf "declare -x ${ev}=\'${!ev}\'\n" >> ${TEMPDIR}/.env
+    fi
+done
+sed -i'' 's/"//g' ${TEMPDIR}/.env && source ${TEMPDIR}/.env
+
+if [[ "${BIRD}" == '1' ]] && [ ${BIRD_CONFIG} ]; then
+    log 'generating BIRD configuration...'
+    echo "${BIRD_CONFIG}" | base64 -d  > /usr/local/etc/bird.conf
+    if [ ${BIRD_IFACE_CMDS} ]; then
+        $(which bash) -c "$(echo ${BIRD_IFACE_CMDS} | base64 -d)"
+    fi
+    /usr/local/sbin/bird --version\
+      && /usr/local/sbin/bird -p\
+      && /usr/local/sbin/bird -u bird -g bird
+fi
+
+log 'generating tunnel credentials...'
+if ([[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "5" ]]) \
+  && [[ ${VPN_LOCATION_GROUP} ]] && [[ ${VPN_LOCATION} ]] \
+  && [[ ${VPN_PROVIDER} ]] && [[ ${VPN_USERNAME} ]] && [[ ${VPN_PASSWD} ]]; then
+
+    printf "${VPN_USERNAME}\n${VPN_PASSWD}\n" > ${WORKDIR}/credentials.txt
+else
+    printf "${GUID}\n${TUN_PASSWD}\n" > ${WORKDIR}/credentials.txt
+fi
+chmod 600 ${WORKDIR}/credentials.txt
+
+log 'adding IPv6 localhost configuration...'
+cat << EOF >> /etc/hosts
+# IPv6 Configuration
+::1         ip6-localhost ip6-loopback localhost
+fe00::0     ip6-localnet
+ff00::0     ip6-mcastprefix
+ff02::1     ip6-allnodes
+ff02::2     ip6-allrouters
+EOF
+
+if [ -f ${WORKDIR}/sysctl/local.conf ]; then
+    log 'tuning networking and limits...'
+    sysctl -p ${WORKDIR}/sysctl/local.conf
+fi
+
+if [ -f /etc/security/limits.conf ]; then
+    log 'updating limits...'
+    grep -q -F '* soft nofile 100000' /etc/security/limits.conf\
+      || printf '* soft nofile 100000\n' >> /etc/security/limits.conf
+    grep -q -F '* hard nofile 100000' /etc/security/limits.conf\
+      || printf '* hard nofile 100000\n' >> /etc/security/limits.conf
+fi
+
+log 'enabling forwarding...'
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv4.conf.all.rp_filter=0
+
+if [[ "${AF}" == "6" ]] || [[ "${TUN_IPV6}" == "1" ]]; then
+    sysctl -w net.ipv6.conf.all.forwarding=1
+    sysctl -w net.ipv6.conf.$(get_iface).forwarding=0
+
+    for iface in all default lo docker0 balena0 $(get_iface) $(get_wiface); do
+        sysctl -w net.ipv6.conf.${iface}.accept_ra=2
+    done
+fi
+
+sysctl -w net.ipv4.conf.all.route_localnet=1
+sysctl -w net.ipv4.tcp_mtu_probing=1
+
+for iface in docker0 balena0 $(get_iface) $(get_wiface) dummy0; do
+    log "setting ${iface} MTU..."
+    ip link set dev ${iface} mtu ${LINK_MTU} || true
+done
+
+log 'enumerating tunnel protocol name...'
+tun_proto=$(with_backoff get_tunnel_proto)
+
+log 'inreasing TCP congestion window...'
+defrt=$(ip route | grep "^default" | head -1)
+ip route change ${defrt} initcwnd 10 initrwnd 10
+
+if [[ "${AF}" == "6" ]]; then
+    defrt6=($(ip -6 route | grep "^default" | head -1))
+    defrt6=$(for el in ${defrt6[@]}; do if [[ "${el}" != "expires" ]] && ! [[ ${el} =~ [0-9]+sec ]]; then\
+      printf "%s " $el; fi; done)
+    ip -6 route change ${defrt6} initcwnd 10 initrwnd 10
+fi
+
+log 'creating iptables command aliases...'
+cat << EOF > /root/.aliases
+alias ip4tables=iptables
+alias ip4tables-save=iptables-save
+alias ip4tables-restore=iptables-restore
+EOF
+shopt -s expand_aliases
+source /root/.aliases
+
+for af in ${AF_INETS}; do
+    if [[ "${RESIN}" == "1" ]]; then
+        version_hash=$(echo "$RESIN_HOST_OS_VERSION" | md5sum | awk '{print $1}')
+        if ! [ -f "${DATADIR}/rules-${version_hash}.v${af}" ]; then
+            log "saving default ip${af}tables rules..."
+            eval ip${af}tables-save > ${DATADIR}/rules-${version_hash}.v${af} || true
+        fi
+    fi
+
+    temp=$(mktemp)\
+      && eval ip${af}tables-save\
+      | grep -E 'DOCKER_OUTPUT|DOCKER_POSTROUTING' > ${temp}\
+      && printf "*nat\n$(cat ${temp})\nCOMMIT\n" >> ${DATADIR}/docker${af}.rules\
+      && rm ${temp}
+
+    for table in filter nat mangle raw; do
+        for chain in PREROUTING INPUT FORWARD OUTPUT POSTROUTING; do
+            log "flushing ip${af}tables: ${table} ${chain}..."
+            eval ip${af}tables -t ${table} -F ${chain} || true
+        done
+    done
+
+    if [[ "${RESIN}" == "1" ]]; then
+        log "restoring factory ip${af}tables rules..."
+        eval ip${af}tables-restore < ${DATADIR}/rules-${version_hash}.v${af} || true
+    fi
+
+    log 'clamping MSS to PMTU...'
+    eval ip${af}tables -I FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+    eval ip${af}tables -t mangle -I FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+done
+
+[ -f ${DATADIR}/docker4.rules ]\
+  && log 'recovering Docker iptables chains...'\
+  && iptables-restore -n < ${DATADIR}/docker4.rules || true
+
+if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
+    [ -f ${DATADIR}/docker4.rules ]\
+    && log 'recovering Docker ip6tables chains...'\
+    && ip6tables-restore -n < ${DATADIR}/docker6.rules || true
+fi
+
+log 'adding ipv4 rules for local access...'
+ipt_add_rule nat A "POSTROUTING -o ${EXT_IFACE} -j MASQUERADE"
+
+for sif in ${INT_IFACES}; do
+    for dif in ${INT_IFACES}; do
+        ipt_add_rule filter I "DOCKER-USER -i ${sif} -o ${dif} -j ACCEPT"
+    done
+done
+
+if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then # work around missing ip6tables kernel modules
+    log 'adding ipv6 rules for local access...'
+    ip6t_add_rule nat A "POSTROUTING -o ${EXT_IFACE} -j MASQUERADE"
+
+	for sif in ${INT_IFACES}; do
+		for dif in ${INT_IFACES}; do
+			ip6t_add_rule filter I "DOCKER-USER -i ${sif} -o ${dif} -j ACCEPT"
+		done
+	done
+fi
+
+if [[ ${IPV4_SNAT} ]] || [[ ${IPV6_SNAT} ]]; then
+    log 'configuring IP SNATs...'
+    configure_snat
+fi
+
+log '(re)creating ipsets...'
+if [[ ! $(ipset list domain-filter-ipv4) ]]; then
+    ipset create domain-filter-ipv4 hash:net
+else
+    ipset flush domain-filter-ipv4
+fi
+
+if [[ "${TUN_IPV6}" == "1" ]]; then
+    if [[ ! $(ipset list domain-filter-ipv6) ]]; then
+        ipset create domain-filter-ipv6 hash:net family inet6
+    else
+        ipset flush domain-filter-ipv6
+    fi
+fi
+
+log 'removing bandwidth limits...'
+with_backoff bash ${WORKDIR}/scripts/limit-server.sh -s
+
+if [[ "${AF}" != "6" ]]; then
+    tun_proto=udp
+fi
+
+log 'updating config templates...'
+if [[ "${AUTH}" != "none" ]] && [[ "${CIPHER}" != "none" ]]; then
+    for template in openvpn/udp_server.conf openvpn/tcp_server.conf; do
+        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+            printf "tls-crypt {{WORKDIR}}/openvpn/ta.key\n" >> ${WORKDIR}/${template}
+        else
+            printf "tls-auth {{WORKDIR}}/openvpn/ta.key\n" >> ${WORKDIR}/${template}
+            printf "key-direction 0\n" >> ${WORKDIR}/${template}
+        fi
+    done
+
+    key=$(cat ${WORKDIR}/openvpn/ta.key)
+    if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        cat << EOF >> ${WORKDIR}/client.ovpn
+tls-exit
+remote-cert-tls server
+<tls-crypt>
+${key}
+</tls-crypt>
+EOF
+    else
+        cat << EOF >> ${WORKDIR}/client.ovpn
+tls-exit
+remote-cert-tls server
+<tls-auth>
+${key}
+</tls-auth>
+key-direction 1
+EOF
+    fi
+fi
+
+if [[ "${CLIENT_CERT}" == "1" ]]; then
+    key=$(cat ${WORKDIR}/openvpn/client.key)
+    cert=$(cat ${WORKDIR}/openvpn/client.crt)
+    cat << EOF >> ${WORKDIR}/client.ovpn
+<key>
+${key}
+</key>
+<cert>
+${cert}
+</cert>
+EOF
+
+else
+    for template in openvpn/udp_server.conf openvpn/tcp_server.conf; do
+        if [[ ${OPENVPN_VERSION} =~ 2\.3 ]]; then
+            printf "client-cert-not-required\n" >> ${WORKDIR}/${template}
+        else
+            printf "verify-client-cert none\n" >> ${WORKDIR}/${template}
+        fi
+    done
+fi
+
+for template in mgmt.ovpn client.ovpn openvpn/udp_server.conf openvpn/tcp_server.conf; do
+    sed -i'' "s#{{WORKDIR}}#${WORKDIR}#g" ${WORKDIR}/${template}
+    sed -i'' "s#{{TEMPDIR}}#${TEMPDIR}#g" ${WORKDIR}/${template}
+    sed -i'' "s#{{DATADIR}}#${DATADIR}#g" ${WORKDIR}/${template}
+    sed -i'' "s#{{ARCH}}#${ARCH}#g" ${WORKDIR}/${template}
+
+    if [[ ${OPENVPN_VERBOSITY} ]]; then
+        printf "verb ${OPENVPN_VERBOSITY}\n" >> ${WORKDIR}/${template}
+    fi
+
+    if [[ "${SUPPRESS_TS}" == "1" ]]; then
+       printf "suppress-timestamps\n" >> ${WORKDIR}/${template}
+    fi
+done
+
+for template in openvpn/udp_server.conf openvpn/tcp_server.conf; do
+    if [[ "${OPENVPN_COMPRESS}" == "1" ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+            printf "compress lz4\n" >> ${WORKDIR}/${template}
+            printf "push \"compress lz4\"\n" >> ${WORKDIR}/${template}
+        else
+            printf "comp-lzo yes\n" >> ${WORKDIR}/${template}
+            printf "push \"comp-lzo yes\"\n" >> ${WORKDIR}/${template}
+        fi
+    elif [[ "${OPENVPN_COMPRESS}" == "0" ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+            printf "compress\n" >> ${WORKDIR}/${template}
+            printf "push \"compress\"\n" >> ${WORKDIR}/${template}
+        else
+            printf "comp-lzo no\n" >> ${WORKDIR}/${template}
+            printf "push \"comp-lzo no\"\n" >> ${WORKDIR}/${template}
+        fi
+    else
+        log 'no compression directives added (compatibility)'
+    fi
+
+    for dns in ${DNS_SERVERS}; do
+        printf "push \"dhcp-option DNS ${dns}\"\n" >> ${WORKDIR}/${template}
+    done
+
+    if [[ "${TUN_IPV6}" == "1" ]] && [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        for dns in ${DNS6_SERVERS}; do
+            printf "push \"dhcp-option DNS6 ${dns}\"\n" >> ${WORKDIR}/${template}
+        done
+    fi
+done
+
+for template in mgmt.ovpn client.ovpn; do
+    if [[ "${OPENVPN_COMPRESS}" == "1" ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+            printf "compress lz4\n" >> ${WORKDIR}/${template}
+        else
+            printf "comp-lzo yes\n" >> ${WORKDIR}/${template}
+        fi
+    elif [[ "${OPENVPN_COMPRESS}" == "0" ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+            printf "compress\n" >> ${WORKDIR}/${template}
+        else
+            printf "comp-lzo no\n" >> ${WORKDIR}/${template}
+        fi
+    else
+        log 'no compression directives added (compatibility)'
+    fi
+done
+
+if [[ "${TUN_IPV6}" == "1" ]]; then
+    log 'updating OpenVPN client configuration...'
+    printf "tun-ipv6\n" >> ${WORKDIR}/openvpn/client.ovpn
+fi
+
+for proto in ${TUN_PROTO}; do
+    log 'calculating random subnets...'
+    random_subnetv4=$(echo 10.$(((($RANDOM + 1) % 256 ))).$(((($RANDOM + 1) % 256 ))))
+    random_subnetv6=$(printf 'fde4:8dba:82e1:%x' $RANDOM)
+
+    log "${proto}: updating OpenVPN server configuration..."
+    printf "server ${random_subnetv4}.0 255.255.255.0\n" >> ${WORKDIR}/openvpn/${proto}_server.conf
+
+    if [[ "${TUN_IPV6}" == "1" ]]; then
+        log 'enabling IPv6 tunnel support...'
+        printf "server-ipv6 ${random_subnetv6}::/64\n" >> ${WORKDIR}/openvpn/${proto}_server.conf
+        printf "tun-ipv6\n" >> ${WORKDIR}/openvpn/${proto}_server.conf
+    fi
+done
+
+if [[ "${TUN_MGMT}" == "1" ]]; then
+    log "starting management tunnel proto=${tun_proto}..."
+    printf "dev ${MGMT_IFACE}\n" >> ${WORKDIR}/mgmt.ovpn
+    with_backoff openvpn --config ${WORKDIR}/mgmt.ovpn --remote ${MGMT_HOST} ${OPENVPN_PORT} ${tun_proto} &
+fi
+
+log 'generating base dnsmasq configuration...'
+cat << EOF > ${WORKDIR}/dnsmasq.conf
+bind-dynamic
+domain-needed
+bogus-priv
+log-facility=-
+EOF
+
+# https://github.com/systemd/systemd/issues/8085
+dnsmasq_config 'user=root' ${WORKDIR}/dnsmasq.conf
+
+if [[ ! "${DEVICE_TYPE}" == "5" ]]; then
+    dnsmasq_config "no-resolv" ${WORKDIR}/dnsmasq.conf
+    for dns in ${DNS_SERVERS}; do
+        dnsmasq_config "server=${dns}" ${WORKDIR}/dnsmasq.conf
+    done
+
+    if [[ "${AF}" == "6" ]]; then
+        for dns in ${DNS6_SERVERS}; do
+            dnsmasq_config "server=${dns}" ${WORKDIR}/dnsmasq.conf
+        done
+    fi
+else
+    dnsmasq_config "resolv-file=${WORKDIR}/resolv.dnsmasq" ${WORKDIR}/dnsmasq.conf
+    dnsmasq_config "strict-order" ${WORKDIR}/dnsmasq.conf
+    [ -f ${WORKDIR}/resolv.dnsmasq ] && rm ${WORKDIR}/resolv.dnsmasq
+    for dns in ${DNS_SERVERS}; do
+        dnsmasq_config "nameserver ${dns}" ${WORKDIR}/resolv.dnsmasq
+    done
+
+    if [[ "${AF}" == "6" ]]; then
+        for dns in ${DNS6_SERVERS}; do
+            dnsmasq_config "nameserver ${dns}" ${WORKDIR}/resolv.dnsmasq
+        done
+    fi
+fi
+
+if [[ "${DEBUG}" == "1" ]]; then
+    dnsmasq_config "log-queries\nlog-dhcp" ${WORKDIR}/dnsmasq.conf
+fi
+
+if grep -E '^\.$' /etc/init.d/dnsmasq; then
+    log 'fixing dnsmasq init script...'
+    sed -i'' -e '/^\.$/d' /etc/init.d/dnsmasq
+fi
+
+log 'updating dnsmasq service options...'
+ln -s ${WORKDIR}/dnsmasq.conf /etc/dnsmasq.d/${DNS_SUB_DOMAIN}.conf\
+  && systemctl enable dnsmasq.service
+
+###########################
+# client mode(s) or mixed #
+###########################
+if [[ "${DEVICE_TYPE}" == "2" ]] || [[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "5" ]]; then
+    log 'setting up policy routing...'
+    grep -q -F '248' /etc/iproute2/rt_tables || printf "248\t${DNS_SUB_DOMAIN}\n" >> /etc/iproute2/rt_tables
+
+    if ! [[ $(ip rule show | grep "0x1 lookup ${DNS_SUB_DOMAIN}") ]]; then
+        ip rule add fwmark 1 table ${DNS_SUB_DOMAIN}
+    fi
+
+    if ! [[ $(ip rule show | grep "0x3 lookup main") ]]; then
+        ip rule add fwmark 3 table main
+    fi
+
+    if [[ "${TUN_IPV6}" == "1" ]]; then
+        if ! [[ $(ip -6 rule show | grep "0x1 lookup ${DNS_SUB_DOMAIN}") ]]; then
+            ip -6 rule add fwmark 1 table ${DNS_SUB_DOMAIN}
+        fi
+    fi
+
+    if [[ "${TUN_IPV6}" == "1" ]]; then
+        if ! [[ $(ip -6 rule show | grep "0x3 lookup main") ]]; then
+            ip -6 rule add fwmark 3 table main
+        fi
+    fi
+
+    if [[ "${DEVICE_TYPE}" == "3" ]]; then
+        log 'setting up policy routing for mixed mode (double-vpn)...'
+        grep -q -F '247' /etc/iproute2/rt_tables || printf "247\tdouble_vpn\n" >> /etc/iproute2/rt_tables
+        ip route add $(ip route | grep "^default" | head -1) table double_vpn
+
+        if [[ $(get_wiface) ]]; then
+            ip route add $(ip route | grep "$(get_wiface)" | head -1) initcwnd 10 initrwnd 10 table double_vpn
+        fi
+
+        if ! [[ $(ip rule show | grep "0x2 lookup double_vpn") ]]; then
+            ip rule add fwmark 2 lookup double_vpn
+        fi
+
+        if ! [[ $(ip rule show | grep "from $(get_ipaddr) lookup double_vpn") ]]; then
+            ip rule add from $(get_ipaddr) table double_vpn
+        fi
+
+        if [[ "${AF}" == "6" ]]; then
+            ip -6 route add $(ip -6 route | grep "^default" | head -1) table double_vpn
+
+            if [[ $(get_wiface 6) ]]; then
+                ip route add $(ip -6 route | grep "$(get_wiface 6)" | head -1) initcwnd 10 initrwnd 10 table double_vpn
+            fi
+
+            if ! [[ $(ip -6 rule show | grep "0x2 lookup double_vpn") ]]; then
+                ip -6 rule add fwmark 2 lookup double_vpn
+            fi
+
+            if ! [[ $(ip -6 rule show | grep "from $(get_ipaddr) lookup double_vpn") ]]; then
+                ip -6 rule add from $(get_ip6addr) table double_vpn
+            fi
+        fi
+    fi
+
+    if ! [[ -f ${DATADIR}/${IPASN_DB} ]]; then
+        log "downloading ${IPASN_DB}..."
+        download_ipasn_db
+    fi
+
+    if [[ ${AS_NUMS} ]] && [[ -f ${DATADIR}/${IPASN_DB} ]]; then
+        log "alpha2=${ALPHA_2} as_nums=${AS_NUMS}"
+        log 'populating ipv4 ipsets...'
+        for prefix in $(${WORKDIR}/scripts/pyboot.sh as_prefixes 4); do
+             ipset -q add domain-filter-ipv4 ${prefix}
+        done
+
+        if [[ "${TUN_IPV6}" == "1" ]]; then
+            log 'populating ipv6 ipsets...'
+            for prefix in $(${WORKDIR}/scripts/pyboot.sh as_prefixes 6); do
+                ipset -q add domain-filter-ipv6 ${prefix}
+            done
+        fi
+    fi
+
+    for ip in ${IPADDRSV4}; do
+        log "populating ${ip} ipv4 ipsets..."
+        ipset -q add domain-filter-ipv4 ${ip}
+    done
+
+    if [[ "${TUN_IPV6}" == "1" ]]; then
+        for ip in ${IPADDRSV6}; do
+            log "populating ${ip} ipv6 ipsets..."
+            ipset -q add domain-filter-ipv6 ${ip}
+        done
+    fi
+
+    log 'updating dnsmasq configuration...'
+    dnsmasq_config "interface=$(get_iface)" ${WORKDIR}/dnsmasq.conf
+
+    for if in ${INT_IFACES}; do
+        dnsmasq_config "interface=${if}" ${WORKDIR}/dnsmasq.conf
+    done
+
+    if [[ $(get_wiface 6) ]]; then
+        ip -6 addr add ${WIP6}/64 dev $(get_wiface 6) nodad
+    fi
+
+    if [[ "${DHCP_ENABLED}" == "1" ]]; then
+        dnsmasq_config "dhcp-range=${DHCP_SCOPE}" ${WORKDIR}/dnsmasq.conf
+        dnsmasq_config "dhcp-option=6,${DNS_SERVERS// /,}" ${WORKDIR}/dnsmasq.conf
+
+        if [[ "${TUN_IPV6}" == "1" ]]; then
+            dnsmasq_config "enable-ra\ndhcp-range=::1000,::FFFF,constructor:$(get_wiface 6),64,12h" ${WORKDIR}/dnsmasq.conf
+
+            for dns in ${DNS6_SERVERS}; do
+                dnsmasq_config "dhcp-option=option6:dns-server,[${dns}]" ${WORKDIR}/dnsmasq.conf
+            done
+        fi
+    fi
+
+    log "adding ${DNS_SUB_DOMAIN} hostname..."
+    dnsmasq_config "address=/${DNS_SUB_DOMAIN}/${WIP4}" ${WORKDIR}/dnsmasq.conf
+    dnsmasq_config "address=/${DNS_SUB_DOMAIN}/${WIP6}" ${WORKDIR}/dnsmasq.conf
+
+    for domain in ${DOMAINS}; do
+        log "adding ${domain} config..."
+        dnsmasq_config "ipset=/${domain}/domain-filter-ipv4,domain-filter-ipv6" ${WORKDIR}/dnsmasq.conf
+    done
+
+    if [[ "${DEVICE_TYPE}" == "2" ]] || [[ "${DEVICE_TYPE}" == "5" ]]; then
+        log '(re)starting dnsmasq...'
+        with_backoff chown -hR root:root /run/dnsmasq;\
+          chown -hR root:root /var/run/dnsmasq;\
+          systemctl restart dnsmasq
+    fi
+fi
+
+###########################
+# server mode(s) or mixed #
+###########################
+if [[ "${DEVICE_TYPE}" == "1" ]] || [[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "4" ]]; then
+    if [[ "${SNIPROXY_ENABLED}" == "1" ]]; then
+        log 'generating base SNIProxy config...'
+        cat << EOF > ${WORKDIR}/sniproxy.conf
+user daemon
+pidfile /var/tmp/sniproxy.pid
+
+resolver {
+    nameserver ${SNIPROXY_DNS_RESOLVER}
+    mode ${SNIPROXY_MODE}
+}
+
+error_log {
+    filename /dev/stderr
+}
+
+access_log {
+    filename /dev/stdout
+}
+
+listener ${SNIPROXY_HTTP_PORT} {
+    proto http
+    table http
+}
+
+listener ${SNIPROXY_HTTPS_PORT} {
+    proto tls
+    table https
+}
+
+EOF
+
+        printf "table http {\n" >> ${WORKDIR}/sniproxy.conf
+        if [[ "${SERVICES}" != "#" ]]; then
+            for domain in ${DOMAINS}; do
+                log "adding ${domain} config..."
+                printf "    $(echo ${domain} | sed -r 's/\./\\./') * 80\n" >> ${WORKDIR}/sniproxy.conf
+            done
+        else
+            log 'adding wildcard config...'
+            printf "    .* * 80\n" >> ${WORKDIR}/sniproxy.conf
+        fi
+        printf "}\n\n" >> ${WORKDIR}/sniproxy.conf
+
+        printf "table https {\n" >> ${WORKDIR}/sniproxy.conf
+        if [[ "${SERVICES}" != "#" ]]; then
+            for domain in ${DOMAINS}; do
+                log "adding ${domain} config..."
+                printf "    $(echo ${domain} | sed -r 's/\./\\./') * 443\n" >> ${WORKDIR}/sniproxy.conf
+            done
+        else
+            log 'adding wildcard config...'
+            printf "    .* * 443\n" >> ${WORKDIR}/sniproxy.conf
+        fi
+        printf "}\n" >> ${WORKDIR}/sniproxy.conf
+    fi
+
+    if [[ "${SOCKS_ENABLED}" == "1" ]]; then
+        if [[ ! $(grep $(hostname) /root/.ssh/authorized_keys) ]]; then
+            log 'setting up keys...'
+            cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+        fi
+
+        log 'starting SOCKS proxy...'
+        ipt_add_rule filter I "INPUT -i ${EXT_IFACE} -p tcp -m tcp --dport ${SOCKS_PORT} -j ACCEPT"
+        if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
+            ip6t_add_rule filter I "INPUT -i ${EXT_IFACE} -p tcp -m tcp --dport ${SOCKS_PORT}"
+        fi
+        ssh -o StrictHostKeyChecking=no -f -N -D 0.0.0.0:${SOCKS_PORT} localhost
+    fi
+
+    log 'setting bandwidth limits...'
+    if [[ ! "${MAX_RATE}" == "0" ]]; then
+        with_backoff bash ${WORKDIR}/scripts/limit-server.sh
+    else
+        log "no bandwidth restrictions applied max_rate=${MAX_RATE}mbit"
+        with_backoff bash ${WORKDIR}/scripts/limit-server.sh -s
+    fi
+
+    if [[ ${UPNP_TCP_PORT_FORWARD} ]] || [[ ${UPNP_UDP_PORT_FORWARD} ]]; then
+        log 'forwarding ports...'
+        forward_ports
+        declare -x UPNP=$?
+    fi
+fi
+
+if [[ "${STUNNEL}" == "1" ]]; then
+    if [[ "${DEVICE_TYPE}" == "1" ]] || [[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "4" ]]; then
+        log 'generating certificate...'
+        openssl req -new -newkey rsa:4096\
+          -config /etc/ssl/openssl.cnf\
+          -days 365 -nodes -x509 -subj "/C=US/CN=black.box"\
+          -keyout /etc/stunnel/stunnel.pem -out /etc/stunnel/stunnel.pem\
+          && chmod 600 /etc/stunnel/stunnel.pem
+
+        log 'generating stunnel config (server)...'
+cat << EOF > /etc/stunnel/stunnel-server.conf
+cert = /etc/stunnel/stunnel.pem
+pid = /var/run/stunnel.pid
+output = /var/log/stunnel
+
+[openvpn]
+accept=:::${STUNNEL_PORT}
+connect=::1:${OPENVPN_PORT}
+EOF
+
+        ipt_add_rule filter I "INPUT -i ${EXT_IFACE}\
+          -p tcp -m tcp --dport ${STUNNEL_PORT} -j ACCEPT"
+        if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
+            ip6t_add_rule filter I "INPUT -i ${EXT_IFACE}\
+              -p tcp -m tcp --dport ${STUNNEL_PORT}"
+        fi
+        while true; do
+            if ! pgrep stunnel > /dev/null; then
+                log 'starting stunnel (server)...'
+                $(which stunnel) /etc/stunnel/stunnel-server.conf
+            fi
+            sleep 5m
+        done &
+    fi
+
+    if [[ "${DEVICE_TYPE}" == "2" ]] || [[ "${DEVICE_TYPE}" == "3" ]]; then
+        log 'generating stunnel config (client)...'
+cat << EOF > /etc/stunnel/stunnel-client.template.conf
+pid = /var/run/stunnel.pid
+output = /var/log/stunnel
+
+EOF
+
+cat << EOF >> /etc/stunnel/stunnel-client.template.conf
+[openvpn]
+client = yes
+accept = :::${OPENVPN_PORT}
+connect = {{OPENVPN_SERVER}}:${STUNNEL_PORT}
+EOF
+    fi
+fi
+
+if [[ ${WANPROXY} ]]; then
+    if [[ "${DEVICE_TYPE}" == "1" ]] || [[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "4" ]]; then
+        log 'generating WANProxy server config...'
+        cat << EOF > ${WORKDIR}/server.conf
+create codec codec0
+set codec0.codec XCodec
+set codec0.compressor zlib
+set codec0.compressor_level 6
+activate codec0
+
+create interface $(get_iface)
+set $(get_iface).family IPv${AF}
+set $(get_iface).host "localhost"
+set $(get_iface).port "0"
+activate $(get_iface)
+
+create peer peer0
+set peer0.family IPv${AF}
+set peer0.host "localhost"
+set peer0.port "${OPENVPN_PORT}"
+activate peer0
+
+create proxy proxy0
+set proxy0.interface $(get_iface)
+set proxy0.interface_codec codec0
+set proxy0.peer peer0
+set proxy0.peer_codec None
+activate proxy0
+EOF
+
+        if [[ "${WANPROXY}" == "SOCAT" ]]; then
+            ipt_add_rule flter I "INPUT -i ${EXT_IFACE} -p tcp -m tcp --dport ${SOCAT_PORT} -j ACCEPT"
+            if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
+                ip6t_add_rule filter I "INPUT -i ${EXT_IFACE} -p tcp -m tcp --dport ${SOCAT_PORT}"
+            fi
+            start_wanproxy_server
+        fi
+    fi
+
+    if [[ "${DEVICE_TYPE}" == "2" ]] || [[ "${DEVICE_TYPE}" == "3" ]]; then
+        log 'generating WANProxy client config...'
+        cat << EOF > ${WORKDIR}/client.conf
+create codec codec0
+set codec0.codec XCodec
+set codec0.compressor zlib
+set codec0.compressor_level 6
+activate codec0
+
+create interface $(get_iface)
+set $(get_iface).family IPv${AF}
+set $(get_iface).host "localhost"
+set $(get_iface).port "${WANPROXY_PORT}"
+activate $(get_iface)
+
+create peer peer0
+set peer0.family IPv${AF}
+set peer0.host "localhost"
+set peer0.port "3301"
+activate peer0
+
+create proxy proxy0
+set proxy0.interface $(get_iface)
+set proxy0.interface_codec None
+set proxy0.peer peer0
+set proxy0.peer_codec codec0
+activate proxy0
+EOF
+
+        log 'starting WANProxy client...'
+        (nohup $(which wanproxy) -c ${WORKDIR}/client.conf) &
+        cat ${WORKDIR}/id_rsa.pub >> /root/.ssh/authorized_keys
+    fi
+fi
+
+if [[ ${VPN_PROVIDER} ]] && [[ ${VPN_LOCATION_GROUP} ]] && [[ ${VPN_LOCATION} ]]; then
+    log 'generating custom VPN client configuration...'
+    generate_vpn_profile "${VPN_PROVIDER}" "${VPN_LOCATION_GROUP}" "${VPN_LOCATION}"
+    sed -i'' "s#{{TEMPDIR}}#${TEMPDIR}#g" ${WORKDIR}/client.ovpn
+    sed -i'' "s#{{WORKDIR}}#${WORKDIR}#g" ${WORKDIR}/client.ovpn
+    sed -i'' "s#{{DATADIR}}#${DATADIR}#g" ${WORKDIR}/client.ovpn
+
+    if [[ ${VPN_USER_CERT} ]]; then
+        echo ${VPN_USER_CERT} | base64 -d > ${WORKDIR}/client.crt
+    sed -i'' "s;#USERCERT;${WORKDIR}/client.crt;" ${WORKDIR}/client.ovpn
+    sed -i'' "s;#PATHuser.crt;${WORKDIR}/client.crt;" ${WORKDIR}/client.ovpn
+    fi
+
+    if [[ ${VPN_USER_KEY} ]]; then
+        echo ${VPN_USER_KEY} | base64 -d > ${WORKDIR}/client.key
+    sed -i'' "s;#USERKEY;${WORKDIR}/client.key;" ${WORKDIR}/client.ovpn
+    sed -i'' "s;#PATHuser.key;${WORKDIR}/client.key;" ${WORKDIR}/client.ovpn
+    fi
+
+    if [[ ${OPENVPN_VERBOSITY} ]]; then
+        printf "verb ${OPENVPN_VERBOSITY}\n" >> ${WORKDIR}/client.ovpn
+    fi
+
+    if [[ "${SUPPRESS_TS}" == "1" ]]; then
+       printf "suppress-timestamps\n" >> ${WORKDIR}/client.ovpn
+    fi
+
+    sed -i'' 's/redirect-gateway/;redirect-gateway/g' ${WORKDIR}/client.ovpn
+    sed -i'' 's/auth-user-pass/;auth-user-pass/g' ${WORKDIR}/client.ovpn
+    printf "auth-user-pass ${WORKDIR}/credentials.txt\n" >> ${WORKDIR}/client.ovpn
+fi
+
+log 'overriding/ignoring default routes...'
+for subnet in 0 64 128 192; do
+    printf "route ${subnet}.0.0.0 192.0.0.0 net_gateway\n" >> ${WORKDIR}/client.ovpn
+done
+
+if [ "${REMOTE_OVERRIDE}" ]; then
+    log 'overriding OpenVPN remote...'
+    sed -i'' -E '/remote\s.*/d' ${WORKDIR}/client.ovpn
+    printf "${REMOTE_OVERRIDE}\n" >> ${WORKDIR}/client.ovpn
+fi
+
+if [ "${OPENVPN_CONFIG_EXTRA}" ]; then
+    log 'adding extra OpenVPN directives...'
+    printf "${OPENVPN_CONFIG_EXTRA}" | base64 -d >> ${WORKDIR}/client.ovpn
+fi
+
+if [[ "${AF}" == "6" ]]; then
+    log 'TODO: work out how to ignore/override IPv6 routes\n'
+fi
+
+if [[ ${CUSTOM_COMMANDS} ]]; then
+    log 'executing custom commands...'
+    $(which bash) -c "$(echo ${CUSTOM_COMMANDS} | base64 -d)"
+fi
+
+log 'entering main...'
+AF=${AF} AP=${AP} UPNP=${UPNP} with_backoff ${WORKDIR}/scripts/pyboot.sh main

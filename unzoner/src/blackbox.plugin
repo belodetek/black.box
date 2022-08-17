@@ -27,7 +27,7 @@ def auth_user(uid, pwd):
                 guid=uid, name='PAIRED_DEVICE_GUID')
         except Exception as e:
             paired_device = None
-        
+
         if DEBUG: print('paired_device={} uid={}'.format(paired_device, uid))
         if paired_device: return True
 
@@ -46,7 +46,7 @@ def auth_user(uid, pwd):
             )
         )
         if policy_routing and policy_routing == 0: return False
-        
+
     # password check (resin.io Data API)
     jwtoken = None
     device_type = None
@@ -79,17 +79,17 @@ def auth_user(uid, pwd):
             result = check_active_paypal_subscription(guid=uid, baid=baid)
         except Exception as e:
             result = None
-            
+
         if DEBUG: print('paypal={} uid={}'.format(result, uid))
         if result: return True
-    
+
     # Bitcoin payment check (resin.io Data API)
     if BITCOIN_PAYMENT_CHECK:
         try:
             result = check_active_bitcoin_payment(guid=uid)
         except Exception as e:
             result = None
-            
+
         if DEBUG: print('bitcoin={} uid={}'.format(result, uid))
         if result: return True
 

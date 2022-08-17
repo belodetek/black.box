@@ -438,15 +438,22 @@ def main():
 						pass
 
 				# speedtest result
-				if len(c_str) == 15: # lines of output hack (iperf --dualtest)
-					down = [el for el in c_str[-4].split(' ') if el]
-					up = [el for el in c_str[-2].split(' ') if el]
-
+				if len(c_str) >= 13: # lines of output hack (iperf --dualtest)
 					result = {
-						'status': 0,
-						'down': ' '.join([s for s in down[2:] if s]),
-						'up': ' '.join([s for s in up[2:] if s])
+						'status': 0
 					}
+
+					try:
+						down = [el for el in c_str[-2].split(' ') if el]
+						result['down'] = ' '.join([s for s in down[2:] if s])
+					except:
+						result['down'] = 'N/A'
+
+					try:
+						up = [el for el in c_str[-1].split(' ') if el]
+						result['up'] = ' '.join([s for s in up[2:] if s])
+					except:
+						result['up'] = 'N/A'
 
 					log('run_speedtest: result={}'.format(result))
 

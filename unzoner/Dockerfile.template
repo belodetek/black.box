@@ -1,0 +1,312 @@
+# --- build stage
+FROM balenalib/%%BALENA_ARCH%%-ubuntu-python:3.9-build AS build
+
+LABEL maintainer=team@belodetek.io
+
+# https://www.balena.io/docs/learn/more/masterclasses/cli-masterclass/#82-build-time-variables
+ARG AARCH64_OPTIMISE_FLAGS
+ARG ARM_OPTIMISE_FLAGS
+ARG BUILD_BIRD
+ARG BUILD_BIRD_VERSION
+ARG BUILD_OPENSSL
+ARG BUILD_OPENSSL_VERSION
+ARG BUILD_OPENVPN
+ARG BUILD_OPENVPN_VERSION
+ARG BUILD_SNIPROXY
+ARG BUILD_SNIPROXY_VERSION
+ARG BUILD_WANPROXY
+ARG BUILD_WANPROXY_VERSION
+ARG COMPILE_CODE
+ARG DNS_SUB_DOMAIN
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN install_packages \
+    automake \
+    bison \
+    ca-certificates \
+    cmake \
+    curl \
+    fakeroot \
+    flex \
+    gawk \
+    gettext \
+    libev-dev \
+    liblz4-dev \
+    liblzo2-dev \
+    libpam-dev \
+    libssl-dev \
+    libtool \
+    libudns-dev \
+    openssl \
+    python3-venv \
+    python3-mysqldb
+
+WORKDIR /data
+
+RUN useradd openssl && (passwd -d openssl || true)
+
+RUN if [ "$BUILD_OPENSSL" = '1' ]; then \
+    set -x; git clone --single-branch --branch openssl-$BUILD_OPENSSL_VERSION https://github.com/openssl/openssl \
+    && cd openssl \
+    && chown -hR openssl:openssl . \
+    && if [ '%%BALENA_ARCH%%' = 'armv7hf' ]; then ./config --prefix=/usr/local/ssl shared threads no-async $ARM_OPTIMISE_FLAGS; \
+    elif [ '%%BALENA_ARCH%%' = 'aarch64' ]; then ./config --prefix=/usr/local/ssl shared threads no-async $AARCH64_OPTIMISE_FLAGS; \
+    else ./config --prefix=/usr/local/ssl shared threads no-async; fi && make -j $(nproc); fi
+
+USER openssl
+
+RUN if [ "$BUILD_OPENSSL" = '1' ]; then set -x; cd openssl && id && make test; fi
+
+USER root
+
+RUN (deluser --remove-home openssl && delgroup openssl) || true
+
+RUN if [ "$BUILD_OPENSSL" = '1' ]; then \
+    set -x; cd openssl && id && make install_sw \
+    && /usr/local/ssl/bin/openssl version && ldd /usr/local/ssl/bin/openssl; fi
+
+# https://stackoverflow.com/a/39006247/1559300
+RUN if [ "$BUILD_OPENVPN" = '1' ]; then \
+    set -x; wget -q https://swupdate.openvpn.org/community/releases/openvpn-$BUILD_OPENVPN_VERSION.tar.gz \
+    && tar -xvf openvpn-$BUILD_OPENVPN_VERSION.tar.gz && cd openvpn-$BUILD_OPENVPN_VERSION \
+    && if [ "$BUILD_OPENSSL" = '1' ]; then CFLAGS='-I/usr/local/ssl/include -Wl,-rpath=/usr/local/ssl/lib -Wl,-rpath=/usr/local/ssl/lib64 -L/usr/local/ssl/lib -L/usr/local/ssl/lib64' ./configure; else ./configure; fi \
+    && make -j $(nproc) && make check && make install \
+    && /usr/local/sbin/openvpn --version \
+    && ldd /usr/local/sbin/openvpn; fi
+
+RUN if [ "$BUILD_SNIPROXY" = '1' ]; then \
+    git clone https://github.com/dlundquist/sniproxy.git \
+    && cd sniproxy \
+    && git checkout $BUILD_SNIPROXY_VERSION \
+    && ./autogen.sh \
+    && ./configure \
+    && make install; fi
+
+RUN if [ "$BUILD_BIRD" = '1' ]; then \
+    wget -q https://bird.network.cz/download/bird-$BUILD_BIRD_VERSION.tar.gz \
+    && tar -xvf bird-$BUILD_BIRD_VERSION.tar.gz && cd bird-$BUILD_BIRD_VERSION \
+    && mkdir -p tools/ \
+    && wget -qO tools/config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' \
+    && wget -qO tools/config.sub 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD' \
+    && autoreconf && ./configure && make -j $(nproc) && make install; fi
+
+RUN if [ "$BUILD_WANPROXY" = '1' ]; then \
+    wget -q http://wanproxy.org/releases/wanproxy-$BUILD_WANPROXY_VERSION.tar.gz \
+    && tar zxf wanproxy-$BUILD_WANPROXY_VERSION.tar.gz \
+    && cd wanproxy-$BUILD_WANPROXY_VERSION/programs/wanproxy \
+    && make && cp wanproxy /usr/local/sbin; fi
+
+WORKDIR /root
+
+ENV VIRTUAL_ENV=/root/venv3
+
+RUN python3 -m venv $VIRTUAL_ENV
+
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+COPY requirements.txt /requirements.txt
+
+RUN pip3 install --upgrade pip setuptools wheel \
+    && pip3 install --upgrade -r /requirements.txt
+
+COPY src/tests/requirements.txt /_requirements.txt
+
+RUN pip3 install --upgrade -r /_requirements.txt
+
+COPY app/requirements.txt /__requirements.txt
+
+RUN pip3 install --upgrade -r /__requirements.txt
+
+RUN mkdir -p build
+
+COPY ./ build/
+
+RUN chown root:root -hR ./
+
+WORKDIR /root/build
+
+RUN if [ "$COMPILE_CODE" = '1' ]; then \
+    install_packages ccache \
+    && pip3 install --upgrade \
+    nuitka \
+    ordered-set \
+    patchelf \
+    && mkdir -p app && cd app \
+    && nuitka3 \
+    --remove-output \
+    --assume-yes-for-downloads \
+    --output-dir=$(uname -m) \
+    --plugin-enable=pylint-warnings \
+    --standalone application.py \
+    && cd "$(uname -m)/application.dist" && ln -s ../../templates/ && cd ../.. \
+    && cd .. && mkdir -p src && cd src \
+    && cat < $DNS_SUB_DOMAIN.plugin > plugin.py \
+    && for src in log gen_hash as_prefixes main auth client; do \
+    nuitka3 \
+    --remove-output \
+    --assume-yes-for-downloads \
+    --output-dir=$(uname -m) \
+    --plugin-enable=pylint-warnings \
+    --standalone $src.py; done; fi
+
+# https://www.balena.io/docs/learn/more/masterclasses/cli-masterclass/#81-build-time-secrets
+RUN set -a \
+    && . /run/secrets/env \
+    && utils/encrypt.sh
+
+WORKDIR /opt
+
+RUN set -a \
+    && . /run/secrets/env \
+    && mkdir -p /usr/share/GeoIP/ \
+    && wget -q "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" -O - | gunzip -d - > /usr/share/GeoIP/GeoIP.dat \
+    && wget -q "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" -O - | gunzip -d - > /usr/share/GeoIP/GeoLiteCity.dat \
+    && wget -q "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" -O - | gunzip -d - > /usr/share/GeoIP/GeoIPASNum.dat
+
+COPY systemd/* ./systemd/
+
+
+# --- runtime
+FROM balenalib/%%BALENA_ARCH%%-ubuntu-python:3.9
+
+LABEL maintainer=team@belodetek.io
+
+ENV UDEV on
+
+ENV VIRTUAL_ENV /root/venv3
+
+ENV PATH "$VIRTUAL_ENV/bin:$PATH"
+
+ENV DEBIAN_FRONTEND noninteractive
+
+ENV PYTHONUNBUFFERED 1
+
+ENV TERM xterm
+
+ENV INITSYSTEM on
+
+ENV container lxc
+
+COPY --from=build /usr/local/ /usr/local/
+
+COPY --from=build /root/venv3/ /root/venv3/
+
+COPY --from=build /usr/share/GeoIP/ /usr/share/GeoIP/
+
+COPY --from=build /opt/systemd/entry.sh /usr/bin/entry.sh
+
+COPY --from=build /opt/systemd/balena.service /etc/systemd/system/balena.service
+
+RUN [ -f /usr/local/sbin/openvpn ] || install_packages openvpn
+
+RUN [ -f /usr/local/sbin/sniproxy ] || install_packages sniproxy
+
+RUN [ -f /usr/local/ssl/bin/openssl ] && (rm -f /usr/local/bin/openssl && ln -s /usr/local/ssl/bin/openssl /usr/local/bin/openssl) \
+    || install_packages openssl
+
+RUN which bird || install_packages bird
+
+RUN install_packages \
+    bash \
+    bridge-utils \
+    ca-certificates \
+    coreutils \
+    cryptsetup \
+    curl \
+    dbus \
+    dnsmasq \
+    dnsutils \
+    e2fsprogs \
+    fdisk \
+    findutils \
+    gawk \
+    geoip-bin \
+    geoip-database \
+    gettext \
+    git \
+    grep \
+    haveged \
+    hdparm \
+    hostapd \
+    iftop \
+    iperf \
+    iproute2 \
+    ipset \
+    iptables \
+    iputils-ping \
+    iputils-tracepath \
+    iw \
+    jq \
+    kmod \
+    libev4 \
+    libevent-2.1 \
+    liblz4-1 \
+    liblzo2-2 \
+    libmysqlclient-dev \
+    libpcre3 \
+    libtool \
+    libudns0 \
+    linux-firmware \
+    lsof \
+    miniupnpc \
+    mtr \
+    mysql-client \
+    net-tools \
+    netcat-openbsd \
+    nmap \
+    openntpd \
+    openssh-server \
+    procps \
+    psmisc \
+    sipcalc\
+    socat \
+    stunnel \
+    sysstat \
+    systemd-sysv \
+    tcpdump \
+    telnet \
+    udev \
+    usbutils \
+    vim \
+    wget \
+    whois \
+    wireless-tools \
+    zlib1g
+
+RUN (groupadd bird || true) && (useradd -r -g bird bird || true)
+
+RUN systemctl set-default multi-user.target \
+	&& systemctl mask \
+	apt-daily-upgrade.timer \
+	apt-daily.timer \
+	dev-hugepages.mount \
+	dev-mqueue.mount \
+	display-manager.service \
+	getty.target \
+	getty@.service \
+	graphical.target \
+	sys-fs-fuse-connections.mount \
+	sys-kernel-config.mount \
+	sys-kernel-debug.mount \
+	systemd-logind.service \
+	systemd-remount-fs.service \
+	&& systemctl enable /etc/systemd/system/balena.service \
+	ssh.service \
+    openntpd.service
+
+STOPSIGNAL SIGRTMIN+3
+
+VOLUME [ "/tmp", "/run", "/run/lock" ]
+
+ENTRYPOINT ["/usr/bin/entry.sh"]
+
+WORKDIR /root
+
+COPY functions .
+
+COPY bootstrap.sh .
+
+COPY --from=build /root/build/app.tgz.enc ./
+
+CMD ["bash", "bootstrap.sh"]

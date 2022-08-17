@@ -1,0 +1,812 @@
+####################
+# common functions #
+####################
+
+wlan_regex='wlan[0-9]+[^:]*|wlp[0-9]+s[0-9]+[^:]*|wlx[0-9a-fA-F][^:]*'
+
+
+function dnsmasq_config() {
+    grep "${1}" ${2} || printf "${1}\n" >> "${2}"
+}
+
+
+function reboot_device() {
+    curl ${CURL_OPTS} -X POST --header "Content-Type:application/json"\
+      "$BALENA_SUPERVISOR_ADDRESS/v1/reboot?apikey=$BALENA_SUPERVISOR_API_KEY"
+}
+
+function ipt_add_rule() {
+    table=${1}
+    action=${2}
+    rule="${3}"
+    log """add: af=4 table=\'${table}\' action=\'${action}\' rule=\'${rule}\'"""
+    eval /sbin/iptables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+     || eval /sbin/iptables --wait -t ${table} -${action} ${rule} || true
+}
+
+
+function ipt_del_rule() {
+    table=${1}
+    rule="${2}"
+    log """del: af=4 table=\'${table}\' rule=\'${rule}\'"""
+    eval /sbin/iptables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+      && eval /sbin/iptables --wait -t ${table} -D ${rule} || true
+}
+
+
+function ip6t_add_rule() {
+    table=${1}
+    action=${2}
+    rule="${3}"
+    log """add: af=6 table=\'${table}\' action=\'${action}\' rule=\'${rule}\'"""
+    eval /sbin/ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+     || eval /sbin/ip6tables --wait -t ${table} -${action} ${rule} || true
+}
+
+
+function ip6t_del_rule() {
+    table=${1}
+    rule="${2}"
+    log """del: af=6 table=\'${table}\' rule=\'${rule}\'"""
+    eval /sbin/ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+      && eval /sbin/ip6tables --wait -t ${table} -D ${rule} || true
+}
+
+
+function strip_quotes() {
+    if [[ "${RESIN}" != '1' ]]; then
+        for ev in ${1}; do
+            if env | grep -E "^${ev}=.*$" | grep '"'; then
+                temp_env=$(mktemp)
+                env | grep -E "^${ev}=.*$" > ${temp_env} && source ${temp_env} && rm ${temp_env}
+            fi
+        done
+    fi
+}
+
+
+# log to stdout and fifo
+function log() {
+    local msg="${1}"
+    timeout 1s "${WORKDIR}/scripts/pyboot.sh" log "${msg}"
+}
+
+
+# tests and overrides supplied DNS servers
+function test_dns() {
+    dhcp_dns=$(nmap --script broadcast-dhcp-discover \
+          | grep 'Domain Name Server' \
+          | grep -Po '([0-9\.]+)' \
+          | tr '\n' ' ')
+    for server in ${DNS_SERVERS}; do
+        dig +short +time=3 google.com @${server} > /dev/null 2>&1
+        if [[ $? -eq 0 ]]; then
+            printf "${server}\n"
+        else
+            printf "${dhcp_dns}\n"
+        fi
+    done
+}
+
+
+# creates encrypted file system
+function mount_work() {
+    for dev in $(losetup -a | awk -F':' '{print $1}'); do
+        printf "removing ${dev}...\n"
+        losetup -d ${dev}
+    done
+
+    if mount | grep ${WORKDIR}; then
+        umount ${WORKDIR}
+    fi
+
+    mkdir -p ${WORKDIR}
+
+    if [[ "${ENCRYPT_MOUNT}" == "1" ]]; then
+        loopdev=$(losetup -f)
+
+        printf "setting up encrypted filesystem on ${loopdev}...\n"
+
+        modprobe aes || modprobe aes_$(uname -m); modprobe cryptoloop; modprobe loop
+
+        printf "allocating ${DNS_SUB_DOMAIN}.img...\n"
+
+        fallocate -l ${ENCRYPT_MOUNT_SIZE} /root/${DNS_SUB_DOMAIN}.img \
+          || truncate -s ${ENCRYPT_MOUNT_SIZE} /root/${DNS_SUB_DOMAIN}.img
+
+        (printf 'using cryptsetup with device mapper...\n' \
+          && losetup ${loopdev} ${DNS_SUB_DOMAIN}.img \
+          && if cryptsetup status ${DNS_SUB_DOMAIN}; then cryptsetup remove ${DNS_SUB_DOMAIN}; fi \
+          && echo -e "$(openssl rand -base64 32)\n" | cryptsetup -c aes -y create ${DNS_SUB_DOMAIN} ${loopdev} \
+          && mkfs.ext4 -F /dev/mapper/${DNS_SUB_DOMAIN} \
+          && mount /dev/mapper/${DNS_SUB_DOMAIN} ${WORKDIR}) \
+        || (printf 'fall-back to legacy encryption method (losetup)...\n' \
+          && echo -e "$(openssl rand -base64 32)\n" | losetup -p 0 -e aes ${loopdev} /root/${DNS_SUB_DOMAIN}.img \
+          && mkfs.ext4 -F ${loopdev} \
+          && mount ${loopdev} ${WORKDIR})
+    else
+        printf "using plaintext filesystem on ${WORKDIR}...\n"
+    fi
+
+    return $?
+}
+
+
+# configures IP SNATs
+function configure_snat() {
+    local iface=$(get_iface)
+
+    local snatv4=( ${IPV4_SNAT} )
+    if [[ "${snatv4[0]}" == "auto" ]]; then
+        local ipmask=$(ip addr show $(get_iface) | grep inet | grep -v inet6 | awk '{print $2}' | head -n 1)
+        local snatv4=( $(nmap -nsL ${ipmask} | grep "Nmap scan report" | awk '{print $NF}') )
+        unset 'snatv4[${#snatv4[@]}-1]'
+        local snatv4=( ${snatv4[@]:1} )
+    fi
+
+    local snatv6=( ${IPV6_SNAT} )
+    if [[ "${snatv6[0]}" == "auto" ]] && [[ ${snatv6[1]} =~ [0-9]+ ]]; then
+        local snatv6=( $(generate_random_ipaddrs6 ${snatv6[1]}) )
+    fi
+
+    if ! [[ "${#snatv4[@]}" == "0" ]]; then
+        local gw=$(ip route | grep default | awk '{print $3}')
+
+        local count=1
+        for ip in ${snatv4[@]}; do
+            local prob=$(awk -v m=$m "BEGIN {print 1/${count}}")
+            printf "SNAT: ${ip}=${prob}\n"
+
+            if ! ip addr show dev ${iface} | grep ${ip} && ! [[ "${ip}" == "${gw}" ]]; then
+                ip addr add ${ip}/32 dev ${iface}
+            fi
+
+            if ! iptables -L POSTROUTING -t nat | grep SNAT | grep "to:${ip}" && ! [[ "${ip}" == "${gw}" ]]; then
+                iptables --wait -t nat -I POSTROUTING -o ${iface} -p tcp\
+                  -m statistic --mode random --probability ${prob} -j SNAT --to-source ${ip}
+                iptables --wait -t nat -I POSTROUTING -o ${iface} -p udp\
+                  -m statistic --mode random --probability ${prob} -j SNAT --to-source ${ip}
+            fi
+            local count=$(( $count + 1 ))
+        done
+    fi
+
+    if ! [[ "${#snatv6[@]}" == "0" ]]; then
+        local prob=$(awk -v m=$m "BEGIN {print (1/${#snatv6[@]})}")
+
+        local count=1
+        for ip in ${snatv6[@]}; do
+            local prob=$(awk -v m=$m "BEGIN {print 1/${count}}")
+            printf "SNAT: ${ip}=${prob}\n"
+
+            if ! ip -6 addr show dev ${iface} | grep ${ip}; then
+                ip -6 addr add ${ip}/128 dev ${iface}
+            fi
+
+            if ! ip6tables -L POSTROUTING -t nat | grep SNAT | grep "to:${ip}"; then
+                ip6tables --wait -t nat -I POSTROUTING -o ${iface} -p tcp\
+                  -m statistic --mode random --probability ${prob} -j SNAT --to-source ${ip}
+                ip6tables --wait -t nat -I POSTROUTING -o ${iface} -p udp\
+                  -m statistic --mode random --probability ${prob} -j SNAT --to-source ${ip}
+            fi
+            local count=$(( $count + 1 ))
+        done
+    fi
+}
+
+
+# gets country from API
+function get_country() {
+    with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H 'Accept: application/json' -H "X-Auth-Token: ${AUTH_TOKEN}" | jq -r '.country'\
+      "${API_HOST}/api/v${API_VERSION}/device/${DEVICE_TYPE}/${GUID}/${AF}"
+}
+
+
+# updates device status
+function update_device_status() {
+    local status=0
+    if [[ ${1} ]]; then
+        local status=${1}
+    fi
+
+    for af in ${AF_INETS}; do
+        with_backoff curl ${CURL_OPTS} -4 -X PUT\
+          --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+          -H 'Content-Type: application/json' -H "X-Auth-Token: ${AUTH_TOKEN}"\
+          "${API_HOST}/api/v${API_VERSION}/device/${DEVICE_TYPE}/${GUID}/${af}"\
+          --data "{\"bytesin\":0,\"bytesout\":0,\"city\":null,\"conns\":0,\"weight\":1,\"country\":null,\"guid\":\"${GUID}\",\"ip\":null,\"proto\":${af},\"status\":${status},\"type\":\"${DEVICE_TYPE}\"}"
+    done
+}
+
+
+# generates custom VPN provider profile
+function generate_vpn_profile() {
+    local provider=$(echo ${1} | sed 's/ /%20/g')
+    local group=$(echo ${2} | sed 's/ /%20/g')
+    local location=$(echo ${3} | sed 's/ /%20/g')
+    with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H "X-Auth-Token: ${AUTH_TOKEN}"\
+      "${API_HOST}/api/v${API_VERSION}/vpnprovider/${provider}/group/${group}/name/${location}/profile" > ${WORKDIR}/client.ovpn
+
+    # add support directives
+    printf 'status {{TEMPDIR}}/client.status 10\n' >> ${WORKDIR}/client.ovpn
+    printf 'script-security 3\n' >> ${WORKDIR}/client.ovpn
+    printf 'up "{{WORKDIR}}/scripts/client-up.sh"\n' >> ${WORKDIR}/client.ovpn
+    printf 'route-up "{{WORKDIR}}/scripts/client-route-up.sh"\n' >> ${WORKDIR}/client.ovpn
+    printf 'route-pre-down "{{WORKDIR}}/scripts/client-down.sh"\n' >> ${WORKDIR}/client.ovpn
+    printf 'down-pre\n' >> ${WORKDIR}/client.ovpn
+}
+
+
+# downloads IPASN_DB from S3
+function download_ipasn_db() {
+   mkdir -p ${DATADIR}
+   with_backoff curl ${CURL_OPTS}\
+     -o ${DATADIR}/${IPASN_DB}\
+     --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*60))\
+     "https://s3.eu-central-1.amazonaws.com/belodetech/${IPASN_DB}"
+}
+
+
+# start WANProxy server
+function start_wanproxy_server() {
+    local temp_file=$(mktemp) && \
+      ($(which wanproxy) -c ${WORKDIR}/server.conf &>${temp_file}&) && \
+      sleep 5 && \
+      local port=$(grep -Po "[0-9]+$" ${temp_file}) && \
+      rm ${temp_file} && \
+      local pid=$(netstat -a -n -p | grep ${port} | grep -Po "[0-9]+/wanproxy" | awk -F'/' '{print $1}') && \
+
+      if [[ "${WANPROXY}" == "SOCAT" ]]; then
+          $(which socat) TCP${AF}-LISTEN:${SOCAT_PORT},su=nobody,fork,reuseaddr TCP${AF}:localhost:${port} &
+      fi
+
+      echo ${pid} ${port}
+}
+
+
+# get remote ping host
+function get_ping_host() {
+    for rtnum in 5; do
+        declare net=route_network_$rtnum
+        printf "get_ping_host: $net=${!net}\n"
+        if ping -c 3 ${!net} > /dev/null 2>&1; then
+            echo $net=${!net}
+            return 0
+        fi
+    done
+    return 1
+}
+
+
+# get next free device slot
+function get_hostname() {
+    if ! ping -c 3 ${DNS_SUB_DOMAIN}.local > /dev/null 2>&1; then
+        echo ${DNS_SUB_DOMAIN}
+    else
+        local device_count=1
+        for ((i=1;i<=${1};i++)); do
+            if ping -c 3 ${DNS_SUB_DOMAIN}-${i}.local > /dev/null 2>&1; then
+                (( device_count++ ))
+            fi
+        done
+        echo ${DNS_SUB_DOMAIN}-${device_count}
+    fi
+}
+
+
+# obtain IGD via UPnP
+function get_igd() {
+    if [[ "${UPNP_ENABLED}" == "1" ]]; then
+        echo $(upnpc -l | grep InternetGatewayDevice -B 1 | head -n 1 | awk '{print $2}')
+    fi
+}
+
+
+# dump IGD info
+function dump_igd() {
+    local rc=1
+    local igd=$(get_igd)
+    if [[ ${igd} ]]; then
+        upnpc -u ${igd} -l
+        return 0
+    fi
+    return ${rc}
+}
+
+
+# forward ports
+function forward_ports() {
+    local count=0
+    local igd=$(get_igd)
+    if [[ ${igd} ]]; then
+        local action=add
+        for port in ${UPNP_TCP_PORT_FORWARD}; do
+            if ! [[ $(dump_igd) =~ [0-9]+[[:space:]]+TCP[[:space:]]+${port}-\>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:${port} ]]; then
+                printf "action=${action} port=${port}:TCP ipaddr=$(get_ipaddr):${port}\n"
+                upnpc -a $(get_ipaddr) ${port} ${port} TCP
+            fi
+
+            if [[ $(dump_igd) =~ [0-9]+[[:space:]]+TCP[[:space:]]+${port}-\>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:${port} ]]; then
+                local count=$((${count} + 1))
+            fi
+        done
+
+        for port in ${UPNP_UDP_PORT_FORWARD}; do
+            if ! [[ $(dump_igd) =~ [0-9]+[[:space:]]+UDP[[:space:]]+${port}-\>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:${port} ]]; then
+                printf "action=${action} port=${port}:UDP ipaddr=$(get_ipaddr):${port}\n"
+                upnpc -a $(get_ipaddr) ${port} ${port} UDP
+            fi
+
+            if [[ $(dump_igd) =~ [0-9]+[[:space:]]+UDP[[:space:]]+${port}-\>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:${port} ]]; then
+                local count=$((${count} + 1))
+            fi
+        done
+    fi
+    return ${count}
+}
+
+
+# remove port forwards
+function remove_port_forward() {
+   local igd=$(get_igd)
+   if [[ ${igd} ]]; then
+        local action=delete
+        for port in ${UPNP_TCP_PORT_FORWARD}; do
+            if [[ $(dump_igd) =~ [0-9]+[[:space:]]+TCP[[:space:]]+${port}-\>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:${port} ]]; then
+                printf "action=${action} port=${port}:TCP ipaddr=$(get_ipaddr):${port}\n"
+                upnpc -d ${port} TCP
+            fi
+        done
+
+        for port in ${UPNP_UDP_PORT_FORWARD}; do
+            if [[ $(dump_igd) =~ [0-9]+[[:space:]]+UDP[[:space:]]+${port}-\>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:${port} ]]; then
+                printf "action=${action} port=${port}:UDP ipaddr=$(get_ipaddr):${port}\n"
+                upnpc -d ${port} UDP
+            fi
+        done
+    fi
+}
+
+
+# starts wireless networking (AP)
+function start_ap() {
+    local country=${1}
+    [ ${country} ] || local country=US
+    printf "wait for interface...\n"
+    count=0
+    while ! ping -c 1 -W 1 ${WIP4} > /dev/null 2>&1; do
+        for wiface in $(get_dormant_wiface) $(get_wiface); do
+            ifconfig ${wiface} ${WIP4} > /dev/null 2>&1
+            printf "ifconfig=$(ifconfig ${wiface})\n"
+        done
+        sleep 1
+        ((count=count+1))
+        printf "count=${count}\n"
+        if [ ${count} -ge 15 ]; then
+            break
+        fi
+    done
+    if [[ $(get_dormant_wiface) ]]; then
+        local wiface=$(get_dormant_wiface)
+    else
+        local wiface=$(get_wiface)
+    fi
+    [ ${wiface} ] || local wiface=wlan0
+    printf "wiface=${wiface}\n"
+    printf "interface=${wiface}\nssid=${SSID}\n" > /etc/hostapd/hostapd.conf
+    if [[ "${WPA2}" == '1' ]]; then
+      echo """auth_algs=1
+wpa=2
+wpa_key_mgmt=WPA-PSK
+wpa_passphrase=${PASSPHRASE}
+wpa_pairwise=CCMP TKIP
+rsn_pairwise=CCMP""" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${IEEE80211D} ]] && [[ ${country} ]]; then
+        echo """ieee80211d=${IEEE80211D}
+country_code=${country}" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${IEEE80211N} ]]; then
+        printf "ieee80211n=${IEEE80211N}\n" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${IEEE80211H} ]]; then
+        printf "ieee80211h=${IEEE80211H}\n" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${IEEE80211AC} ]]; then
+        printf "ieee80211ac=${IEEE80211AC}\n" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${HW_MODE} ]]; then
+        printf "hw_mode=${HW_MODE}\n" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${WMM_ENABLED} ]]; then
+        printf "wmm_enabled=${WMM_ENABLED}\n" >> /etc/hostapd/hostapd.conf
+    fi
+    if [[ ${RF_CHANNEL} ]]; then
+        printf "channel=${RF_CHANNEL}\n" >> /etc/hostapd/hostapd.conf
+    fi
+    printf "(re)start hostapd: wiface=${wiface} country_code=${country}\n"
+    sed -i'' 's#.*DAEMON_CONF=.*#DAEMON_CONF=/etc/hostapd/hostapd.conf#g' /etc/default/hostapd
+    systemctl unmask hostapd.service && with_backoff systemctl restart hostapd
+    return $?
+}
+
+
+# obtains country alpha code from country name from geoip info
+function country_code() {
+    if [[ -n "${COUNTRY_OVERRIDE}" ]]; then
+        local country=${COUNTRY_OVERRIDE}
+    else
+        local country=$(with_backoff curl ${CURL_OPTS} -${AF}\
+          --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+          "${MGMT_HOST}/country")
+    fi
+
+    if [[ -z ${country} ]]; then
+        local country="United States"
+    fi
+
+    local alpha_2=$(with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H "X-Auth-Token: ${AUTH_TOKEN}"\
+      "${API_HOST}/api/v${API_VERSION}/country/$(echo "${country}" | sed 's/ /%20/g')")
+
+    if [[ -z ${alpha_2} ]]; then
+        local alpha_2=US
+    fi
+
+    echo ${alpha_2}
+}
+
+
+# obtains country alpha_2 code from input country name
+function country2alpha() {
+    if [[ -z ${1} ]]; then
+        local country="United States"
+    else
+        local country="${1}"
+    fi
+
+    local alpha_2=$(with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H "X-Auth-Token: ${AUTH_TOKEN}"\
+      "${API_HOST}/api/v${API_VERSION}/country/$(echo "${country}" | sed 's/ /%20/g')")
+
+    if [[ -z ${alpha_2} ]]; then
+        local alpha_2=US
+    fi
+
+    echo ${alpha_2}
+}
+
+
+# obtains services from API
+function get_services() {
+    if [[ -z ${2} ]]; then
+        local default=1
+    else
+        local default=${2}
+    fi
+
+    local services=$(with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H "X-Auth-Token: ${AUTH_TOKEN}"\
+      "${API_HOST}/api/v${API_VERSION}/alpha/${1}/services/default/${default}")
+
+    if [[ -z ${services} ]]; then
+        local services=""
+    fi
+
+    echo ${services}
+}
+
+
+# obtains ASNs from API
+function get_asns() {
+    if [[ -z ${2} ]]; then
+        local services=common
+    else
+        local services=${2}
+    fi
+
+    local as_nums=$(with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H 'Accept: application/json' -H "X-Auth-Token: ${AUTH_TOKEN}"\
+      "${API_HOST}/api/v${API_VERSION}/alpha/${1}/asns/${services}")
+
+    if [[ -z ${as_nums} ]]; then
+        local as_nums=""
+    fi
+
+    echo ${as_nums}
+}
+
+
+# obtains domains from API
+function get_domains() {
+    if [[ -z ${2} ]]; then
+        local services=common
+    else
+        local services=${2}
+    fi
+
+    local domains=$(with_backoff curl ${CURL_OPTS} -4\
+      --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*2))\
+      -H 'Accept: application/json' -H "X-Auth-Token: ${AUTH_TOKEN}"\
+      "${API_HOST}/api/v${API_VERSION}/alpha/${1}/domains/${services}")
+
+    if [[ -z ${domains} ]]; then
+        local domains=""
+    fi
+
+    echo ${domains}
+}
+
+
+# get tunnel protocol name
+function get_tunnel_proto() {
+    local tun_proto=udp
+    if [[ "${AF}" == "6" ]]; then
+        local tun_proto=${tun_proto}${AF};
+    fi
+    echo ${tun_proto}
+}
+
+
+# obtains dormant wireless interface
+function get_dormant_wiface() {
+    local af=4
+    if [[ ${1} ]]; then
+        local af=${1}
+    fi
+    local wiface=$(ip -${af} link\
+      | grep -E 'state DORMANT|state DOWN'\
+      | grep -Po ${wlan_regex}\
+      | head -n 1)
+    if [[ ${wiface} ]]; then
+        echo ${wiface}
+    fi
+}
+
+# obtains active wireless interface
+function get_wiface() {
+    local af=4
+    if [[ ${1} ]]; then
+        local af=${1}
+    fi
+    local wiface=$(ip -${af} link\
+      | grep -v 'state DORMANT'\
+      | grep -v 'state DOWN'\
+      | grep 'state UP'\
+      | grep -Po ${wlan_regex}\
+      | head -n 1)
+    if [[ ${wiface} ]]; then
+        echo ${wiface}
+    fi
+}
+
+
+# obtains public interface
+function get_iface() {
+    local iface=$(ip -4 route | grep default | awk '{print $5}' | head -n 1)
+    if [[ ${iface} ]]; then
+        if ip link \
+          | grep ${iface} \
+          | grep -v 'state DORMANT' \
+          | grep -v 'state DOWN' \
+          | grep 'state UP' > /dev/null 2>&1; then
+            echo ${iface}
+        fi
+    fi
+}
+
+
+# obtains public interface (ipv6)
+function get_iface6() {
+    local iface6=$(ip -6 route | grep default | awk '{print $5}' | head -n 1)
+    if [[ ${iface6} ]]; then
+        if ip -6 link \
+          | grep ${iface6} \
+          | grep -v 'state DORMANT' \
+          | grep -v 'state DOWN' \
+          | grep 'state UP' > /dev/null 2>&1; then
+            echo ${iface6}
+        fi
+    fi
+}
+
+
+# obtains local ipaddr
+function get_ipaddr() {
+    IFACE=$(get_iface)
+    local ipaddr=$(ip addr show dev ${IFACE} | \
+      grep inet | \
+      grep -v inet6 | \
+      awk '{print $2}' | \
+      grep -Po '[0-9]{1,3}+\.[0-9]{1,3}+\.[0-9]{1,3}+\.[0-9]{1,3}+(?=\/)' | head -n 1)
+    echo $(echo ${ipaddr} | awk '{print $1}')
+}
+
+
+# obtains public ipaddr6
+function get_ip6addr() {
+    IFACE6=$(get_iface6)
+    local ip6addr=$(ip -6 addr show dev ${IFACE6} | \
+      grep inet6 |
+      grep -v link | \
+      grep "scope global" | \
+      grep "/64" | \
+      awk '{print $2}' | \
+      grep -Po '[0-9a-fA-F:].+[^/.+]{4}' | head -n 1)
+    echo $(echo ${ip6addr} | awk '{print $1}')
+}
+
+
+# obtains public ipaddr
+function get_ipaddr() {
+    IFACE=$(get_iface)
+    local ipaddr=$(ip addr show dev ${IFACE} | \
+      grep inet | \
+      grep -v inet6 | \
+      awk '{print $2}' | \
+      grep -Po '[0-9]{1,3}+\.[0-9]{1,3}+\.[0-9]{1,3}+\.[0-9]{1,3}+(?=\/)' | head -n 1)
+    echo $(echo ${ipaddr} | awk '{print $1}')
+}
+
+
+# obtains (tunnel) iface ipaddr
+function get_tun_ipaddr() {
+    local ipaddr=$(ip addr show dev ${1} | \
+      grep inet | \
+      grep -v inet6 | \
+      awk '{print $2}' | head -n 1)
+    if [[ "${ipaddr}" != "" ]]; then
+        echo $(echo ${ipaddr} | awk '{print $1}')
+    else
+        return 1
+    fi
+}
+
+
+# obtains (tunnel) iface subnet
+function get_tun_subnet() {
+    local subnet=$(ip route | \
+      grep ${1} | \
+      grep -v link | \
+      awk '{print $1}' | head -n 1)
+    if [[ "${subnet}" != "" ]]; then
+        echo $(echo ${subnet} | awk '{print $1}')
+    else
+        return 1
+    fi
+}
+
+
+# obtains (tunnel) iface ipaddr6
+function get_tun_ipaddr6() {
+    local ipaddr6=$(ip -6 addr show dev ${1} | \
+      grep inet6 | \
+      awk '{print $2}' | \
+      grep -Po '[0-9a-fA-F:].+[^/.+]{4}' | head -n 1)
+    if [[ "${ipaddr6}" != "" ]]; then
+        echo $(echo ${ipaddr6} | awk '{print $1}')
+    else
+        return 1
+    fi
+}
+
+# obtains interface subnet
+function get_subnet() {
+    local subnet=$(ip route | \
+      grep ${1} | \
+      grep link | \
+      awk '{print $1}' | head -n 1)
+    if [[ "${subnet}" != "" ]]; then
+        echo $(echo ${subnet} | awk '{print $1}')
+    else
+        return 1
+    fi
+}
+
+# obtains (tunnel) iface subnet v6
+function get_tun_subnet6() {
+    local subnet6=$(ip -6 route | \
+      grep ${1} | \
+      grep -v link | \
+      awk '{print $1}' | head -n 1)
+    if [[ "${subnet6}" != "" ]]; then
+        echo $(echo ${subnet6} | awk '{print $1}')
+    else
+        return 1
+    fi
+}
+
+# obtains interface subnet v6
+function get_subnet6() {
+    local subnet6=$(ip -6 route | \
+      grep ${1} | \
+      grep link | \
+      awk '{print $1}' | head -n 1)
+    if [[ "${subnet6}" != "" ]]; then
+        echo $(echo ${subnet6} | awk '{print $1}')
+    else
+        return 1
+    fi
+}
+
+# obtains IPv6 subnet mask
+function get_public6_prefix() {
+    local iface6=$(get_iface6)
+    local public6_prefix=$(ifconfig ${iface6} | \
+      grep inet6 | grep Global | \
+      awk -F' ' '{print $3}' | grep -Po '\/([0-9]+)' | head -n 1)
+    echo ${public6_prefix}
+}
+
+
+# obtains IPv6 first four words
+function get_ip_first_words() {
+    IFACE6=$(get_iface6)
+    local first_words=$(ip -6 addr show dev ${IFACE6} scope global | \
+      grep inet6 | awk '{print $2}' | xargs sipcalc | grep Expanded | \
+      grep -Po '[a-zA-Z0-9]{1,4}:[a-zA-Z0-9]{1,4}:[a-zA-Z0-9]{1,4}:[a-zA-Z0-9]{1,4}:[a-zA-Z0-9]{1,4}' | head -n 1)
+    echo ${first_words}
+}
+
+
+# generates random IPv6 addresses from subnet
+function generate_random_ipaddrs6() {
+    local iface6=$(get_iface6)
+    local subnet=$(get_public6_prefix)
+    local first_words=$(get_ip_first_words)
+    for (( x=0; x<=${1}; x++ ))
+    do
+        local random_words=$(printf '%x:%x:%x\n' $RANDOM $RANDOM $RANDOM)
+        local ip6addr=${first_words}:${random_words}
+        printf "${ip6addr} "
+    done
+    printf "\n"
+}
+
+
+# Retries a command a with backoff.
+#
+# The retry count is given by ATTEMPTS (default 5), the
+# initial backoff timeout is given by TIMEOUT in seconds
+# (default 1.)
+#
+# Successive backoffs double the timeout.
+#
+# Beware of set -e killing your whole script!
+function with_backoff {
+  local max_attempts=${ATTEMPTS-3}
+  local timeout=${TIMEOUT-2}
+  local attempt=0
+  local exitCode=0
+
+  while [[ $attempt < $max_attempts ]]
+  do
+    "$@"
+    exitCode=$?
+
+    if [[ $exitCode == 0 ]]
+    then
+      break
+    fi
+
+    echo "Failure! Retrying in $timeout.." 1>&2
+    sleep $timeout
+    attempt=$(( attempt + 1 ))
+    timeout=$(( timeout * 2 ))
+  done
+
+  if [[ $exitCode != 0 ]]
+  then
+    echo "You've failed me for the last time! ($@)" 1>&2
+  fi
+
+  return $exitCode
+}
