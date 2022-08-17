@@ -57,11 +57,11 @@
 
 ### configuration
 
-    RESIN_HOST_CONFIG_gpu_mem=16 # RPi only
+    BALENA_HOST_CONFIG_gpu_mem=16 # RPi only
 
-    RESIN_HOST_CONFIG_hdmi_blanking=2 # RPi only
+    BALENA_HOST_CONFIG_hdmi_blanking=2 # RPi only
 
-    RESIN_SUPERVISOR_UPDATE_STRATEGY=hand-over
+    BALENA_SUPERVISOR_UPDATE_STRATEGY=hand-over
 
 ### service variables
 
@@ -89,8 +89,8 @@
     WMM_ENABLED=1
 
 
-### download balenaOS image
-> balenaOS configured image for end users to download
+### (optional) download balenaOS image
+> direct end users to [balenaHub](https://hub.balena.io) or manually download and distribute configured image(s)
 
     BALENA_APP_ID=<app-id> e.g. 1234567
     OS_VERSION=<app-version> # e.g. 2.98.33 or 2.83.18+rev5.prod
@@ -209,7 +209,7 @@ WIP6 | Wi-Fi interface IPv6 address | fde4:8dba:82e1:2000::1
 WMM_ENABLED | [hostapd](https://w1.fi/cgit/hostap/plain/hostapd/hostapd.conf) WMM feature flag | 0 or 1
 STUNNEL | proxy OpenVPN through stunnel | 0 or 1
 WAN_PROXY | proxy OpenVPN through WANProxy using transport | SSH or SOCAT
-OPENVPN_VERSION | OpenVPN configuration version | 2.3 or 2.4
+OPENVPN_VERSION | OpenVPN configuration version | 2.3, 2.4 or 2.5
 OPENVPN_COMPRESS | OpenVPN compression | unset, 0 or 1
 LOCAL_DNS | Force DNS resolver traffic to go out the local Internet interface | 0 or 1
 VPN_USERNAME | VPN username | None

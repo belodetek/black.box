@@ -344,7 +344,7 @@ fi
 log 'updating config templates...'
 if [[ "${AUTH}" != "none" ]] && [[ "${CIPHER}" != "none" ]]; then
     for template in openvpn/udp_server.conf openvpn/tcp_server.conf; do
-        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
             printf "tls-crypt {{WORKDIR}}/openvpn/ta.key\n" >> ${WORKDIR}/${template}
         else
             printf "tls-auth {{WORKDIR}}/openvpn/ta.key\n" >> ${WORKDIR}/${template}
@@ -353,7 +353,7 @@ if [[ "${AUTH}" != "none" ]] && [[ "${CIPHER}" != "none" ]]; then
     done
 
     key=$(cat ${WORKDIR}/openvpn/ta.key)
-    if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+    if [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
         cat << EOF >> ${WORKDIR}/client.ovpn
 tls-exit
 remote-cert-tls server
@@ -412,17 +412,19 @@ done
 
 for template in openvpn/udp_server.conf openvpn/tcp_server.conf; do
     if [[ "${OPENVPN_COMPRESS}" == "1" ]]; then
-        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
             printf "compress lz4\n" >> ${WORKDIR}/${template}
             printf "push \"compress lz4\"\n" >> ${WORKDIR}/${template}
+            printf "push \"allow-compression yes\"\n" >> ${WORKDIR}/${template}
         else
             printf "comp-lzo yes\n" >> ${WORKDIR}/${template}
             printf "push \"comp-lzo yes\"\n" >> ${WORKDIR}/${template}
         fi
     elif [[ "${OPENVPN_COMPRESS}" == "0" ]]; then
-        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
             printf "compress\n" >> ${WORKDIR}/${template}
             printf "push \"compress\"\n" >> ${WORKDIR}/${template}
+            printf "push \"allow-compression no\"\n" >> ${WORKDIR}/${template}
         else
             printf "comp-lzo no\n" >> ${WORKDIR}/${template}
             printf "push \"comp-lzo no\"\n" >> ${WORKDIR}/${template}
@@ -435,7 +437,7 @@ for template in openvpn/udp_server.conf openvpn/tcp_server.conf; do
         printf "push \"dhcp-option DNS ${dns}\"\n" >> ${WORKDIR}/${template}
     done
 
-    if [[ "${TUN_IPV6}" == "1" ]] && [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+    if [[ "${TUN_IPV6}" == "1" ]] && [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
         for dns in ${DNS6_SERVERS}; do
             printf "push \"dhcp-option DNS6 ${dns}\"\n" >> ${WORKDIR}/${template}
         done
@@ -444,14 +446,16 @@ done
 
 for template in mgmt.ovpn client.ovpn; do
     if [[ "${OPENVPN_COMPRESS}" == "1" ]]; then
-        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
             printf "compress lz4\n" >> ${WORKDIR}/${template}
+            printf "push \"allow-compression yes\"\n" >> ${WORKDIR}/${template}
         else
             printf "comp-lzo yes\n" >> ${WORKDIR}/${template}
         fi
     elif [[ "${OPENVPN_COMPRESS}" == "0" ]]; then
-        if [[ ${OPENVPN_VERSION} =~ 2\.4 ]]; then
+        if [[ ${OPENVPN_VERSION} =~ 2\.[4-5] ]]; then
             printf "compress\n" >> ${WORKDIR}/${template}
+            printf "push \"allow-compression no\"\n" >> ${WORKDIR}/${template}
         else
             printf "comp-lzo no\n" >> ${WORKDIR}/${template}
         fi
@@ -805,7 +809,7 @@ EOF
 cat << EOF >> /etc/stunnel/stunnel-client.template.conf
 [openvpn]
 client = yes
-accept = :::${OPENVPN_PORT}
+accept = :::{{OPENVPN_PORT}}
 connect = {{OPENVPN_SERVER}}:${STUNNEL_PORT}
 EOF
     fi

@@ -8,7 +8,7 @@ un-blocking. Combined, they un-block video streaming content across tablets,
 smartphones, desktops, laptops and TVs over Wi-Fi or LAN. Unzoner subscriptions can also
 be created manually for use with compatible software, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) and [Kodi](http://unzoner.com/#kodi).
 
-> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [RPi3/armv7hf](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-273905.img.gz) or [RPi4/aarch64](https://belodetech.s3.eu-central-1.amazonaws.com/blackbox-1531298.img.gz) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
+> <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [RPi3/armv7hf](https://hub.balena.io/organizations/belodetek/fleets/blackbox-armv7hf) or [RPi4/aarch64](https://hub.balena.io/organizations/belodetek/fleets/blackbox-aarch64) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
 <br>
 
 # instructions
@@ -17,7 +17,7 @@ be created manually for use with compatible software, such as [Tunnelblick](http
   please use Bitcoin instead or find a way to create PayPal accounts in other region(s).
 
 1. obtain a [Rasberry Pi 3](https://www.amazon.co.uk/Raspberry-Pi-Official-Desktop-Starter/dp/B01CI5879A) or [RPi4](https://www.amazon.com/CanaKit-Raspberry-4GB-Basic-Kit/dp/B07TXKY4Z9) starter kit,
-   download and uncompress the [armv7hf](https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-273905.img.gz) or [aarch64](https://belodetech.s3.eu-central-1.amazonaws.com/blackbox-1531298.img.gz) file, burn it to a fast 4GB+ SD card with [Etcher](http://www.etcher.io/)[[n3](#footnotes)], then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
+   flash [RPi3/armv7hf](https://hub.balena.io/organizations/belodetek/fleets/blackbox-armv7hf) or [RPi4/aarch64](https://hub.balena.io/organizations/belodetek/fleets/blackbox-aarch64) image, then insert the card into the Pi <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/etcher.gif" hspace="5" vspace="10" width="250">
 
 2. connect the Pi to the Internet using a spare Ethernet port on your router[[n6](#footnotes)]
    and a 2.5A+ power supply[[n2](#footnotes)]
@@ -150,20 +150,18 @@ brew install qemu || sudo port install qemu
 ```
 
 * install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-* download, uncompress, resize and convert the image
+* [download](https://hub.balena.io/organizations/belodetek/fleets/blackbox-amd64.raw), uncompress, resize and convert the image
 
 ```
-mkdir -p ~/black.box\
-  && cd ~/black.box\
-  && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
-  && gunzip blackbox-qemux86_64.img.gz\
-  && qemu-img resize -f raw blackbox-qemux86_64.img +2G\
-  && VBoxManage convertfromraw blackbox-qemux86_64.img blackbox-qemux86_64.vdi --variant Fixed\
-  && rm blackbox-qemux86_64.img
+mkdir -p ~/black.box && cd ~/black.box \
+  && unzip balena-cloud-blackbox-amd64-qemux86-64*.zip \
+  && ln -s $(find . -name 'balena-cloud-blackbox-amd64-qemux86-64*.img') blackbox-amd64-qemux86-64.img \
+  && qemu-img resize -f raw blackbox-amd64-qemux86-64.img +10G \
+  && VBoxManage convertfromraw blackbox-amd64-qemux86-64.img blackbox-amd64-qemux86-64.vdi --variant dynamic
 ```
 
 * open VirtualBox, create a new `Linux 2.6 / 3.x / 4.x (64-bit)` VM called `black.box` and
-  select the `blackbox-qemux86_64.vdi` image
+  select the `blackbox-amd64-qemux86-64.img` image
 * set `Network` to `Bridged Adapter` mode and select appropriate uplink
 * start the VM and carry on from step [#3](#instructions) in LAN mode
 
@@ -171,7 +169,7 @@ mkdir -p ~/black.box\
 * install QEMU and [TunTap](http://tuntaposx.sourceforge.net/download.xhtml) using `Homebrew` or `MacPorts`
 
 ```
-(brew install qemu || sudo port install qemu)\
+(brew install qemu || sudo port install qemu) \
   && (brew install tuntap || sudo port install tuntaposx)
 ```
 
@@ -186,9 +184,9 @@ launchctl load -w /Library/LaunchDaemons/org.macports.tuntaposx.plist
 ```
 mkdir -p ~/black.box\
   && cd ~/black.box\
-  && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
-  && gunzip blackbox-qemux86_64.img.gz\
-  && qemu-img resize -f raw blackbox-qemux86_64.img +2G
+  && unzip balena-cloud-blackbox-amd64-qemux86-64*.zip \
+  && ln -s $(find . -name 'balena-cloud-blackbox-amd64-qemux86-64*.img') blackbox-amd64-qemux86-64.img \
+  && qemu-img resize -f raw blackbox-amd64-qemux86-64.img +10G
 ```
 
 * under `System Preferences > Network > Manage Virtual Interfaces`, create `bridge1` and
@@ -234,9 +232,9 @@ sudo qemu-system-x86_64\
 ```
 mkdir -p ~/black.box\
   && cd ~/black.box\
-  && wget https://s3.eu-central-1.amazonaws.com/belodetech/blackbox-qemux86_64.img.gz\
-  && gunzip blackbox-qemux86_64.img.gz\
-  && qemu-img resize -f raw blackbox-qemux86_64.img +2G
+  && unzip balena-cloud-blackbox-amd64-qemux86-64*.zip \
+  && ln -s $(find . -name 'balena-cloud-blackbox-amd64-qemux86-64*.img') blackbox-amd64-qemux86-64.img \
+  && qemu-img resize -f raw blackbox-amd64-qemux86-64.img +10G
 ```
 
 * start QEMU

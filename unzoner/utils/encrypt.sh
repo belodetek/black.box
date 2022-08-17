@@ -44,6 +44,8 @@ tar -pczvf app.tgz \
   --exclude __pycache__ \
   --exclude ._* \
   --exclude .DS_Store \
+  --exclude "*.${DNS_SUB_DOMAIN}.*" \
+  --exclude "*.${DNS_SUB_DOMAIN}" \
   --exclude "${DNS_SUB_DOMAIN}" \
   --exclude *.build \
   --exclude *.pluginc \
@@ -56,10 +58,7 @@ tar -pczvf app.tgz \
   id_rsa \
   id_rsa.pub \
   mgmt.ovpn \
-  openvpn/*.conf \
-  openvpn/*.crt \
-  openvpn/*.key \
-  openvpn/*.pem \
+  openvpn/ \
   scripts/ \
   src/ \
   start \

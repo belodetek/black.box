@@ -55,7 +55,7 @@ if [[ "${SPEEDTEST}" == "1" ]]; then
         if ! pgrep iperf &> /dev/null; then
             (while true; do
                 if ! pgrep iperf &> /dev/null; then
-                    $(which iperf) -V --interval=1 --print_mss --nodelay --server --daemon --parallel=10;
+                    $(which iperf) -V --interval=1 --nodelay --server --daemon --parallel=10;
                 fi
                 sleep 30
             done) &
@@ -64,7 +64,7 @@ if [[ "${SPEEDTEST}" == "1" ]]; then
         if ! pgrep iperf &> /dev/null; then
             (while true; do
                 if ! pgrep iperf &> /dev/null; then
-                    $(which iperf) --interval=1 --print_mss --nodelay --server --daemon --parallel=10;
+                    $(which iperf) --interval=1 --nodelay --server --daemon --parallel=10;
                 fi
                 sleep 30
             done) &

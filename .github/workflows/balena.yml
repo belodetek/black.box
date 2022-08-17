@@ -21,6 +21,10 @@ jobs:
           - aarch64
           - amd64
           - armv7hf
+    outputs:
+      aarch64: ${{ steps.version.outputs.aarch64 }}
+      amd64: ${{ steps.version.outputs.amd64 }}
+      armv7hf: ${{ steps.version.outputs.armv7hf }}
 
     steps:
       - uses: actions/checkout@v3
@@ -57,6 +61,7 @@ jobs:
           rm docker-compose.yml
 
       - name: push draft or finalise release
+        id: build
         uses: balena-io/balena-ci@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
@@ -64,6 +69,11 @@ jobs:
           fleet: ${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source: unzoner
+
+      - name: arch version
+        id: version
+        run: |
+          echo "::set-output name=${{ matrix.arch }}::${{ steps.build.outputs.version }}"
 
   deploy:
     runs-on: ubuntu-latest
@@ -74,14 +84,39 @@ jobs:
         fleet:
           - belodetek/bbqemudev
           - belodetek/bbrpi3dev
-          - belodetek/bbrpi4dev
+          - belodetek/blackbox-aarch64
           - belodetek/bbnucdev
-          - belodetek/bbnuclive
-          - belodetek/bbqemulive
-          - belodetek/bbrpi3live
+          - belodetek/blackbox-amd64
+          - belodetek/blackbox-amd64-raw
+          - belodetek/blackbox-armv7hf
+        # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
+        include:
+          - arch: aarch64
+            fleet: belodetek/blackbox-aarch64
+          - arch: amd64
+            fleet: belodetek/bbqemudev
+          - arch: amd64
+            fleet: belodetek/bbnucdev
+          - arch: amd64
+            fleet: belodetek/blackbox-amd64
+          - arch: amd64
+            fleet: belodetek/blackbox-amd64-raw
+          - arch: armv7hf
+            fleet: belodetek/bbrpi3dev
+          - arch: armv7hf
+            fleet: belodetek/blackbox-armv7hf
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: update block version
+        run: |
+          # https://github.com/orgs/community/discussions/25634
+          arch_version='${{ needs.publish.outputs[format('{0}', matrix.arch)] }}'
+
+          sed -i "s#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%/${arch_version}#g" Dockerfile.template
+
+          cat < Dockerfile.template
 
       - name: push draft or finalise release
         uses: balena-io/balena-ci@master

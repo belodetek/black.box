@@ -167,9 +167,8 @@ def connect_node(family=AF):
     ############
     # VPN mode #
     ############
-    if DEVICE_TYPE == 5 or (
-        DEVICE_TYPE == 3
-        and VPN_PROVIDER
+    if DEVICE_TYPE in [3, 5] or (
+        VPN_PROVIDER
         and VPN_LOCATION_GROUP
         and VPN_LOCATION
         and VPN_USERNAME
@@ -186,8 +185,14 @@ def connect_node(family=AF):
                 VPN_PASSWD
             )
         )
-        assert VPN_PROVIDER and VPN_LOCATION_GROUP and VPN_LOCATION \
-               and VPN_USERNAME and VPN_PASSWD
+
+        assert (
+            VPN_PROVIDER
+            and VPN_LOCATION_GROUP
+            and VPN_LOCATION
+            and VPN_USERNAME
+            and VPN_PASSWD
+        )
 
     else:
         #########################
@@ -334,9 +339,9 @@ def connect_node(family=AF):
             )
         )
 
-        ####################
-        # stunnel override #
-        ####################
+        ########################################
+        # stunnel override for unblocking mode #
+        ########################################
         if STUNNEL:
             result = conf_stunnel_client(node=ipaddr)
             if DEBUG: print(result)
@@ -357,9 +362,9 @@ def connect_node(family=AF):
                     )
                 )
 
-        #####################
-        # WANProxy override #
-        #####################
+        ##############################
+        # (legacy) WANProxy override #
+        ##############################
         if WANPROXY:
             (c_wpid, s_wpid, s_wport) = start_wanproxy_server(
                 ipaddr=ipaddr,
@@ -413,6 +418,35 @@ def connect_node(family=AF):
         cmd.append(CIPHER)
         cmd.append('--auth')
         cmd.append(AUTH)
+
+    ####################################
+    # stunnel override for mixed modes #
+    ####################################
+    if DEVICE_TYPE in [5, 3]:
+        if STUNNEL:
+            try:
+                ipaddr = REMOTE_OVERRIDE.split(' ')[1]
+                port = REMOTE_OVERRIDE.split(' ')[2]
+                tun_proto = REMOTE_OVERRIDE.split(' ')[3]
+
+                log('{}: stunnel={} proto={} ipaddr={} port={}'.format(
+                    stack()[0][3],
+                    STUNNEL,
+                    tun_proto,
+                    ipaddr,
+                    port
+                ))
+
+                result = conf_stunnel_client(node=ipaddr, port=port)
+                if DEBUG: print(result)
+
+                result = openvpn_remote_override()
+                if DEBUG: print(result)
+
+                result = restart_stunnel_client()
+                if DEBUG: print(result)
+            except:
+                if DEBUG: print_exc()
 
     log(
         '{}: ipaddr={} af={} qtype={} proto={} port={} country={} guid={} provider={} group={} location={} username={}'.format(
@@ -468,7 +502,7 @@ def start_server(proto='udp'):
 
     if EXPLICIT_EXIT_NOTIFY in [1, 2]\
        and proto == 'udp'\
-       and bool(re.search('^(2\.4\.|2\.5\.)', OPENVPN_VERSION)):
+       and bool(re.search('^2\.[4-5]\.', OPENVPN_VERSION)):
         cmd.append('--explicit-exit-notify')
         cmd.append(str(EXPLICIT_EXIT_NOTIFY))
 
@@ -761,8 +795,32 @@ def log_server_stats(status=[False, False]):
         result = plugin_loader.plugin.log_plugin_server(status=status)
 
 
+def openvpn_remote_override(conf='/mnt/{}/client.ovpn'.format(DNS_SUB_DOMAIN)):
+    f = open(conf, 'r')
+    text = f.read()
+    f.close()
+    p = re.compile('remote\s+(.*)\s+(.*)\s+([tcpud46]+)')
+    m = p.search(text)
+    try:
+        groups = m.groups()
+        host = groups[0]
+        port = groups[1]
+        proto = groups[2]
+        search = 'remote {} {} {}'.format(host, port, proto)
+        replace = 'remote {} {} {}'.format('localhost', port, proto)
+        text = text.replace(search, replace)
+        f = open(conf, 'w')
+        f.write(text)
+        f.close()
+    except:
+        if DEBUG: print_exc()
+
+    return text
+
+
 def conf_stunnel_client(
     node=None,
+    port=OPENVPN_PORT,
     conf='/etc/stunnel/stunnel-client.conf',
     template='/etc/stunnel/stunnel-client.template.conf'
 ):
@@ -770,7 +828,8 @@ def conf_stunnel_client(
     f = open(template, 'r')
     template = f.read()
     f.close()
-    template = template.replace('{{OPENVPN_SERVER}}', node)
+    template = template.replace('{{OPENVPN_SERVER}}', str(node))
+    template = template.replace('{{OPENVPN_PORT}}', str(port))
     f = open(conf, 'w')
     f.write(template)
     f.close()

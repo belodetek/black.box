@@ -128,7 +128,7 @@ def recv_with_timeout(s, timeout=5):
             try:
                 buffer = s.recv(1024)
                 if buffer:
-                    data.append(buffer)
+                    data.append(buffer.decode())
                     # reset the begin time for measurement
                     begin = time()
                 else:

@@ -75,7 +75,7 @@ def main():
 			'^.* dev ([\w\d]+) local ([\d]+\.[\d]+\.[\d]+\.[\d]+) peer ([\d]+\.[\d]+\.[\d]+\.[\d]+)$'
 		)
 
-	if bool(re.search('^(2\.4\.|2\.5\.)', OPENVPN_VERSION)):
+	if bool(re.search('^2\.[4-5]\.', OPENVPN_VERSION)):
 		p2 = re.compile(
 			'^.*ifconfig ([\w\d]+) ([\d]+\.[\d]+\.[\d]+\.[\d]+) pointopoint ([\d]+\.[\d]+\.[\d]+\.[\d]+) mtu [\d]+$'
 		)
