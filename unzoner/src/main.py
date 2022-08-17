@@ -208,7 +208,7 @@ def main():
 								if DEBUG: print_exc()
 
 					if started[idx] and not starting[idx]:
-						if not kill_thread.isAlive():
+						if not kill_thread.is_alive():
 								kill_thread = Thread(
 									target=disconnect_clients,
 									args=()
@@ -218,12 +218,12 @@ def main():
 								log(
 									'disconnect_clients: name={} alive={} daemon={}'.format(
 										kill_thread.name,
-										kill_thread.isAlive(),
-										kill_thread.isDaemon()
+										kill_thread.is_alive(),
+										kill_thread.daemon
 									)
 								)
 
-						if not auth_thread.isAlive():
+						if not auth_thread.is_alive():
 							if BITCOIN_PAYMENT_CHECK:
 								auth_thread = Thread(
 									target=reauthenticate_clients,
@@ -234,8 +234,8 @@ def main():
 								log(
 									'reauthenticate_clients: name={} alive={} daemon={}'.format(
 										auth_thread.name,
-										auth_thread.isAlive(),
-										auth_thread.isDaemon()
+										auth_thread.is_alive(),
+										auth_thread.daemon
 									)
 								)
 
