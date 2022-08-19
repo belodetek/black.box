@@ -27,13 +27,12 @@ from http.client import (
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_paypal_billing_agreement_id_for_guid(guid=None):
     try:
-        result = get_device_env_by_name(
+        return get_device_env_by_name(
             guid=guid,
             name='PAYPAL_BILLING_AGREEMENT'
         )
     except:
         result = None
-    return result.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -56,7 +55,6 @@ def check_active_paypal_subscription(guid=GUID, baid=None):
 def get_jwt_payload(baid=None):
     if not baid: return None
     try:
-        result = json.loads(get_jwt_payload_from_paypal(baid=baid))['description']
+        return json.loads(get_jwt_payload_from_paypal(baid=baid))['description']
     except:
         result = None
-    return result.decode()

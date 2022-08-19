@@ -1,12 +1,19 @@
-# https://www.balena.io/docs/learn/deploy/deploy-with-balena-button/#balenayml-configuration-file
-name: Unzoner
-type: sw.application
-description: Unblock Netflix!
+name: black.box
+type: sw.block
+description: VPN policy-based router
 fleetcta: Copy pasta!
 post-provisioning: |
   [![balena](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
 
   > 📜 Your unblocking journey starts [here](http://unzoner.com/#instructions)...
+
+  ## Coming soon...
+  > ⏳ [build and run](unzoner/README.md) your own Unzoner
+  
+  * Unzoner API [repository](https://bitbucket.org/belodedenko/api)
+  * Dashboard [repository](https://bitbucket.org/belodedenko/dashboard)
+  * Management server [repository](https://bitbucket.org/belodedenko/mgmt)
+  * Deployment automation [repository]](https://bitbucket.org/belodedenko/cloudformation)
 
 assets:
   repository:
@@ -18,19 +25,6 @@ assets:
     data:
       url: 'https://raw.githubusercontent.com/belodetek/black.box/master/images/logo.png'
 data:
-  # https://github.com/belodetek/black.box/blob/master/unzoner/README.md#service-variables
-  applicationEnvironmentVariables:
-    - SOUND_VOLUME: 75
-    - FRAGMENT: 1300
-    - HW_MODE: g
-    - IEEE80211N: 1
-    - OPENVPN_COMPRESS: 1
-    - WMM_ENABLED: 1
-  # https://github.com/belodetek/black.box/blob/master/unzoner/README.md#configuration
-  applicationConfigVariables:
-    - BALENA_HOST_CONFIG_gpu_mem: 16
-    - BALENA_HOST_CONFIG_hdmi_blanking: 2
-    - BALENA_SUPERVISOR_UPDATE_STRATEGY: hand-over
   defaultDeviceType: raspberrypi4-64
   supportedDeviceTypes:
     - fincm3

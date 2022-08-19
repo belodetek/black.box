@@ -14,13 +14,12 @@ from api import get_device_env_by_name
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
 def get_last_payment_date(guid=None):
     try:
-        result = get_device_env_by_name(
+        return get_device_env_by_name(
             guid=guid,
             name='BITCOIN_LAST_PAYMENT_DATE'
         )
     except:
         result = None
-    return result.decode()
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))

@@ -96,9 +96,9 @@ def auth_user(uid, pwd):
     return False # deny ALL by default
 
 
-def client_connect(uname):
+def client_connect(username=None):
     return True
 
 
-def client_disconnect(uname):
+def client_disconnect(username=None):
     return True
