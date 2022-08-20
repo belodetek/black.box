@@ -10,6 +10,7 @@ on:
 env:
   ENVIRONMENT: balena-cloud.com
   BLOCK_PREFIX: belodetek/unzoner
+  VERBOSE: true
 
 jobs:
   publish:
@@ -25,9 +26,60 @@ jobs:
       aarch64: ${{ steps.version.outputs.aarch64 }}
       amd64: ${{ steps.version.outputs.amd64 }}
       armv7hf: ${{ steps.version.outputs.armv7hf }}
+      release_notes: ${{ steps.release-notes.outputs.release_notes }}
+      semver: ${{ steps.semver.outputs.version }}
+      version_tag: ${{ steps.semver.outputs.version_tag }}
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # https://github.com/marketplace/actions/git-semantic-version
+      - name: generate new semantic version
+        id: semver
+        uses: paulhatch/semantic-version@v4.0.2
+        with:
+          format: "${major}.${minor}.${patch}"
+          major_pattern: "/major:\\s*|Change-type:\\s*major/gmi"
+          minor_pattern: "/minor:\\s*|Change-type:\\s*minor/gmi"
+
+      - name: check semver
+        run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          echo 'changed:        ${{ steps.semver.outputs.changed }}'
+          echo 'increment:      ${{ steps.semver.outputs.increment }}'
+          echo 'major:          ${{ steps.semver.outputs.major }}'
+          echo 'minor:          ${{ steps.semver.outputs.patch }}'
+          echo 'patch:          ${{ steps.semver.outputs.patch }}'
+          echo 'version:        ${{ steps.semver.outputs.version }}'
+          echo 'version_tag:    ${{ steps.semver.outputs.version_tag }}'
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # https://github.com/cookpete/auto-changelog
+      - name: generate release notes
+        id: release-notes
+        run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          sudo npm --location=global install auto-changelog
+
+          tmpfile="$(mktemp)"
+
+          git tag '${{ steps.semver.outputs.version_tag }}'
+
+          auto-changelog \
+            --output "${tmpfile}" \
+            --starting-version '${{ steps.semver.outputs.version_tag }}' \
+            --ending-version '${{ steps.semver.outputs.version_tag }}'
+
+          release_notes="$(cat < "${tmpfile}")" && rm -f "${tmpfile}"
+
+          echo "::set-output name=release_notes::$(echo "${release_notes}" | openssl base64 -A)"
 
       - name: install additional dependencies
         run: |
@@ -44,6 +96,8 @@ jobs:
       - name: imported GPG key
         if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
         run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
           echo 'fingerprint: ${{ steps.import-gpg-key.outputs.fingerprint }}'
           echo 'keyid:       ${{ steps.import-gpg-key.outputs.keyid }}'
           echo 'name:        ${{ steps.import-gpg-key.outputs.name }}'
@@ -54,27 +108,52 @@ jobs:
         run: |
           git secret reveal -fp '${{ secrets.GPG_PASSPHRASE }}'
 
-      # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/188
-      - name: remove composition
+      - name: update versioned assets
         if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
         run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/188
           rm docker-compose.yml
+
+          yq -i e '.version="${{ steps.semver.outputs.version }}"' unzoner/balena.yml
 
       - name: push draft or finalise release
         id: build
         uses: balena-io/balena-ci@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
-          create_tag: true
           environment: ${{ env.ENVIRONMENT }}
           fleet: ${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source: unzoner
 
-      - name: arch version
+      - name: export architecture version
         id: version
         run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
           echo "::set-output name=${{ matrix.arch }}::${{ steps.build.outputs.version }}"
+
+      - name: update balena release notes
+        run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          block_id="$(curl "https://api.${{ env.ENVIRONMENT }}/v6/application?\$filter=slug%20eq%20'${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}'&\$select=id" \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+            | jq -r '.d[].id')"
+
+          # FIXME: probably require additional escaping of JSON reserved characters
+          release_notes="$(echo '${{ steps.release-notes.outputs.release_notes }}' \
+            | base64 -d \
+            | awk '{printf "%s\\n", $0}')"
+
+          curl --retry 3 --fail \
+            -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${block_id}%20and%20id%20eq%20${{ steps.build.outputs.release_id }}" \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+            -d "{\"note\":\"${release_notes}\"}"
 
   deploy:
     runs-on: ubuntu-latest
@@ -110,8 +189,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: update block version
+      - name: update versioned assets
         run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          for yaml in unzoner/balena.yml balena.yml; do
+              yq -i e '.version="${{ needs.publish.outputs.semver }}"' "${yaml}"
+          done
+
           # https://github.com/orgs/community/discussions/25634
           arch_version='${{ needs.publish.outputs[format('{0}', matrix.arch)] }}'
 
@@ -122,13 +207,71 @@ jobs:
 
           sed -i "s#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%/${arch_version}#g" Dockerfile.template
 
-          cat < Dockerfile.template
-
       - name: push draft or finalise release
+        id: build
         uses: balena-io/balena-ci@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
-          create_tag: true
           environment: ${{ env.ENVIRONMENT }}
           fleet: ${{ matrix.fleet }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: update balena release notes
+        run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          fleet_id="$(curl "https://api.${{ env.ENVIRONMENT }}/v6/application?\$filter=slug%20eq%20'${{ matrix.fleet }}'&\$select=id" \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+            | jq -r '.d[].id')"
+
+          release_notes="$(echo '${{ needs.publish.outputs.release_notes }}' \
+            | base64 -d \
+            | awk '{printf "%s\\n", $0}')"
+
+          curl --retry 3 --fail \
+            -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${fleet_id}%20and%20id%20eq%20${{ steps.build.outputs.release_id }}" \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+            -d "{\"note\":\"${release_notes}\"}"
+
+        # https://github.com/cookpete/auto-changelog
+      - name: generate CHANGELOG
+        if: github.event.pull_request.merged == true
+        run: |
+          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          auto-changelog
+
+      - name: import GPG key
+        id: import-gpg-key
+        if: github.event.pull_request.merged == true
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      # https://github.com/marketplace/actions/git-auto-commit
+      - name: Commit CHANGELOG and versioned asset(s)
+        uses: stefanzweifel/git-auto-commit-action@v4
+        # https://stackoverflow.com/a/61565445/1559300
+        if: github.event.pull_request.merged == true
+        with:
+          add_options: -u
+          branch: ${{ github.base_ref }}
+          commit_author: ${{ steps.import-gpg-key.outputs.name }} <${{ steps.import-gpg-key.outputs.email }}>
+          commit_message: Update CHANGELOG and ${{ needs.publish.outputs_version_tag }} asset(s)
+          commit_options: --no-verify --signoff
+          commit_user_email: ${{ steps.import-gpg-key.outputs.email }}
+          commit_user_name: ${{ steps.import-gpg-key.outputs.name }}
+          disable_globbing: true
+          file_pattern: CHANGELOG.md balena.yml unzoner/balena.yml
+          push_options: --force
+          skip_checkout: true
+          skip_dirty_check: true
+          skip_fetch: true
+          status_options: --untracked-files=no
+          tagging_message: ${{ needs.publish.outputs_version_tag }}
