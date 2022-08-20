@@ -65,6 +65,7 @@ jobs:
         uses: balena-io/balena-ci@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
+          create_tag: true
           environment: ${{ env.ENVIRONMENT }}
           fleet: ${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -114,6 +115,11 @@ jobs:
           # https://github.com/orgs/community/discussions/25634
           arch_version='${{ needs.publish.outputs[format('{0}', matrix.arch)] }}'
 
+          # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/193
+          if [[ -z $arch_version ]]; then
+              arch_version="$(yq e .version balena.yml)"
+          fi
+
           sed -i "s#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%/${arch_version}#g" Dockerfile.template
 
           cat < Dockerfile.template
@@ -122,6 +128,7 @@ jobs:
         uses: balena-io/balena-ci@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
+          create_tag: true
           environment: ${{ env.ENVIRONMENT }}
           fleet: ${{ matrix.fleet }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
