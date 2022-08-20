@@ -13,7 +13,7 @@ post-provisioning: |
   * Unzoner API [repository](https://bitbucket.org/belodedenko/api)
   * Dashboard [repository](https://bitbucket.org/belodedenko/dashboard)
   * Management server [repository](https://bitbucket.org/belodedenko/mgmt)
-  * Deployment automation [repository]](https://bitbucket.org/belodedenko/cloudformation)
+  * Deployment automation [repository](https://bitbucket.org/belodedenko/cloudformation)
 
 assets:
   repository:
@@ -38,4 +38,4 @@ data:
     - raspberrypi3
     - raspberrypi3-64
     - raspberrypi4-64
-version: 1.2.0
+version: 1.2.1
