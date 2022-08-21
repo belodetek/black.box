@@ -100,12 +100,12 @@ jobs:
           - amd64
           - armv7hf
     outputs:
-      aarch64_release_id: ${{ steps.version.outputs.aarch64_release_id }}
-      aarch64_version: ${{ steps.version.outputs.aarch64_version }}
-      amd64_release_id: ${{ steps.version.outputs.amd64_release_id }}
-      amd64_version: ${{ steps.version.outputs.amd64_version }}
-      armv7hf_release_id: ${{ steps.version.outputs.armv7hf_release_id }}
-      armv7hf_version: ${{ steps.version.outputs.armv7hf_version }}
+      aarch64_release_id: ${{ steps.block.outputs.aarch64_release_id }}
+      aarch64_version: ${{ steps.block.outputs.aarch64_version }}
+      amd64_release_id: ${{ steps.block.outputs.amd64_release_id }}
+      amd64_version: ${{ steps.block.outputs.amd64_version }}
+      armv7hf_release_id: ${{ steps.block.outputs.armv7hf_release_id }}
+      armv7hf_version: ${{ steps.block.outputs.armv7hf_version }}
 
     steps:
       - uses: actions/checkout@v3
@@ -148,10 +148,15 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source: unzoner
 
-      - name: export architecture version
-        id: version
+      - name: export block build results
+        id: block
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          block_id="$(curl "https://api.${{ env.ENVIRONMENT }}/v6/application?\$filter=slug%20eq%20'${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}'&\$select=id" \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+            | jq -r '.d[].id')"
 
           # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/193
           arch_version='${{ steps.build.outputs.version }}'
@@ -170,21 +175,19 @@ jobs:
                 '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
           fi
 
-          echo "::set-output name=${{ matrix.arch }}_version::${arch_version}"
+          echo "::set-output name=${{ matrix.arch }}_block_id::${block_id}"
           echo "::set-output name=${{ matrix.arch }}_release_id::${release_id}"
+          echo "::set-output name=${{ matrix.arch }}_version::${arch_version}"
 
       # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/194
       - name: update balena release notes
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
-          block_id="$(curl "https://api.${{ env.ENVIRONMENT }}/v6/application?\$filter=slug%20eq%20'${{ env.BLOCK_PREFIX }}-${{ matrix.arch }}'&\$select=id" \
-            -H 'Content-Type: application/json' \
-            -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
-            | jq -r '.d[].id')"
-
           # https://github.com/orgs/community/discussions/25634
-          release_id='${{ steps.version.outputs[format('{0}_release_id', matrix.arch)] }}'
+          release_id='${{ steps.block.outputs[format('{0}_release_id', matrix.arch)] }}'
+
+          block_id='${{ steps.block.outputs[format('{0}_block_id', matrix.arch)] }}'
 
           # FIXME: probably require additional escaping of JSON reserved characters
           release_notes="$(echo '${{ needs.release-notes.outputs.release_notes }}' \
