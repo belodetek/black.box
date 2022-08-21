@@ -149,8 +149,14 @@ jobs:
             | base64 -d \
             | awk '{printf "%s\\n", $0}')"
 
+          # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/193
+          release_id='${{ steps.build.outputs.release_id }}'
+          if [[ -z $release_id ]]; then
+              release_id="$(yq e .version unzoner/balena.yml)"
+          fi
+
           curl --retry 3 --fail \
-            -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${block_id}%20and%20id%20eq%20${{ steps.build.outputs.release_id }}" \
+            -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${block_id}%20and%20id%20eq%20${release_id}" \
             -H 'Content-Type: application/json' \
             -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
             -d "{\"note\":\"${release_notes}\"}"
@@ -200,7 +206,6 @@ jobs:
           # https://github.com/orgs/community/discussions/25634
           arch_version='${{ needs.publish.outputs[format('{0}', matrix.arch)] }}'
 
-          # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/193
           if [[ -z $arch_version ]]; then
               arch_version="$(yq e .version balena.yml)"
           fi

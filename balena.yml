@@ -1,10 +1,13 @@
----
 # https://www.balena.io/docs/learn/deploy/deploy-with-balena-button/#balenayml-configuration-file
 name: Unzoner
 type: sw.application
 description: Unblock Netflix!
 fleetcta: Copy pasta!
-post-provisioning: "[![balena](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)\n\n> \U0001F4DC Your unblocking journey starts [here](http://unzoner.com/#instructions)...\n"
+post-provisioning: |
+  [![balena](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
+
+  > 📜 Your unblocking journey starts [here](http://unzoner.com/#instructions)...
+
 assets:
   repository:
     type: blob.asset
@@ -41,4 +44,4 @@ data:
     - raspberrypi3
     - raspberrypi3-64
     - raspberrypi4-64
-version: 1.2.1
+version: 1.2.2
