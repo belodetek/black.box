@@ -44,7 +44,7 @@ jobs:
           echo 'changed:        ${{ steps.semver.outputs.changed }}'
           echo 'increment:      ${{ steps.semver.outputs.increment }}'
           echo 'major:          ${{ steps.semver.outputs.major }}'
-          echo 'minor:          ${{ steps.semver.outputs.patch }}'
+          echo 'minor:          ${{ steps.semver.outputs.minor }}'
           echo 'patch:          ${{ steps.semver.outputs.patch }}'
           echo 'version:        ${{ steps.semver.outputs.version }}'
           echo 'version_tag:    ${{ steps.semver.outputs.version_tag }}'
@@ -123,16 +123,6 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: imported GPG key
-        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.merged == false
-        run: |
-          [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
-
-          echo 'fingerprint: ${{ steps.import-gpg-key.outputs.fingerprint }}'
-          echo 'keyid:       ${{ steps.import-gpg-key.outputs.keyid }}'
-          echo 'name:        ${{ steps.import-gpg-key.outputs.name }}'
-          echo 'email:       ${{ steps.import-gpg-key.outputs.email }}'
-
       - name: reveal secrets
         if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.merged == false
         run: |
@@ -149,7 +139,8 @@ jobs:
 
       - name: push draft or finalise release
         id: build
-        uses: balena-io/balena-ci@master
+        # https://github.com/balena-io/deploy-to-balena-action/pull/195
+        uses: balena-io/balena-ci@ab77/operational
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
           environment: ${{ env.ENVIRONMENT }}
@@ -173,9 +164,10 @@ jobs:
           if [[ -z $release_id ]]; then
               release_id=$(curl --retry 3 --fail \
                 "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${block_id}&\$select=id,semver,is_final,is_invalidated,release_type" \
-                -H "Content-Type: application/json" \
-                -H "Authorization: Bearer $AUTH_TOKEN" \
-                | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
+                -H 'Content-Type: application/json' \
+                -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+                | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' \
+                '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
           fi
 
           echo "::set-output name=${{ matrix.arch }}_version::${arch_version}"
@@ -256,7 +248,8 @@ jobs:
 
       - name: push draft or finalise release
         id: build
-        uses: balena-io/balena-ci@master
+        # https://github.com/balena-io/deploy-to-balena-action/pull/195
+        uses: balena-io/balena-ci@ab77/operational
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
           environment: ${{ env.ENVIRONMENT }}
@@ -277,9 +270,10 @@ jobs:
           if [[ -z $release_id ]]; then
               release_id=$(curl --retry 3 --fail \
                 "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${fleet_id}&\$select=id,semver,is_final,is_invalidated,release_type" \
-                -H "Content-Type: application/json" \
-                -H "Authorization: Bearer $AUTH_TOKEN" \
-                | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
+                -H 'Content-Type: application/json' \
+                -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
+                | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' \
+                '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
           fi
 
           release_notes="$(echo '${{ needs.release-notes.outputs.release_notes }}' \
