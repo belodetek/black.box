@@ -2,8 +2,12 @@
 name: publish to balenaCloud
 
 on:
- pull_request:
+  # https://github.com/orgs/community/discussions/26724
+  pull_request:
     types: [opened, synchronize, closed]
+    branches:
+      - master
+  push:
     branches:
       - master
 
@@ -13,20 +17,11 @@ env:
   VERBOSE: true
 
 jobs:
-  publish:
+  versioning:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      matrix:
-        arch:
-          - aarch64
-          - amd64
-          - armv7hf
     outputs:
-      aarch64: ${{ steps.version.outputs.aarch64 }}
-      amd64: ${{ steps.version.outputs.amd64 }}
-      armv7hf: ${{ steps.version.outputs.armv7hf }}
-      release_notes: ${{ steps.release-notes.outputs.release_notes }}
       semver: ${{ steps.semver.outputs.version }}
       version_tag: ${{ steps.semver.outputs.version_tag }}
 
@@ -40,6 +35,7 @@ jobs:
         id: semver
         uses: paulhatch/semantic-version@v4.0.2
         with:
+          # https://www.conventionalcommits.org
           format: "${major}.${minor}.${patch}"
           major_pattern: "/major:\\s*|Change-type:\\s*major/gmi"
           minor_pattern: "/minor:\\s*|Change-type:\\s*minor/gmi"
@@ -56,6 +52,19 @@ jobs:
           echo 'version:        ${{ steps.semver.outputs.version }}'
           echo 'version_tag:    ${{ steps.semver.outputs.version_tag }}'
 
+  release-notes:
+    runs-on: ubuntu-latest
+    needs: versioning
+    strategy:
+      fail-fast: true
+    outputs:
+      release_notes: ${{ steps.release-notes.outputs.release_notes }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -70,16 +79,39 @@ jobs:
 
           tmpfile="$(mktemp)"
 
-          git tag '${{ steps.semver.outputs.version_tag }}'
+          git tag '${{ needs.versioning.outputs.version_tag }}'
 
           auto-changelog \
             --output "${tmpfile}" \
-            --starting-version '${{ steps.semver.outputs.version_tag }}' \
-            --ending-version '${{ steps.semver.outputs.version_tag }}'
+            --starting-version '${{ needs.versioning.outputs.version_tag }}' \
+            --ending-version '${{ needs.versioning.outputs.version_tag }}'
 
           release_notes="$(cat < "${tmpfile}")" && rm -f "${tmpfile}"
 
           echo "::set-output name=release_notes::$(echo "${release_notes}" | openssl base64 -A)"
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - versioning
+      - release-notes
+    strategy:
+      fail-fast: true
+      matrix:
+        arch:
+          - aarch64
+          - amd64
+          - armv7hf
+    outputs:
+      aarch64_release_id: ${{ steps.version.outputs.aarch64_release_id }}
+      aarch64_version: ${{ steps.version.outputs.aarch64_version }}
+      amd64_release_id: ${{ steps.version.outputs.amd64_release_id }}
+      amd64_version: ${{ steps.version.outputs.amd64_version }}
+      armv7hf_release_id: ${{ steps.version.outputs.armv7hf_release_id }}
+      armv7hf_version: ${{ steps.version.outputs.armv7hf_version }}
+
+    steps:
+      - uses: actions/checkout@v3
 
       - name: install additional dependencies
         run: |
@@ -116,7 +148,7 @@ jobs:
           # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/188
           rm docker-compose.yml
 
-          yq -i e '.version="${{ steps.semver.outputs.version }}"' unzoner/balena.yml
+          yq -i e '.version="${{ needs.versioning.outputs.semver }}"' unzoner/balena.yml
 
       - name: push draft or finalise release
         id: build
@@ -133,8 +165,26 @@ jobs:
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
-          echo "::set-output name=${{ matrix.arch }}::${{ steps.build.outputs.version }}"
+          # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/193
+          arch_version='${{ steps.build.outputs.version }}'
+          release_id='${{ steps.build.outputs.release_id }}'
 
+          if [[ -z $arch_version ]]; then
+              arch_version='${{ needs.versioning.outputs.semver }}'
+          fi
+
+          if [[ -z $release_id ]]; then
+              release_id=$(curl --retry 3 --fail \
+                "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${block_id}&\$select=id,semver,is_final,is_invalidated,release_type" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer $AUTH_TOKEN" \
+                | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
+          fi
+
+          echo "::set-output name=${{ matrix.arch }}_version::${arch_version}"
+          echo "::set-output name=${{ matrix.arch }}_release_id::${release_id}"
+
+      # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/194
       - name: update balena release notes
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
@@ -144,16 +194,13 @@ jobs:
             -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
             | jq -r '.d[].id')"
 
+          # https://github.com/orgs/community/discussions/25634
+          release_id='${{ steps.version.outputs[format('{0}_release_id', matrix.arch)] }}'
+
           # FIXME: probably require additional escaping of JSON reserved characters
-          release_notes="$(echo '${{ steps.release-notes.outputs.release_notes }}' \
+          release_notes="$(echo '${{ needs.release-notes.outputs.release_notes }}' \
             | base64 -d \
             | awk '{printf "%s\\n", $0}')"
-
-          # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/193
-          release_id='${{ steps.build.outputs.release_id }}'
-          if [[ -z $release_id ]]; then
-              release_id="$(yq e .version unzoner/balena.yml)"
-          fi
 
           curl --retry 3 --fail \
             -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${block_id}%20and%20id%20eq%20${release_id}" \
@@ -163,7 +210,10 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: publish
+    needs:
+      - publish
+      - release-notes
+      - versioning
     strategy:
       fail-fast: true
       matrix:
@@ -200,15 +250,10 @@ jobs:
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
           for yaml in unzoner/balena.yml balena.yml; do
-              yq -i e '.version="${{ needs.publish.outputs.semver }}"' "${yaml}"
+              yq -i e '.version="${{ needs.versioning.outputs.semver }}"' "${yaml}"
           done
 
-          # https://github.com/orgs/community/discussions/25634
-          arch_version='${{ needs.publish.outputs[format('{0}', matrix.arch)] }}'
-
-          if [[ -z $arch_version ]]; then
-              arch_version="$(yq e .version balena.yml)"
-          fi
+          arch_version='${{ needs.publish.outputs[format('{0}_version', matrix.arch)] }}'
 
           sed -i "s#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%/${arch_version}#g" Dockerfile.template
 
@@ -230,19 +275,29 @@ jobs:
             -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
             | jq -r '.d[].id')"
 
-          release_notes="$(echo '${{ needs.publish.outputs.release_notes }}' \
+          release_id='${{ steps.build.outputs.release_id }}'
+
+          if [[ -z $release_id ]]; then
+              release_id=$(curl --retry 3 --fail \
+                "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${fleet_id}&\$select=id,semver,is_final,is_invalidated,release_type" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer $AUTH_TOKEN" \
+                | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
+          fi
+
+          release_notes="$(echo '${{ needs.release-notes.outputs.release_notes }}' \
             | base64 -d \
             | awk '{printf "%s\\n", $0}')"
 
           curl --retry 3 --fail \
-            -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${fleet_id}%20and%20id%20eq%20${{ steps.build.outputs.release_id }}" \
+            -X PATCH "https://api.${{ env.ENVIRONMENT }}/v6/release?\$filter=belongs_to__application%20eq%20${fleet_id}%20and%20id%20eq%20${release_id}" \
             -H 'Content-Type: application/json' \
             -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
             -d "{\"note\":\"${release_notes}\"}"
 
         # https://github.com/cookpete/auto-changelog
       - name: generate CHANGELOG
-        if: github.event.pull_request.merged == true
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
@@ -250,7 +305,7 @@ jobs:
 
       - name: import GPG key
         id: import-gpg-key
-        if: github.event.pull_request.merged == true
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -263,12 +318,12 @@ jobs:
       - name: Commit CHANGELOG and versioned asset(s)
         uses: stefanzweifel/git-auto-commit-action@v4
         # https://stackoverflow.com/a/61565445/1559300
-        if: github.event.pull_request.merged == true
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         with:
           add_options: -u
           branch: ${{ github.base_ref }}
           commit_author: ${{ steps.import-gpg-key.outputs.name }} <${{ steps.import-gpg-key.outputs.email }}>
-          commit_message: Update CHANGELOG and ${{ needs.publish.outputs_version_tag }} asset(s)
+          commit_message: Update CHANGELOG and ${{ needs.versioning.outputs_version_tag }} asset(s)
           commit_options: --no-verify --signoff
           commit_user_email: ${{ steps.import-gpg-key.outputs.email }}
           commit_user_name: ${{ steps.import-gpg-key.outputs.name }}
@@ -279,4 +334,4 @@ jobs:
           skip_dirty_check: true
           skip_fetch: true
           status_options: --untracked-files=no
-          tagging_message: ${{ needs.publish.outputs_version_tag }}
+          tagging_message: ${{ needs.versioning.outputs_version_tag }}
