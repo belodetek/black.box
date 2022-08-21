@@ -289,11 +289,17 @@ jobs:
             -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
             -d "{\"note\":\"${release_notes}\"}"
 
-        # https://github.com/cookpete/auto-changelog
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # https://github.com/cookpete/auto-changelog
       - name: generate CHANGELOG
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
+
+          sudo npm --location=global install auto-changelog
 
           auto-changelog
 
