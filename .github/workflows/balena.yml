@@ -7,9 +7,6 @@ on:
     types: [opened, synchronize, closed]
     branches:
       - master
-  push:
-    branches:
-      - master
 
 env:
   ENVIRONMENT: balena-cloud.com
@@ -114,19 +111,20 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: install additional dependencies
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.merged == false
         run: |
           sudo apt install -y git-secret
 
       - name: import GPG key
         id: import-gpg-key
-        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.merged == false
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: imported GPG key
-        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.merged == false
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
@@ -136,12 +134,11 @@ jobs:
           echo 'email:       ${{ steps.import-gpg-key.outputs.email }}'
 
       - name: reveal secrets
-        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.merged == false
         run: |
           git secret reveal -fp '${{ secrets.GPG_PASSPHRASE }}'
 
       - name: update versioned assets
-        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed'}}
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
