@@ -3,19 +3,7 @@ name: black.box
 type: sw.block
 description: VPN policy-based router
 fleetcta: Copy pasta!
-post-provisioning: |
-  [![balena](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
-
-  > 📜 Your unblocking journey starts [here](http://unzoner.com/#instructions)...
-
-  ## Coming soon...
-  > ⏳ [build and run](unzoner/README.md) your own Unzoner
-  
-  * Unzoner API [repository](https://bitbucket.org/belodedenko/api)
-  * Dashboard [repository](https://bitbucket.org/belodedenko/dashboard)
-  * Management server [repository](https://bitbucket.org/belodedenko/mgmt)
-  * Deployment automation [repository](https://bitbucket.org/belodedenko/cloudformation)
-
+post-provisioning: "[![balena](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)\n\n> \U0001F4DC Your unblocking journey starts [here](http://unzoner.com/#instructions)...\n\n## Coming soon...\n> ⏳ [build and run](unzoner/README.md) your own Unzoner\n\n* Unzoner API [repository](https://bitbucket.org/belodedenko/api)\n* Dashboard [repository](https://bitbucket.org/belodedenko/dashboard)\n* Management server [repository](https://bitbucket.org/belodedenko/mgmt)\n* Deployment automation [repository](https://bitbucket.org/belodedenko/cloudformation)\n"
 assets:
   repository:
     type: blob.asset
@@ -39,4 +27,4 @@ data:
     - raspberrypi3
     - raspberrypi3-64
     - raspberrypi4-64
-version: 1.2.8
+version: 1.2.9
