@@ -334,6 +334,8 @@ jobs:
 
           auto-changelog
 
+          git tag --delete '${{ needs.versioning.outputs.version_tag }}'
+
       - name: import GPG key
         id: import-gpg-key
         uses: crazy-max/ghaction-import-gpg@v4
@@ -367,3 +369,4 @@ jobs:
           skip_dirty_check: true
           skip_fetch: true
           status_options: --untracked-files=no
+          tagging_message: ${{ needs.versioning.outputs_version_tag }}
