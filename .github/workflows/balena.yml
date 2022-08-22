@@ -236,6 +236,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          # https://github.com/marketplace/actions/git-auto-commit#push-to-protected-branches
+          # https://github.com/orgs/community/discussions/25305
+          token: ${{ secrets.PAT }}
 
       - name: update versioned assets
         run: |
@@ -323,7 +327,11 @@ jobs:
           add_options: -u
           branch: ${{ github.base_ref }}
           commit_author: ${{ steps.import-gpg-key.outputs.name }} <${{ steps.import-gpg-key.outputs.email }}>
-          commit_message: Update CHANGELOG and ${{ needs.versioning.outputs_version_tag }} asset(s)
+          commit_message: |
+            ci: Update CHANGELOG and ${{ needs.versioning.outputs_version_tag }} asset(s)
+
+            Signed-off-by: ${{ steps.import-gpg-key.outputs.name }} <${{ steps.import-gpg-key.outputs.email }}>
+
           commit_options: --no-verify --signoff
           commit_user_email: ${{ steps.import-gpg-key.outputs.email }}
           commit_user_name: ${{ steps.import-gpg-key.outputs.name }}
@@ -334,4 +342,4 @@ jobs:
           skip_dirty_check: true
           skip_fetch: true
           status_options: --untracked-files=no
-          tagging_message: ${{ needs.versioning.outputs_version_tag }}
+          tagging_message: ${{ needs.versioning.outputs.version_tag }}
