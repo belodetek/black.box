@@ -128,14 +128,17 @@ jobs:
         run: |
           git secret reveal -fp '${{ secrets.GPG_PASSPHRASE }}'
 
-      - name: update versioned assets
+      - name: update release version(s)
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
           # FIXME: https://github.com/balena-io/deploy-to-balena-action/issues/188
           rm docker-compose.yml
 
-          yq -i e '.version="${{ needs.versioning.outputs.semver }}"' unzoner/balena.yml
+          # https://github.com/mikefarah/yq/issues/439
+          #yq -i e '.version="${{ needs.versioning.outputs.semver }}"' unzoner/balena.yml
+          sed -i '/version:.*/d' unzoner/balena.yml
+          echo 'version: ${{ needs.versioning.outputs.semver }}' >> unzoner/balena.yml
 
       - name: push draft or finalise release
         id: build
@@ -236,17 +239,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          # https://github.com/marketplace/actions/git-auto-commit#push-to-protected-branches
-          # https://github.com/orgs/community/discussions/25305
-          token: ${{ secrets.PAT }}
 
-      - name: update versioned assets
+      - name: update release version(s)
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
           for yaml in unzoner/balena.yml balena.yml; do
-              yq -i e '.version="${{ needs.versioning.outputs.semver }}"' "${yaml}"
+              #yq -i e '.version="${{ needs.versioning.outputs.semver }}"' "${yaml}"
+              sed -i '/version:.*/d' "${yaml}"
+              echo 'version: ${{ needs.versioning.outputs.semver }}' >> "${yaml}"
           done
 
           arch_version='${{ needs.publish.outputs[format('{0}_version', matrix.arch)] }}'
@@ -293,23 +294,46 @@ jobs:
             -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
             -d "{\"note\":\"${release_notes}\"}"
 
+  commit:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    needs:
+      - versioning
+      - deploy
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # https://github.com/marketplace/actions/git-auto-commit#push-to-protected-branches
+          # https://github.com/orgs/community/discussions/25305
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
 
       # https://github.com/cookpete/auto-changelog
-      - name: generate CHANGELOG
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+      - name: set release version(s) and prepare CHANGELOG.md
         run: |
           [[ ${{ env.VERBOSE }} =~ true|True|On|on|1 ]] && set -x
 
           sudo npm --location=global install auto-changelog
 
+          git tag '${{ needs.versioning.outputs.version_tag }}'
+
+          for yaml in unzoner/balena.yml balena.yml; do
+              #yq -i e '.version="${{ needs.versioning.outputs.semver }}"' "${yaml}"
+              sed -i '/version:.*/d' "${yaml}"
+              echo 'version: ${{ needs.versioning.outputs.semver }}' >> "${yaml}"
+          done
+
           auto-changelog
 
       - name: import GPG key
         id: import-gpg-key
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -322,7 +346,6 @@ jobs:
       - name: Commit CHANGELOG and versioned asset(s)
         uses: stefanzweifel/git-auto-commit-action@v4
         # https://stackoverflow.com/a/61565445/1559300
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         with:
           add_options: -u
           branch: ${{ github.base_ref }}
