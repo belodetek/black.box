@@ -175,7 +175,8 @@ jobs:
                 -H 'Content-Type: application/json' \
                 -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
                 | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' \
-                '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
+                '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id' \
+                | head -n 1)
           fi
 
           echo "::set-output name=${{ matrix.arch }}_block_id::${block_id}"
@@ -281,7 +282,8 @@ jobs:
                 -H 'Content-Type: application/json' \
                 -H 'Authorization: Bearer ${{ secrets.BALENA_API_KEY }}' \
                 | jq -r --arg semver '${{ needs.versioning.outputs.semver }}' \
-                '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id')
+                '.d[] | select((.semver==$semver) and (.is_final==true) and (.is_invalidated==false) and (.release_type=="final")).id' \
+                | head -n 1)
           fi
 
           release_notes="$(echo '${{ needs.release-notes.outputs.release_notes }}' \
