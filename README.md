@@ -1,3 +1,5 @@
+[![publish to balenaCloud](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg?branch=master)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
+
 <a href="https://dashboard.unzoner.com/sub"><img align="left" src="https://api.unzoner.com/api/v1.0/countries/available/flags.png"></a><br><br>
 
 `black.box` is a VPN policy routing appliance, which runs on [Raspberry Pi(s)](https://en.wikipedia.org/wiki/Raspberry_Pi),

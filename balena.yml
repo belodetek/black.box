@@ -4,7 +4,7 @@ type: sw.application
 description: Unblock Netflix!
 fleetcta: Copy pasta!
 post-provisioning: |
-  [![balena](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
+  [![publish to balenaCloud](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg?branch=master)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
 
   > 📜 Your unblocking journey starts [here](http://unzoner.com/#instructions)...
 
