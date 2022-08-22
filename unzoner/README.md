@@ -1,3 +1,5 @@
+[![publish to balenaCloud](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg?branch=master)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
+
 # black.box
 
 ## ToC
