@@ -365,4 +365,3 @@ jobs:
           skip_dirty_check: true
           skip_fetch: true
           status_options: --untracked-files=no
-          tagging_message: ${{ needs.versioning.outputs.version_tag }}
