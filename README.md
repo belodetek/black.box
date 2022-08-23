@@ -51,7 +51,7 @@ Wi-Fi network or routed via the device's Ethernet (LAN) IP address, can (a) typi
 access popular streaming [services](#services) from anywhere in the world; (b) to provide
 privacy and anonymity via 3rd party VPN providers; or (c) etablish private VPN links
 between two or more locations. Application source code is [available](https://github.com/ab77/black.box/tree/master/unzoner)
-under the [MIT](https://github.com/ab77/black.box/blob/master/src/LICENSE) license.
+under the [MIT](https://github.com/belodetek/black.box/blob/master/LICENSE) license.
 
 ```
 +---------+         +-----------------+
