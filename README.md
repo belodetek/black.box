@@ -5,10 +5,11 @@
 `black.box` is a VPN policy routing appliance, which runs on [Raspberry Pi(s)](https://en.wikipedia.org/wiki/Raspberry_Pi),
 [DD-WRT](https://privacyapp.flashrouters.com/) routers and other[[n8](#footnotes)] devices. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125">
 
-`Unzoner` is a subscription-based service, designed specifically for Internet content
-un-blocking. Combined, they un-block video streaming content across tablets,
-smartphones, desktops, laptops and TVs over Wi-Fi or LAN. Unzoner subscriptions can also
-be created manually for use with compatible software, such as [Tunnelblick](http://unzoner.com/#tunnelblick-and-windows) and [Kodi](http://unzoner.com/#kodi).
+`Unzoner` is a subscription-based service, which helps connect `black.box(es)` with
+exit-nodes in target geographical regions.
+
+`black.box` + `Unzoner` un-block video streaming content across [tablets](https://www.unzoner.com/#ios), [smartphones](https://www.unzoner.com/#android), [desktops](http://unzoner.com/#kodi), [laptops](http://unzoner.com/#tunnelblick-and-windows)
+and TVs over Wi-Fi or LAN.
 
 > <img align="middle" src="https://raw.githubusercontent.com/ab77/black.box/master/images/logo.png" width="64"> **TL;DR** find a Raspbery Pi and [flash](http://etcher.io/) it with [RPi3/armv7hf](https://hub.balena.io/organizations/belodetek/fleets/blackbox-armv7hf) or [RPi4/aarch64](https://hub.balena.io/organizations/belodetek/fleets/blackbox-aarch64) image or try [this](#qemu-or-virtualbox) on a PC or [router](#dd-wrt)
 <br>
