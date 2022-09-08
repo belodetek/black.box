@@ -3,8 +3,7 @@
 # black.box
 
 ## ToC
-* [AWS](#aws)
-* [Management server](#management-server)
+* [Backend](#backend)
 * [Balena](#balena)
 * [environment variables](#environment-variables)
 * [miscellaneous](#miscellaneous)
@@ -12,22 +11,21 @@
 * [footnotes](#footnotes)
 
 
-## AWS
+## Backend
 > deploy Unzoner backend(s)...
 
 ### Unzoner API
-> ⏳ coming soon...
+> see, [repository](https://github.com/belodetek/unzoner-api)
 
 ### Unzoner Dashboard
 > ⏳ coming soon...
 
+### Unzoner DNS
+> see, [repository](https://github.com/belodetek/unzoner-dns)
 
-## Management server
-> ⏳ coming soon...
-
+### miscellaneous
+* [ifconfig](https://github.com/mpolden/echoip) service
 * [generate](https://hub.docker.com/r/kylemanna/openvpn/) PKI assets for OpenVPN
-* deploy [ifconfig](https://github.com/mpolden/echoip) service
-* deploy Unzoner DNS server
 
 
 ## Balena

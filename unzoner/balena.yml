@@ -11,10 +11,8 @@ post-provisioning: |
   ## Coming soon...
   > ⏳ [build and run](https://github.com/belodetek/black.box/blob/master/unzoner/README.md) your own Unzoner
 
-  * Unzoner API [repository](https://bitbucket.org/belodedenko/api)
-  * Dashboard [repository](https://bitbucket.org/belodedenko/dashboard)
-  * Management server [repository](https://bitbucket.org/belodedenko/mgmt)
-  * Deployment automation [repository](https://bitbucket.org/belodedenko/cloudformation)
+  * Unzoner API [repository](https://github.com/belodetek/unzoner-api)
+  * DNS server [repository](https://github.com/belodetek/unzoner-dns)
 
 assets:
   repository:
