@@ -253,7 +253,7 @@ jobs:
 
           arch_version='${{ needs.publish.outputs[format('{0}_version', matrix.arch)] }}'
 
-          sed -i "s#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%#FROM bh.cr/belodetek/unzoner-%%BALENA_ARCH%%/${arch_version}#g" Dockerfile.template
+          sed -i "s#FROM bh.cr/${{ matrix.fleet }}-%%BALENA_ARCH%%#FROM bh.cr/${{ matrix.fleet }}-%%BALENA_ARCH%%/${arch_version}#g" Dockerfile.template
 
       - name: push draft or finalise release
         id: build
