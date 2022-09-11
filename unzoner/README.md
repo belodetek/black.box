@@ -18,7 +18,7 @@
 > see, [repository](https://github.com/belodetek/unzoner-api)
 
 ### Unzoner Dashboard
-> ⏳ coming soon...
+> see, [repository](https://github.com/belodetek/unzoner-dashboard)
 
 ### Unzoner DNS
 > see, [repository](https://github.com/belodetek/unzoner-dns)

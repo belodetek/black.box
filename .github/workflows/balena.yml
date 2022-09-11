@@ -214,6 +214,7 @@ jobs:
       fail-fast: true
       matrix:
         fleet:
+          # black.box Unzoner fleets
           - belodetek/bbqemudev
           - belodetek/bbrpi3dev
           - belodetek/blackbox-aarch64
@@ -221,6 +222,10 @@ jobs:
           - belodetek/blackbox-amd64
           - belodetek/blackbox-amd64-raw
           - belodetek/blackbox-armv7hf
+          # VPNArea/Colibri fleets
+          - director/colibrinucdev
+          - director/colibriqemudev
+          - director/colibrinuclive
         # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
         include:
           - arch: aarch64
@@ -237,6 +242,12 @@ jobs:
             fleet: belodetek/bbrpi3dev
           - arch: armv7hf
             fleet: belodetek/blackbox-armv7hf
+          - arch: amd64
+            fleet: director/colibrinucdev
+          - arch: amd64
+            fleet: director/colibriqemudev
+          - arch: amd64
+            fleet: director/colibrinuclive
 
     steps:
       - uses: actions/checkout@v3
