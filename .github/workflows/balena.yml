@@ -215,10 +215,7 @@ jobs:
       matrix:
         fleet:
           # black.box Unzoner fleets
-          - belodetek/bbqemudev
-          - belodetek/bbrpi3dev
           - belodetek/blackbox-aarch64
-          - belodetek/bbnucdev
           - belodetek/blackbox-amd64
           - belodetek/blackbox-amd64-raw
           - belodetek/blackbox-armv7hf
@@ -227,15 +224,9 @@ jobs:
           - arch: aarch64
             fleet: belodetek/blackbox-aarch64
           - arch: amd64
-            fleet: belodetek/bbqemudev
-          - arch: amd64
-            fleet: belodetek/bbnucdev
-          - arch: amd64
             fleet: belodetek/blackbox-amd64
           - arch: amd64
             fleet: belodetek/blackbox-amd64-raw
-          - arch: armv7hf
-            fleet: belodetek/bbrpi3dev
           - arch: armv7hf
             fleet: belodetek/blackbox-armv7hf
 
