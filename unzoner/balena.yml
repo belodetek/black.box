@@ -11,7 +11,9 @@ post-provisioning: |
   ## Coming soon...
   > ⏳ [build and run](https://github.com/belodetek/black.box/blob/master/unzoner/README.md) your own Unzoner
 
+  * Unzoner deployment [repository](https://github.com/belodetek/unzoner-aws)
   * Unzoner API [repository](https://github.com/belodetek/unzoner-api)
+  * Unzoner dashboard [repository](https://github.com/belodetek/unzoner-dashboard)
   * DNS server [repository](https://github.com/belodetek/unzoner-dns)
 
 assets:
