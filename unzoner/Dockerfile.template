@@ -39,8 +39,7 @@ RUN install_packages \
     libtool \
     libudns-dev \
     openssl \
-    python3-venv \
-    python3-mysqldb
+    python3-venv
 
 WORKDIR /data
 
@@ -126,6 +125,9 @@ RUN chown root:root -hR ./
 
 WORKDIR /root/build
 
+# https://www.balena.io/docs/learn/more/masterclasses/cli-masterclass/#81-build-time-secrets
+RUN set -a && . /run/secrets/env && src/tests/run
+
 RUN if [ "$COMPILE_CODE" = '1' ]; then \
     install_packages ccache \
     && pip3 install --upgrade \
@@ -141,7 +143,6 @@ RUN if [ "$COMPILE_CODE" = '1' ]; then \
     --standalone application.py \
     && cd "$(uname -m)/application.dist" && ln -s ../../templates/ && cd ../.. \
     && cd .. && mkdir -p src && cd src \
-    && cat < $DNS_SUB_DOMAIN.plugin > plugin.py \
     && for src in log gen_hash as_prefixes main auth client; do \
     nuitka3 \
     --remove-output \
@@ -150,10 +151,8 @@ RUN if [ "$COMPILE_CODE" = '1' ]; then \
     --plugin-enable=pylint-warnings \
     --standalone $src.py; done; fi
 
-# https://www.balena.io/docs/learn/more/masterclasses/cli-masterclass/#81-build-time-secrets
-RUN set -a \
-    && . /run/secrets/env \
-    && utils/encrypt.sh
+# creates encrypted app.tgz.enc bundle
+RUN set -a && . /run/secrets/env && utils/encrypt.sh
 
 WORKDIR /opt
 
@@ -243,7 +242,6 @@ RUN install_packages \
     libevent-2.1 \
     liblz4-1 \
     liblzo2-2 \
-    libmysqlclient-dev \
     libpcre3 \
     libtool \
     libudns0 \
@@ -251,7 +249,6 @@ RUN install_packages \
     lsof \
     miniupnpc \
     mtr \
-    mysql-client \
     net-tools \
     netcat-openbsd \
     nmap \

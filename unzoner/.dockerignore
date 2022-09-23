@@ -1,5 +1,4 @@
 __pycache__/
-._*
 .DS_Store
 .git
 *.build
@@ -7,12 +6,10 @@ __pycache__/
 *.enc
 *.exe
 *.gz
-*.pluginc
 *.pyc
 *.secret
 *.tgz
 *.tmp
-src/plugin.py**
 src/tests/data
 src/tests/temp
 venv**

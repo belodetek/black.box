@@ -6,14 +6,14 @@ import imp
 from client import connect_disconnect
 
 
-@patch('client.plugin_loader.plugin.client_connect', return_value=True)
+@patch('client.plugin.client_connect', return_value=True)
 def test_client_connect(mock):
     result = connect_disconnect(cmd='connect', username=uuid4().hex)
     assert_is_not_none(result)
     eq_(result, True)
 
 
-@patch('client.plugin_loader.plugin.client_disconnect', return_value=True)
+@patch('client.plugin.client_disconnect', return_value=True)
 def test_client_disconnect(mock):
     result = connect_disconnect(cmd='disconnect', username=uuid4().hex)
     assert_is_not_none(result)

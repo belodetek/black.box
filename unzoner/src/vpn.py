@@ -16,7 +16,7 @@ from subprocess import Popen, PIPE
 from queue import Queue
 
 import auth
-import plugin_loader
+import plugin
 
 from paypal import get_jwt_payload
 from common import retry, log
@@ -751,9 +751,8 @@ def log_client_stats(status=False, country=TARGET_COUNTRY):
 
     # client logging plug-in(s)
     log('{}: plugin={}'.format(stack()[0][3], DNS_SUB_DOMAIN))
-    if plugin_loader.plugin and \
-       'log_plugin_client' in dir(plugin_loader.plugin):
-        result = plugin_loader.plugin.log_plugin_client(status=status)
+    if 'log_plugin_client' in dir(plugin):
+        result = plugin.log_plugin_client(status=status)
 
 
 def log_server_stats(status=[False, False]):
@@ -790,9 +789,8 @@ def log_server_stats(status=[False, False]):
 
     # additional server logging plug-in(s)
     log('{}: plugin={}'.format(stack()[0][3], DNS_SUB_DOMAIN))
-    if plugin_loader.plugin\
-       and 'log_plugin_server' in dir(plugin_loader.plugin):
-        result = plugin_loader.plugin.log_plugin_server(status=status)
+    if 'log_plugin_server' in dir(plugin):
+        result = plugin.log_plugin_server(status=status)
 
 
 def openvpn_remote_override(conf='/mnt/{}/client.ovpn'.format(DNS_SUB_DOMAIN)):
@@ -957,13 +955,13 @@ def disconnect_clients():
     disconnected = list()
     while True:
         if os.path.exists('{}/disconnect_clients'.format(DATADIR)):
-            if not 'client_disconnect' in dir(plugin_loader.plugin): break
+            if not 'client_disconnect' in dir(plugin): break
             clients = get_clients()
             print('{}: clients={}'.format(stack()[0][3], len(clients)))
             for client in clients:
                 if client not in ['UNDEF']:
                     try:
-                        result = plugin_loader.plugin.client_disconnect(client)
+                        result = plugin.client_disconnect(client)
                         disconnected.append(client)
                         print(
                             'client_disconnect: client={} result={}'.format(
