@@ -9,7 +9,7 @@ from inspect import stack
 from traceback import print_exc
 
 import vpn
-import plugin_loader
+import plugin
 
 from common import retry
 from config import (
@@ -66,8 +66,8 @@ def authenticate(username=None, password=None):
 		return False
 
 	result = False
-	if plugin_loader.plugin and 'auth_user' in dir(plugin_loader.plugin):
-		result = plugin_loader.plugin.auth_user(
+	if 'auth_user' in dir(plugin):
+		result = plugin.auth_user(
 			urllib.parse.quote(username),
 			urllib.parse.quote(password)
 		)

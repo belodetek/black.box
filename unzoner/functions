@@ -243,11 +243,10 @@ function generate_vpn_profile() {
 
 # downloads IPASN_DB from S3
 function download_ipasn_db() {
-   mkdir -p ${DATADIR}
-   with_backoff curl ${CURL_OPTS}\
-     -o ${DATADIR}/${IPASN_DB}\
-     --connect-timeout ${CONN_TIMEOUT} --max-time $((${CONN_TIMEOUT}*60))\
-     "https://s3.eu-central-1.amazonaws.com/belodetech/${IPASN_DB}"
+    mkdir -p ${DATADIR}
+    pushd ${DATADIR}
+    with_backoff wget --no-clobber "${IPASN_DB}"
+    popd
 }
 
 

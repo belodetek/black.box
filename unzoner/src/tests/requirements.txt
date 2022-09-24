@@ -5,7 +5,6 @@ requests[security]
 pingparsing
 dnspython
 passlib
-mysqlclient
 
 # tests
 mock

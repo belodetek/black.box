@@ -24,8 +24,27 @@
 > see, [repository](https://github.com/belodetek/unzoner-dns)
 
 ### miscellaneous
-* [ifconfig](https://github.com/mpolden/echoip) service
+* [geoip](https://www.maxmind.com/en/accounts/238005/geoip/downloads)
+* [echoip](https://github.com/mpolden/echoip) service
 * [generate](https://hub.docker.com/r/kylemanna/openvpn/) PKI assets for OpenVPN
+* [create](https://github.com/hadiasghari/pyasn) IPASN database
+
+```
+pip install --upgrade pyasn
+
+s3_bucket=$(uuid)
+
+ts=$(date +%Y%m%d.%H%M)
+
+pyasn_util_download.py --latestv46
+
+pyasn_util_convert.py --single rib.*.bz2 ipasn_${ts}.dat
+
+gzip ipasn_${ts}.dat
+
+aws s3 cp --acl=public-read \
+  ipasn_${ts}.dat.gz s3://${s3_bucket}/
+```
 
 
 ## Balena
@@ -84,6 +103,8 @@
 
     IEEE80211N=1
 
+    IPASN_DB=https://s3.amazonaws.com/${s3_bucket}/ipasn_{{ ts }}.dat.gz
+
     OPENVPN_COMPRESS=1
 
     WMM_ENABLED=1
@@ -139,7 +160,7 @@ name | description | example
 AF | IP address family | 0 = detect; 4 = IPv4; 6 = IPv6
 ALPHA_2 | ISO Alpha-2 country code | gb
 API_HOST | API host | https://api.belodedenko.me
-API_SECRET | API pre-shared secret | `base64.b64encode(hashlib.sha256(...))`
+API_SECRET | API pre-shared secret | `openssl rand -hex 16`
 API_VERSION | API version | 1.0
 AS_NUMS | space separated list of one or more AS numbers to policy route | AS1234 AS5678
 AUTH | OpenVPN network packet authentication | None
