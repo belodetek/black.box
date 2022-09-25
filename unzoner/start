@@ -120,7 +120,7 @@ declare -x REMOTE_OVERRIDE=${REMOTE_OVERRIDE}
 
 
 # plugin configuration
-source ${WORKDIR}/.env-${DNS_SUB_DOMAIN}-plugin
+source ${WORKDIR}/.env-plugin
 
 if [[ "${DEBUG}" == "1" ]]; then
     set -x
