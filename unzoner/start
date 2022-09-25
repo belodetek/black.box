@@ -119,9 +119,6 @@ declare -x BIRD_IFACE_CMDS=${BIRD_IFACE_CMDS}
 declare -x REMOTE_OVERRIDE=${REMOTE_OVERRIDE}
 
 
-# plugin configuration
-source ${WORKDIR}/.env-plugin
-
 if [[ "${DEBUG}" == "1" ]]; then
     set -x
     env
