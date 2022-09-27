@@ -167,8 +167,9 @@ def connect_node(family=AF):
     ############
     # VPN mode #
     ############
-    if DEVICE_TYPE in [3, 5] or (
-        VPN_PROVIDER
+    if DEVICE_TYPE == 5 or (
+        DEVICE_TYPE == 3
+        and VPN_PROVIDER
         and VPN_LOCATION_GROUP
         and VPN_LOCATION
         and VPN_USERNAME
