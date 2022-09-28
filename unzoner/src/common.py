@@ -60,10 +60,10 @@ def retry(ExceptionToCheck, tries=DEFAULT_TRIES, delay=DEFAULT_DELAY, backoff=DE
 
 
 def get_md5(s):
-    s = unicode(s)
-    s = s.encode()
+    m = md5()
+    m.update(s.encode())
     try:
-        return md5(s).hexdigest()
+        return m.hexdigest()
     except:
         return s
 
