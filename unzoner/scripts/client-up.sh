@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+shopt -s expand_aliases
 
 [ -e "/root/functions" ] && . /root/functions
 [ -e "/dev/shm/.env" ] && . /dev/shm/.env
@@ -66,12 +67,14 @@ if [[ "${TUN_IPV6}" == "1" ]] && [[ $(ip6tables -t nat -L) ]]; then
     fi
 fi
 
-[ -f ${DATADIR}/docker4.rules ]\
-  && log 'recovering Docker iptables chains...'\
-  && iptables-restore -n < ${DATADIR}/docker4.rules || true
+if [[ -f $DATADIR/docker4.rules ]]; then
+    log 'recovering DOCKER|BALENA iptables rules...'
+    iptables-restore -n < "${DATADIR}/docker4.rules" || true
+fi
 
-if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
-    [ -f ${DATADIR}/docker4.rules ]\
-    && log 'recovering Docker ip6tables chains...'\
-    && ip6tables-restore -n < ${DATADIR}/docker6.rules || true
+if [[ $AF == '4' ]] && [[ $(ip6tables -t nat -L) ]]; then
+    if [[ -f $DATADIR/docker6.rules ]]; then
+        log 'recovering DOCKER|BALENA ip6tables rules...'
+        ip6tables-restore -n < "${DATADIR}/docker6.rules" || true
+    fi
 fi

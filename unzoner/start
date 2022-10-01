@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
+shopt -s expand_aliases
 
 function finish() {
     sleep "$(((RANDOM%30)+30))s"
 }
 trap finish EXIT
 
-[ -e "/root/functions" ] && . /root/functions
+[ -e $HOME/functions ] && . "${HOME}/functions"
 
 declare -x LINK_MTU=${LINK_MTU:-1500}
 declare -x LINK_MTU_SERVER=${LINK_MTU_SERVER:-1500}
@@ -241,28 +242,32 @@ if [[ "${AF}" == "6" ]]; then
 fi
 
 log 'creating iptables command aliases...'
-cat << EOF > /root/.aliases
-alias ip4tables=iptables
+cat << EOF > "${HOME}/.aliases"
+alias iptables=iptables-legacy
+alias ip4tables=iptables-legacy
+alias ip6tables=ip6tables-legacy
+alias iptables-save=iptables-legacy-save
+alias iptables-restore=iptables-legacy-restore
 alias ip4tables-save=iptables-save
 alias ip4tables-restore=iptables-restore
+alias ip6tables-save=ip6tables-legacy-save
+alias ip6tables-restore=ip6tables-legacy-restore
 EOF
-shopt -s expand_aliases
-source /root/.aliases
+ln -s "${HOME}/.aliases" "${HOME}/.bash_aliases"
+source "${HOME}/.bash_aliases"
 
 for af in ${AF_INETS}; do
-    if [[ "${RESIN}" == "1" ]]; then
-        version_hash=$(echo "$RESIN_HOST_OS_VERSION" | md5sum | awk '{print $1}')
+    if [[ $RESIN == '1' ]]; then
+        version_hash="$(echo "$RESIN_HOST_OS_VERSION" | md5sum | awk '{print $1}')"
         if ! [ -f "${DATADIR}/rules-${version_hash}.v${af}" ]; then
             log "saving default ip${af}tables rules..."
-            eval ip${af}tables-save > ${DATADIR}/rules-${version_hash}.v${af} || true
+            eval ip${af}tables-save > "${DATADIR}/rules-${version_hash}.v${af}" || true
         fi
     fi
 
-    temp=$(mktemp)\
-      && eval ip${af}tables-save\
-      | grep -E 'DOCKER_OUTPUT|DOCKER_POSTROUTING' > ${temp}\
-      && printf "*nat\n$(cat ${temp})\nCOMMIT\n" >> ${DATADIR}/docker${af}.rules\
-      && rm ${temp}
+    log "preserving existing DOCKER|BALENA ip${af}tables rules..."
+    eval ip${af}tables-save \
+      | grep -E '^COMMIT$|\*nat|\*filter|\*raw|\*mangle|DOCKER|DOCKER-ISOLATION-STAGE-1|DOCKER-ISOLATION-STAGE-2|DOCKER-USER|BALENA-FIREWALL' > "${DATADIR}/docker${af}.rules"
 
     for table in filter nat mangle raw; do
         for chain in PREROUTING INPUT FORWARD OUTPUT POSTROUTING; do
@@ -271,9 +276,9 @@ for af in ${AF_INETS}; do
         done
     done
 
-    if [[ "${RESIN}" == "1" ]]; then
+    if [[ $RESIN == '1' ]]; then
         log "restoring factory ip${af}tables rules..."
-        eval ip${af}tables-restore < ${DATADIR}/rules-${version_hash}.v${af} || true
+        eval ip${af}tables-restore < "${DATADIR}/rules-${version_hash}.v${af}" || true
     fi
 
     log 'clamping MSS to PMTU...'
@@ -281,14 +286,16 @@ for af in ${AF_INETS}; do
     eval ip${af}tables -t mangle -I FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 done
 
-[ -f ${DATADIR}/docker4.rules ]\
-  && log 'recovering Docker iptables chains...'\
-  && iptables-restore -n < ${DATADIR}/docker4.rules || true
+if [[ -f $DATADIR/docker4.rules ]]; then
+    log 'recovering DOCKER|BALENA iptables rules...'
+    iptables-restore -n < "${DATADIR}/docker4.rules" || true
+fi
 
-if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
-    [ -f ${DATADIR}/docker4.rules ]\
-    && log 'recovering Docker ip6tables chains...'\
-    && ip6tables-restore -n < ${DATADIR}/docker6.rules || true
+if [[ $AF == '4' ]] && [[ $(ip6tables -t nat -L) ]]; then
+    if [[ -f $DATADIR/docker6.rules ]]; then
+        log 'recovering DOCKER|BALENA ip6tables rules...'
+        ip6tables-restore -n < "${DATADIR}/docker6.rules" || true
+    fi
 fi
 
 log 'adding ipv4 rules for local access...'
@@ -732,9 +739,9 @@ EOF
     fi
 
     if [[ "${SOCKS_ENABLED}" == "1" ]]; then
-        if [[ ! $(grep $(hostname) /root/.ssh/authorized_keys) ]]; then
+        if [[ ! $(grep $(hostname) "${HOME}/.ssh/authorized_keys") ]]; then
             log 'setting up keys...'
-            cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+            cat "${HOME}/.ssh/id_rsa.pub" >> "${HOME}/.ssh/authorized_keys"
         fi
 
         log 'starting SOCKS proxy...'
@@ -882,7 +889,7 @@ EOF
 
         log 'starting WANProxy client...'
         (nohup $(which wanproxy) -c ${WORKDIR}/client.conf) &
-        cat ${WORKDIR}/id_rsa.pub >> /root/.ssh/authorized_keys
+        cat "${WORKDIR}/id_rsa.pub" >> "${HOME}/.ssh/authorized_keys"
     fi
 fi
 

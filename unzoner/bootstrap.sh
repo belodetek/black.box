@@ -5,7 +5,7 @@ function finish() {
 }
 trap finish EXIT
 
-[ -e "/root/functions" ] && . /root/functions
+[ -e $HOME/functions ] && . "${HOME}/functions"
 
 declare -x AF=${AF:-0}
 declare -x AP=${AP:-0}
@@ -229,17 +229,23 @@ if [[ "${DEVICE_TYPE}" != "0" ]]; then
 
     printf "hostapd=${AP}\n"
 
-    if [[ ! -f /root/.ssh/id_rsa ]]; then
-        printf "generating new SSH key...\n"
-        echo -e 'y\n' | ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' && \
-          cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+    if [[ ! -f $DATADIR/.ssh/id_rsa ]]; then
+		if [[ ! -f $HOME/.ssh/id_rsa ]]; then
+			printf "generating new SSH key...\n"
+			echo -e 'y\n' | ssh-keygen -f "${HOME}/.ssh/id_rsa" -t rsa -N '' \
+			  && cat "${HOME}/.ssh/id_rsa.pub" >> "${HOME}/.ssh/authorized_keys" \
+			  && cp -rp "${HOME}/.ssh" "${DATADIR}/"
+		fi
+	else
+		printf 'preserving existing SSH key...\n'
+	    cp -rp "${DATADIR}/.ssh" "${HOME}/"
     fi
 
     printf "decrypting files...\n"
     for file in app.tgz
     do
         pushd ${WORKDIR}
-        openssl enc -d -aes-256-cbc -in /root/${file}.enc -out ${file} -K ${ENC_KEY} -iv ${IV} -S ${SALT}
+        openssl enc -d -aes-256-cbc -in "${HOME}/${file}.enc" -out ${file} -K ${ENC_KEY} -iv ${IV} -S ${SALT}
         for arch in ${ARCHS}; do
             if [[ "${arch}" != "$(uname -m)" ]]; then
                 tar --exclude="${arch}" -pxzvf ${file}
@@ -250,8 +256,8 @@ if [[ "${DEVICE_TYPE}" != "0" ]]; then
     sync
 
     printf "starting ssh(d)...\n"
-    cat ${WORKDIR}/id_rsa.pub >> /root/.ssh/authorized_keys\
-      && sed -i'' "s/^.*Port\s.*$/Port ${DOCKER_SSH_PORT}/g" /etc/ssh/sshd_config\
+    cat < "${WORKDIR}/id_rsa.pub" >> "${HOME}/.ssh/authorized_keys" \
+      && sed -i'' "s/^.*Port\s.*$/Port ${DOCKER_SSH_PORT}/g" /etc/ssh/sshd_config \
       && with_backoff service ssh restart
 
     printf "fixing file ownership/permissions...\n"

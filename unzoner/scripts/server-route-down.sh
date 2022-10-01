@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+shopt -s expand_aliases
 
 [ -e "/root/functions" ] && . /root/functions
 [ -e "/dev/shm/.env" ] && . /dev/shm/.env
