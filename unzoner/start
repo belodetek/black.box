@@ -118,9 +118,10 @@ declare -x BIRD=${BIRD:-0}
 declare -x BIRD_CONFIG=${BIRD_CONFIG}
 declare -x BIRD_IFACE_CMDS=${BIRD_IFACE_CMDS}
 declare -x REMOTE_OVERRIDE=${REMOTE_OVERRIDE}
+declare -x IPTABLES_MODE=${IPTABLES_MODE:-legacy}	# legacy or nft
 
 
-if [[ "${DEBUG}" == "1" ]]; then
+if [[ $DEBUG == '1' ]]; then
     set -x
     env
 fi
@@ -243,15 +244,15 @@ fi
 
 log 'creating iptables command aliases...'
 cat << EOF > "${HOME}/.aliases"
-alias iptables=iptables-legacy
-alias ip4tables=iptables-legacy
-alias ip6tables=ip6tables-legacy
-alias iptables-save=iptables-legacy-save
-alias iptables-restore=iptables-legacy-restore
+alias iptables=iptables-${IPTABLES_MODE}
+alias ip4tables=iptables-${IPTABLES_MODE}
+alias ip6tables=ip6tables-${IPTABLES_MODE}
+alias iptables-save=iptables-${IPTABLES_MODE}-save
+alias iptables-restore=iptables-${IPTABLES_MODE}-restore
 alias ip4tables-save=iptables-save
 alias ip4tables-restore=iptables-restore
-alias ip6tables-save=ip6tables-legacy-save
-alias ip6tables-restore=ip6tables-legacy-restore
+alias ip6tables-save=ip6tables-${IPTABLES_MODE}-save
+alias ip6tables-restore=ip6tables-${IPTABLES_MODE}-restore
 EOF
 ln -s "${HOME}/.aliases" "${HOME}/.bash_aliases"
 source "${HOME}/.bash_aliases"
