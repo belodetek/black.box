@@ -20,8 +20,8 @@ function ipt_add_rule() {
     action=${2}
     rule="${3}"
     log """add: af=4 table=\'${table}\' action=\'${action}\' rule=\'${rule}\'"""
-    eval /sbin/iptables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-     || eval /sbin/iptables --wait -t ${table} -${action} ${rule} || true
+    eval ip4tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+     || eval ip4tables --wait -t ${table} -${action} ${rule} || true
 }
 
 
@@ -29,8 +29,8 @@ function ipt_del_rule() {
     table=${1}
     rule="${2}"
     log """del: af=4 table=\'${table}\' rule=\'${rule}\'"""
-    eval /sbin/iptables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-      && eval /sbin/iptables --wait -t ${table} -D ${rule} || true
+    eval ip4tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+      && eval ip4tables --wait -t ${table} -D ${rule} || true
 }
 
 
@@ -39,8 +39,8 @@ function ip6t_add_rule() {
     action=${2}
     rule="${3}"
     log """add: af=6 table=\'${table}\' action=\'${action}\' rule=\'${rule}\'"""
-    eval /sbin/ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-     || eval /sbin/ip6tables --wait -t ${table} -${action} ${rule} || true
+    eval ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+     || eval ip6tables --wait -t ${table} -${action} ${rule} || true
 }
 
 
@@ -48,8 +48,8 @@ function ip6t_del_rule() {
     table=${1}
     rule="${2}"
     log """del: af=6 table=\'${table}\' rule=\'${rule}\'"""
-    eval /sbin/ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-      && eval /sbin/ip6tables --wait -t ${table} -D ${rule} || true
+    eval ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+      && eval ip6tables --wait -t ${table} -D ${rule} || true
 }
 
 
