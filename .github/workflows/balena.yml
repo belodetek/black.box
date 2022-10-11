@@ -142,8 +142,7 @@ jobs:
 
       - name: push draft or finalise release
         id: build
-        # https://github.com/balena-io/deploy-to-balena-action/pull/195
-        uses: balena-io/balena-ci@ab77/operational
+        uses: balena-io/deploy-to-balena-action@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
           environment: ${{ env.ENVIRONMENT }}
@@ -249,8 +248,7 @@ jobs:
 
       - name: push draft or finalise release
         id: build
-        # https://github.com/balena-io/deploy-to-balena-action/pull/195
-        uses: balena-io/balena-ci@ab77/operational
+        uses: balena-io/deploy-to-balena-action@master
         with:
           balena_token: ${{ secrets.BALENA_API_KEY }}
           environment: ${{ env.ENVIRONMENT }}
