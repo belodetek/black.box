@@ -13,11 +13,7 @@ fi
 log "server-down: \$0=$0 \$1=$1 \$2=$2 \$3=$3 \$5=$4 \$5=$5 \$6=$6 \$7=$7 \$8=$8 \$9=$9"
 
 log 'removing ipv4 rules...'
-if [[ ! "${TCP_PORTS}" == "#" ]] && [[ ! "${UDP_PORTS}" == "#" ]]; then
-    with_backoff ip4tables --wait -P FORWARD ACCEPT
-else
-    with_backoff ip4tables --wait -P FORWARD ACCEPT
-fi
+with_backoff ip4tables --wait -P FORWARD ACCEPT
 
 for proto in ${TUN_PROTO}; do
     with_backoff ipt_del_rule filter "INPUT -i ${EXT_IFACE} -p ${proto} -m ${proto} --dport ${OPENVPN_PORT} -j ACCEPT"
@@ -86,12 +82,7 @@ with_backoff ipt_del_rule nat "POSTROUTING -o ${EXT_IFACE} -j MASQUERADE"
 
 if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then # work around missing ip6tables kernel modules
     log 'removing ipv6 rules...'
-    if [[ ! "${TCP_PORTS}" == "#" ]] && [[ ! "${UDP_PORTS}" == "#" ]]; then
-        with_backoff ip6tables --wait -P FORWARD ACCEPT
-    else
-        with_backoff ip6tables --wait -P FORWARD ACCEPT
-    fi
-
+    with_backoff ip6tables --wait -P FORWARD ACCEPT
     with_backoff ip6t_del_rule filter "INPUT -i ${1} -p icmpv6 -j ACCEPT"
     with_backoff ip6t_del_rule filter "INPUT -i ${1} -m state --state RELATED,ESTABLISHED -j ACCEPT"
 
