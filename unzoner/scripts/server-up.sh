@@ -23,6 +23,8 @@ if [[ ! "${TCP_PORTS}" == "#" ]] && [[ ! "${UDP_PORTS}" == "#" ]]; then
     with_backoff ip4tables --wait -P FORWARD DROP
 else
     with_backoff ip4tables --wait -P FORWARD ACCEPT
+    # https://serverfault.com/a/1005666/137589
+    with_backoff ip4tables --wait -I DOCKER-USER -j ACCEPT
 fi
 
 for proto in ${TUN_PROTO}; do
@@ -119,6 +121,8 @@ if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then # work around miss
         with_backoff ip6tables --wait -P FORWARD DROP
     else
         with_backoff ip6tables --wait -P FORWARD ACCEPT
+        # https://serverfault.com/a/1005666/137589
+        with_backoff ip6tables --wait -I DOCKER-USER -j ACCEPT || true
     fi
 
     with_backoff ip6t_add_rule filter I "INPUT -i ${1} -p icmpv6 -j ACCEPT"
