@@ -11,8 +11,8 @@ cmd=${1}
 shift
 
 for dir in ${SOURCE_DIRS}; do
-	if [[ -f $WORKDIR/$dir/$ARCH/$cmd.dist/$cmd ]]; then
-		exec "${WORKDIR}/${dir}/${ARCH}/${cmd}.dist/${cmd}" "$@"
+	if [[ -f $WORKDIR/$dir/$ARCH/$cmd.dist/$cmd.bin ]]; then
+		exec "${WORKDIR}/${dir}/${ARCH}/${cmd}.dist/${cmd}.bin" "$@"
 	fi
 
 	if [[ -f $WORKDIR/$dir/$cmd.py ]]; then

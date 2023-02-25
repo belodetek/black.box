@@ -104,7 +104,7 @@ function ip6t_del_rule() {
 
 function strip_quotes() {
     if [[ "${RESIN}" != '1' ]]; then
-        for ev in ${1}; do
+        for ev in $@; do
             if env | grep -E "^${ev}=.*$" | grep '"'; then
                 temp_env=$(mktemp)
                 env | grep -E "^${ev}=.*$" > ${temp_env} && source ${temp_env} && rm ${temp_env}

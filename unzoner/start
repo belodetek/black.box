@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-shopt -s expand_aliases
 
 function finish() {
     sleep "$(((RANDOM%30)+30))s"
 }
 trap finish EXIT
-
-[ -e $HOME/functions ] && . "${HOME}/functions"
 
 declare -x LINK_MTU=${LINK_MTU:-1500}
 declare -x LINK_MTU_SERVER=${LINK_MTU_SERVER:-1500}
@@ -26,7 +23,6 @@ declare -x API_VERSION=${API_VERSION:-1.0}
 declare -x MGMT_HOST=${MGMT_HOST:-mgmt.unzoner.com}
 declare -x DEVICE_TYPE=${DEVICE_TYPE:-2}
 declare -x DEBUG=${DEBUG:-0}
-declare -x EXT_IFACE=${EXT_IFACE:-$(get_iface)}
 declare -x DHCP_ENABLED=${DHCP_ENABLED:-1}
 declare -x SOCKS_ENABLED=${SOCKS_ENABLED:-0}
 declare -x SOCKS_PORT=${SOCKS_PORT:-1080}
@@ -63,17 +59,12 @@ declare -x UPNP_ENABLED=${UPNP_ENABLED:-0}
 declare -x GUID=${RESIN_DEVICE_UUID:-$(cat /proc/sys/kernel/random/uuid | sed "s/-//g")}
 declare -x POLICY_ROUTING=${POLICY_ROUTING:-1}
 declare -x TARGET_COUNTRY=${TARGET_COUNTRY:-United States}
-declare -x TCP_PORTS=${TCP_PORTS:-80 443} && strip_quotes TCP_PORTS
-declare -x UDP_PORTS=${UDP_PORTS:-53} && strip_quotes UDP_PORTS
-declare -x INT_IFACES=${INT_IFACES:-$(get_wiface) $(get_iface)} && strip_quotes INT_IFACES
+declare -x TCP_PORTS=${TCP_PORTS:-80 443}
+declare -x UDP_PORTS=${UDP_PORTS:-53}
 declare -x DNS_SUB_DOMAIN=${DNS_SUB_DOMAIN:-blackbox}
 declare -x WORKDIR=${WORKDIR:-/mnt/${DNS_SUB_DOMAIN}}
 declare -x TEMPDIR=${TEMPDIR:-/dev/shm} # hardcoded in OpenVPN scripts and config
 declare -x DATADIR=${DATADIR:-/data}
-strip_quotes TARGET_COUNTRY && declare -x ALPHA_2=$(country2alpha "${TARGET_COUNTRY}")
-declare -x SERVICES=${SERVICES:-$(get_services ${ALPHA_2})} && strip_quotes SERVICES
-declare -x AS_NUMS=${AS_NUMS:-$(get_asns ${ALPHA_2} ${SERVICES})} && strip_quotes AS_NUMS
-declare -x DOMAINS=${DOMAINS:-$(get_domains ${ALPHA_2} ${SERVICES})} && strip_quotes DOMAINS
 declare -x OPENVPN_PORT=${OPENVPN_PORT:-1194}
 declare -x OPENVPN_PORTS_EXTRA=${OPENVPN_PORTS_EXTRA} # optional iptables DNATs to OPENVPN_PORT (tcp/udp)
 declare -x OPENVPN_VERBOSITY=${OPENVPN_VERBOSITY:-1}
@@ -126,6 +117,38 @@ if [[ $DEBUG == '1' ]]; then
     env
 fi
 
+if [ -f ${TEMPDIR}/.env ]; then
+    rm ${TEMPDIR}/.env
+fi
+
+unset reboot
+for ev in $(printenv | awk -F'=' '{print $1}'); do
+    if [ ! -z ${ev} ]; then
+        printf "declare -x ${ev}=\'${!ev}\'\n" >> ${TEMPDIR}/.env
+    fi
+done
+sed -i'' 's/"//g' ${TEMPDIR}/.env && source ${TEMPDIR}/.env
+
+# adds BASH_FUNC_* to printenv output
+[ -e $HOME/functions ] && . "${HOME}/functions"
+
+strip_quotes TCP_PORTS UDP_PORTS INT_IFACES TARGET_COUNTRY SERVICES AS_NUMS DOMAINS
+
+declare -x EXT_IFACE=${EXT_IFACE:-$(get_iface)}
+declare -x INT_IFACES=${INT_IFACES:-$(get_wiface) $(get_iface)}
+declare -x ALPHA_2=$(country2alpha "${TARGET_COUNTRY}")
+declare -x SERVICES=${SERVICES:-$(get_services ${ALPHA_2})}
+declare -x AS_NUMS=${AS_NUMS:-$(get_asns ${ALPHA_2} ${SERVICES})}
+declare -x DOMAINS=${DOMAINS:-$(get_domains ${ALPHA_2} ${SERVICES})}
+
+for ev in $(printenv | awk -F'=' '{print $1}' \
+  | grep 'INT_IFACES|INT_IFACES|SERVICES|AS_NUMS|DOMAINS'); do
+    if [ ! -z ${ev} ]; then
+        printf "declare -x ${ev}=\'${!ev}\'\n" >> ${TEMPDIR}/.env
+    fi
+done
+sed -i'' 's/"//g' ${TEMPDIR}/.env && source ${TEMPDIR}/.env
+
 printf 'updating ca cert bundle...\n'
 if ! [ -f ${REQUESTS_CA_BUNDLE} ]; then
     with_backoff curl ${CURL_OPTS} -${AF} \
@@ -149,18 +172,6 @@ if [[ ${RESIN} == "1" ]]; then
 
     while true; do echo -ne "HTTP/1.1 302 Found\r\nLocation: ${DASHBOARD_HOST}/?${qs}\r\nConnection: close\r\n\r\n" | nc -l -p ${NETCAT_PORT} -q 0; sleep 1; done &
 fi
-
-log 'dumping env vars...'
-if [ -f ${TEMPDIR}/.env ]; then
-    rm ${TEMPDIR}/.env
-fi
-
-for ev in $(printenv | awk -F'=' '{print $1}' | head -n -1); do
-    if [ ! -z ${ev} ]; then
-        printf "declare -x ${ev}=\'${!ev}\'\n" >> ${TEMPDIR}/.env
-    fi
-done
-sed -i'' 's/"//g' ${TEMPDIR}/.env && source ${TEMPDIR}/.env
 
 if [[ "${BIRD}" == '1' ]] && [ ${BIRD_CONFIG} ]; then
     log 'generating BIRD configuration...'
