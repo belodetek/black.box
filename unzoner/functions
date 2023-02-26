@@ -1,15 +1,57 @@
 #!/usr/bin/env bash
-shopt -s expand_aliases
+set -a
 
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
+[ -e '/dev/shm/.env' ] && . /dev/shm/.env
+IPTABLES_MODE=${IPTABLES_MODE:-legacy}	# legacy or nft
+wlan_regex='wlan[0-9]+[^:]*|wlp[0-9]+s[0-9]+[^:]*|wlx[0-9a-fA-F][^:]*'
+
 
 ####################
 # common functions #
 ####################
+function iptables() {
+    "iptables-${IPTABLES_MODE}" "$@"
+}
 
-wlan_regex='wlan[0-9]+[^:]*|wlp[0-9]+s[0-9]+[^:]*|wlx[0-9a-fA-F][^:]*'
+
+function ip4tables() {
+    iptables "$@"
+}
+
+
+function iptables-save() {
+    "iptables-${IPTABLES_MODE}-save" "$@"
+}
+
+
+function ip4tables-save() {
+    iptables-save "$@"
+}
+
+
+function iptables-restore() {
+    "iptables-${IPTABLES_MODE}-restore" "$@"
+}
+
+
+function ip4tables-restore() {
+    iptables-restore "$@"
+}
+
+
+function ip6tables() {
+    "ip6tables-${IPTABLES_MODE}" "$@"
+}
+
+
+function ip6tables-save() {
+    "ip6tables-${IPTABLES_MODE}-save" "$@"
+}
+
+
+function ip6tables-restore() {
+    "ip6tables-${IPTABLES_MODE}-restore" "$@"
+}
 
 
 function dnsmasq_config() {
@@ -27,8 +69,8 @@ function ipt_add_rule() {
     action=${2}
     rule="${3}"
     log """add: af=4 table=\'${table}\' action=\'${action}\' rule=\'${rule}\'"""
-    eval ip4tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-     || eval ip4tables --wait -t ${table} -${action} ${rule} || true
+    ip4tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+     || ip4tables --wait -t ${table} -${action} ${rule} || true
 }
 
 
@@ -36,8 +78,8 @@ function ipt_del_rule() {
     table=${1}
     rule="${2}"
     log """del: af=4 table=\'${table}\' rule=\'${rule}\'"""
-    eval ip4tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-      && eval ip4tables --wait -t ${table} -D ${rule} || true
+    ip4tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+      && ip4tables --wait -t ${table} -D ${rule} || true
 }
 
 
@@ -46,8 +88,8 @@ function ip6t_add_rule() {
     action=${2}
     rule="${3}"
     log """add: af=6 table=\'${table}\' action=\'${action}\' rule=\'${rule}\'"""
-    eval ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-     || eval ip6tables --wait -t ${table} -${action} ${rule} || true
+    ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+     || ip6tables --wait -t ${table} -${action} ${rule} || true
 }
 
 
@@ -55,14 +97,14 @@ function ip6t_del_rule() {
     table=${1}
     rule="${2}"
     log """del: af=6 table=\'${table}\' rule=\'${rule}\'"""
-    eval ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
-      && eval ip6tables --wait -t ${table} -D ${rule} || true
+    ip6tables --wait -t ${table} -C ${rule} > /dev/null 2>&1\
+      && ip6tables --wait -t ${table} -D ${rule} || true
 }
 
 
 function strip_quotes() {
     if [[ "${RESIN}" != '1' ]]; then
-        for ev in ${1}; do
+        for ev in $@; do
             if env | grep -E "^${ev}=.*$" | grep '"'; then
                 temp_env=$(mktemp)
                 env | grep -E "^${ev}=.*$" > ${temp_env} && source ${temp_env} && rm ${temp_env}
