@@ -7,14 +7,14 @@ build-variables:
       - BUILD_BIRD=0
       # https://github.com/openssl/openssl
       - BUILD_OPENSSL_VERSION=3.0.5
-      - BUILD_OPENSSL=1
+      - BUILD_OPENSSL=0
       # https://gcc.gnu.org/onlinedocs/gcc/AArch64-Options.html
       - AARCH64_OPTIMISE_FLAGS=-O3 -mtune=cortex-a72 -march=armv8-a
       # https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
       - ARM_OPTIMISE_FLAGS=-O3 -mtune=cortex-a53 -mcpu=cortex-a53+crypto -mfpu=crypto-neon-fp-armv8
       # https://github.com/OpenVPN/openvpn
       - BUILD_OPENVPN_VERSION=2.5.7
-      - BUILD_OPENVPN=1
+      - BUILD_OPENVPN=0
       # FIXME: https://sources.debian.org/patches/sniproxy/0.6.0-2/
       - BUILD_SNIPROXY_VERSION=0.6.0
       - BUILD_SNIPROXY=0
@@ -22,7 +22,7 @@ build-variables:
       - BUILD_WANPROXY_VERSION=0.8.0
       - BUILD_WANPROXY=0
       # https://nuitka.net/
-      - COMPILE_CODE=1
+      - COMPILE_CODE=0
       # (e.g.) dig +short us.{{ DNS_SUB_DOMAIN }}.{{ DNS_DOMAIN }}
       - DNS_SUB_DOMAIN=blackbox
 
