@@ -31,9 +31,6 @@ host = None
 ipaddr = None
 qtype = None
 c_proto = None
-c_wpid = None
-s_wpid = None
-s_wport = None
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))
@@ -110,35 +107,11 @@ def get_openvpn_binary(default='/usr/sbin/openvpn'):
 def connect_node(family=AF):
 	global PROTOS
 	global c_proto
-	global c_wpid
-	global s_wpid
-	global s_wport
 	global ipaddr
 	global country
 	global host
 	global qtype
 
-	try:
-		log('os.kill: {}'.format(c_wpid))
-		os.kill(int(c_wpid), signal.SIGKILL)
-	except:
-		pass
-
-	c_wpid = None
-
-	try:
-		log('kill_remote_pid: {}'.format(
-			kill_remote_pid(
-				ipaddr=ipaddr,
-				family=family,
-				pid=s_wpid
-			)
-		))
-	except:
-		pass
-
-	s_wpid = None
-	s_wport = None
 	ipaddr = None
 
 	if len(PROTOS) <= 0: PROTOS = list(TUN_PROTO) # start again
@@ -330,39 +303,6 @@ def connect_node(family=AF):
 					tun_proto,
 					ipaddr
 				))
-
-		##############################
-		# (legacy) WANProxy override #
-		##############################
-		if WANPROXY:
-			(c_wpid, s_wpid, s_wport) = start_wanproxy_server(
-				ipaddr=ipaddr,
-				family=family,
-				local_pid=c_wpid,
-				remote_pid=s_wpid,
-				port=s_wport
-			)
-
-			log('start_wanproxy_server: ipaddr={} af={} local_pid={} remote_pid={} remote_port={} transport={}'.format(
-				ipaddr,
-				family,
-				c_wpid,
-				s_wpid,
-				s_wport,
-				WANPROXY
-			))
-
-			port = WANPROXY_PORT
-			ipaddr = 'localhost'
-			tun_proto = 'tcp'
-			if family == 6: tun_proto = '{}{}'.format(tun_proto, family)
-			log('{}: wan_proxy={} proto={} ipaddr={} port={}'.format(
-				stack()[0][3],
-				WANPROXY,
-				tun_proto,
-				ipaddr,
-				port
-			))
 
 		if FRAGMENT and tun_proto == 'udp':
 			cmd.append('--tun-mtu')
@@ -572,9 +512,7 @@ def get_client_status():
 	bytesin = 0
 	bytesout = 0
 	try:
-		status = open('{}/client.status'.format(
-			TEMPDIR
-		)).read().split('\n')
+		status = open('{}/client.status'.format(TEMPDIR)).read().split('\n')
 		bytesin = [line.split(',')[1] for line in status if line.split(',')[0] == 'TCP/UDP read bytes'][0]
 		bytesout = [line.split(',')[1] for line in status if line.split(',')[0] == 'TCP/UDP write bytes'][0]
 	except IndexError:
@@ -789,102 +727,6 @@ def restart_stunnel_client(
 		]
 	))
 	return run_shell_cmd(['%s' % stunnel_bin, '%s' % conf])
-
-
-def start_wanproxy_server(
-	ipaddr=None,
-	family=4,
-	local_pid=None,
-	remote_pid=None,
-	port=None,
-	ssh_port=DOCKER_SSH_PORT
-):
-	if WANPROXY == 'SSH':
-		remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
-		assert remote_guid
-		if DEBUG: print( 'get_guid_by_public_ipaddr: ipaddr={} family={} remote_guid={}'.format(
-			ipaddr,
-			family,
-			remote_guid
-		))
-
-	if not (port and remote_pid):
-		if WANPROXY == 'SSH':
-			# start WANProxy server instance and get remote port for forwarding
-			result = run_shell_cmd(
-				[
-					'ssh', '-i', '%s/id_rsa' % WORKDIR,
-					'-o StrictHostKeyChecking=no',
-					'root@%s' % ipaddr,
-					'-p', '%s' % str(ssh_port),
-					'bash',
-					'-c',
-					'"source %s/functions; source %s/.env; start_wanproxy_server"' % (
-						WORKDIR,
-						TEMPDIR
-					)
-				]
-			)
-			if DEBUG: print(result)
-			remote_pid = result[1].split()[0]
-			port = result[1].split()[1]
-
-	if not local_pid:
-		if WANPROXY == 'SSH':
-			# start SSH tunnel
-			result = run_background_shell_cmd(
-				[
-					'ssh', '-i', '%s/id_rsa' % WORKDIR,
-					'-fN','-o StrictHostKeyChecking=no',
-					'-L 3301:localhost:%s' % str(port),
-					'-p', '%s' % str(ssh_port),
-					'root@%s' % ipaddr
-				]
-			)
-			if DEBUG: print(result.__dict__)
-			local_pid = str(int(result.pid) + 1)
-
-		if WANPROXY == 'SOCAT':
-			# start SOCAT local listener
-			result = run_shell_cmd_nowait(
-				[
-					'/usr/bin/socat',
-					'TCP%s-LISTEN:3301,bind=localhost,su=nobody,fork,reuseaddr' % str(
-						family
-					),
-					'TCP%s:%s:%s' % (str(family), ipaddr, SOCAT_PORT)
-				]
-			)
-			if DEBUG: print(result.__dict__)
-			local_pid = str(result.pid)
-
-	return (local_pid, remote_pid, port)
-
-
-def kill_remote_pid(ipaddr=None, family=4, pid=None, ssh_port=DOCKER_SSH_PORT):
-	if WANPROXY == 'SSH':
-		remote_guid = get_guid_by_public_ipaddr(ipaddr=ipaddr, family=family)
-		assert remote_guid
-		if DEBUG: print('get_guid_by_public_ipaddr: ipaddr={} family={} remote_guid={}'.format(
-			ipaddr,
-			family,
-			remote_guid
-		))
-
-	result = None
-	if pid and WANPROXY == 'SSH':
-		# kill remote pid
-		result = run_shell_cmd(
-			[
-				'ssh', '-i', '%s/id_rsa' % WORKDIR,
-				'-o StrictHostKeyChecking=no',
-				'root@%s' % ipaddr,
-				'-p', '%s' % str(ssh_port),
-				'bash', '-c', '"kill -9 %s"' % str(pid)
-			]
-		)
-		if DEBUG: print(result)
-	return result
 
 
 @retry(Exception, cdata='method={}'.format(stack()[0][3]))

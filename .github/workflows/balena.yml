@@ -8,6 +8,11 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  # cancel jobs in progress for updated PRs, but not merge or tag events
+  cancel-in-progress: ${{ github.event.action == 'synchronize' }}
+
 env:
   ENVIRONMENT: balena-cloud.com
   BLOCK_PREFIX: belodetek/unzoner

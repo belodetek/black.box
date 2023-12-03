@@ -68,33 +68,31 @@ def main():
 		)
 	group = p1.groups - 1
 
+	# for information only
 	p2 = re.compile('^.*remote=(.*) country=(.*)$')
 
-	# hdparm tests
+	# (iotest) hdparm tests
 	p3 = re.compile(
 		'^\s+(.*):\s+(\d+\s+.*)\s+in\s+([\d\.]+\s+.*)\s+=\s+(.*)\n$'
 	)
 
-	# dd write
+	# (iotest) dd write
 	p4 = re.compile(
 		'^(\d+\s+.*)\s+\((.*),.*\)\s+.*,\s+(.*),\s+(.*)$'
 	)
 
-	mgmt_ipaddr = None
-	if TUN_MGMT: mgmt_ipaddr = get_ip_address(MGMT_IFACE)
-
 	if DEBUG: print('os.environ: {}'.format(os.environ))
 
 	while True:
-		if DEVICE_TYPE == 0:
+		if DEVICE_TYPE == 0: # disabled
 			log('{}: device={}'.format(this, GUID))
 			sys.exit(0)
 
-		for i in range(1, LOOP_CYCLE + 1):
+		for i in range(1, LOOP_CYCLE + 1): # clunky event loop
 			###########################
 			# server mode(s) or mixed #
 			###########################
-			if DEVICE_TYPE in [1, 3, 4]:
+			if DEVICE_TYPE in [1, 3, 4]: # 1:server 2:unblocking 3:server-mixed 4:private 5:VPN
 				s_lineout = [None, None]
 				s_msg[0] = None
 				s_msg[1] = None
@@ -109,8 +107,7 @@ def main():
 								pass
 					else:
 						if s_stderrq[idx]:
-							with s_stderrq[idx].mutex:
-								s_stderrq[idx].queue.clear()
+							with s_stderrq[idx].mutex: s_stderrq[idx].queue.clear()
 
 					if s_stdoutq[idx]:
 						try:
@@ -127,17 +124,12 @@ def main():
 					if s_msg[idx] in magic_lines:
 						started[idx] = True
 						starting[idx] = False
-						try:
-							log_server_stats(status=started)
-						except:
-							print('exception-handler in {}: {}'.format(this, repr(e)))
-							if DEBUG: print_exc()
+						log_server_stats(status=started)
 
 					if not started[idx] and not starting[idx]:
-						if i == 1: # once per loop (start)
+						if i == 1: # at the beginning of the cycle
 							starting[idx] = True
-							log('{}: cycle={} starting={} proto={}'.format(
-								this,
+							log('vpn-server-state: cycle={} starting={} proto={}'.format(
 								i,
 								starting[idx],
 								proto
@@ -177,7 +169,7 @@ def main():
 								))
 
 						if i == 1 or i % LOOP_CYCLE == 0: # twice per loop (start and end)
-							if DEBUG: log('event-loop-status: cycle={} proto={} status={}'.format(
+							if DEBUG: log('vpn-server-state: cycle={} proto={} status={}'.format(
 								i,
 								proto,
 								get_status(proto=proto)
@@ -186,40 +178,33 @@ def main():
 
 					# flush the stderr queue if not debugging
 					if not DEBUG and s_stderrq[idx]:
-						with s_stderrq[idx].mutex:
-							s_stderrq[idx].queue.clear()
+						with s_stderrq[idx].mutex: s_stderrq[idx].queue.clear()
 
-				if i % LOOP_CYCLE == 0:
-					if DEVICE_TYPE == 3 and connected: # test if double-vpn is up
+				if i % LOOP_CYCLE == 0: # at the end of the cycle
+					try:
+						assert started[idx] and not starting[idx] # if not started by now
+					except:
+						started[idx] = False
+						starting[idx] = False
+						s_proc[idx].terminate()
+						while s_proc[idx].poll() is None: sleep(LOOP_TIMER) # https://stackoverflow.com/a/2996026/1559300
+						s_pid[idx] = None
+
+					if DEVICE_TYPE == 3 and connected: # test if client-vpn is up
 						try:
-							shell_check_output_cmd('ip link | grep {}'.format(TUN_IFACE))
-							geo_result = get_geo_location()
-							assert geo_result, '{}: double-vpn not ready'.format(this)
-							print('double-vpn: {}'.format(geo_result))
-							log_server_stats(status=started) # server up only if double-vpn is up
+							shell_check_output_cmd('ip link | grep {}'.format(TUN_IFACE)) # raises exception if tunnel is down
+							log_server_stats(status=started) # server up only if client-vpn is up
 						except:
-							print('exception-handler in {}: {}'.format(this, repr(e)))
-							if DEBUG: print_exc()
-
-							try:
-								log_server_stats() # force server down if double-vpn is down
-							except:
-								print('exception-handler in {}: {}'.format(this, repr(e)))
-								if DEBUG: print_exc()
+							log_server_stats() # force server down if client-vpn is down
 					else:
-						try:
-							log_server_stats(status=started)
-						except:
-							print('exception-handler in {}: {}'.format(this, repr(e)))
-							if DEBUG: print_exc()
+						log_server_stats(status=started)
 
-					s_status_line = 'server-status: cycle={} started={} starting={} s_pid={} s_conns={} mgmt_ipaddr={} AF={} hostAPd={} UPNP={}'.format(
+					s_status_line = 'server-status: cycle={} started={} starting={} s_pid={} s_conns={} AF={} hostAPd={} UPNP={}'.format(
 						i,
 						started,
 						starting,
 						s_pid,
 						s_conns,
-						mgmt_ipaddr,
 						AF,
 						AP,
 						UPNP
@@ -229,15 +214,15 @@ def main():
 			###########################
 			# client mode(s) or mixed #
 			###########################
-			if DEVICE_TYPE in [2, 3, 5]:
+			if DEVICE_TYPE in [2, 3, 5]: # 1:server 2:unblocking 3:server-mixed 4:private 5:VPN
 				# iperf timeout
 				if c_stp and now - c_stimer > (LOOP_TIMER * LOOP_CYCLE * 5):
-					log('{}: pid={} elapsed={}'.format(
-						this,
+					log('iperf-status: pid={} elapsed={}'.format(
 						c_stp.pid,
 						now - c_stimer
 					))
 					c_stp.terminate()
+					while c_stp.poll() is None: sleep(LOOP_TIMER)
 					c_stp = None
 					c_stq = None
 					c_stimer = 0
@@ -258,8 +243,7 @@ def main():
 
 				# hdparm or dd timeout
 				if c_iotp and now - c_iotimer > (LOOP_TIMER * LOOP_CYCLE * 3):
-					log('{}: pid={} elapsed={} test={}'.format(
-						this,
+					log('iotest-status: pid={} elapsed={} test={}'.format(
 						c_iotp.pid,
 						now - c_iotimer,
 						c_iott
@@ -272,14 +256,12 @@ def main():
 						}
 						log('run_iotest: result={}'.format(result))
 						res = update_iotest(data=result)
-						log('update_iotest({}): {}'.format(
-							res[0],
-							res[1]
-						))
+						log('update_iotest({}): {}'.format(res[0], res[1]))
 					except Exception as e:
 						print('exception-handler in {}: {}'.format(this, repr(e)))
 						if DEBUG: print_exc()
 					c_iotp.terminate()
+					while c_iotp.poll() is None: sleep(LOOP_TIMER)
 					c_iotp = None
 					c_iotq = None
 					c_iotimer = 0
@@ -295,8 +277,7 @@ def main():
 							pass
 				else:
 					if c_stderrq:
-						with c_stderrq.mutex:
-							c_stderrq.queue.clear()
+						with c_stderrq.mutex: c_stderrq.queue.clear()
 
 				c_lineout = None
 				if c_stdoutq:
@@ -383,18 +364,14 @@ def main():
 				if c_msg in magic_lines:
 					connected = True
 					connecting = False
-					try:
-						log_client_stats(status=connected, country=c_country)
-					except:
-						print('exception-handler in {}: {}'.format(this, repr(e)))
-						if DEBUG: print_exc()
+					log_client_stats(status=connected, country=c_country)
 
 				if DEVICE_TYPE == 5:
 					try:
 						m3 = p2.search(c_msg).groups()
 						c_remote = m3[0]
 						c_country = m3[1]
-						log('{}: remote={} country={}'.format(
+						log('vpn-client-state: remote={} country={}'.format(
 							this,
 							c_remote,
 							c_country
@@ -402,11 +379,10 @@ def main():
 					except (IndexError, TypeError, AttributeError):
 						pass
 
-				if not connected and not connecting:
-					if i == 1:
+				if not connected and not connecting: # connect client-vpn
+					if i == 1: # at the beginning of the cycle
 						connecting = True
-						log('{}: cycle={} connecting={} family={}'.format(
-							this,
+						log('vpn-client-state: cycle={} connecting={} family={}'.format(
 							i,
 							connecting,
 							AF
@@ -416,13 +392,16 @@ def main():
 								family=AF
 							)
 							c_pid = c_proc.pid
+							connected = True
+							connecting = False
 						except AssertionError as e:
+							connected = False
 							connecting = False
 							print('exception-handler in {}: {}'.format(this, repr(e)))
 							if DEBUG: print_exc()
 
 				if connected and not connecting:
-					if i % LOOP_CYCLE == 0:
+					if i % LOOP_CYCLE == 0: # at the end of the cycle
 						# run speedtest
 						try:
 							if not c_stimer and dequeue_speedtest():
@@ -461,36 +440,32 @@ def main():
 								c_iotl
 							))
 
-					if i % POLL_FREQ == 0: # every x cycles per loop
-						try:
-							shell_check_output_cmd('ip link | grep {}'.format(TUN_IFACE))
-							geo_result = get_geo_location()
-							assert geo_result, '{}: client tunnel down'.format(this)
-							print('client-vpn: {}'.format(geo_result))
-						except AssertionError as e:
-							print('exception-handler in {}: {}'.format(this, repr(e)))
-							if DEBUG: print_exc()
-							connected = False
-							connecting = False
-							c_proc.terminate()
-							c_pid = None
-
-				if i % LOOP_CYCLE == 0:
+				if i % LOOP_CYCLE == 0: # at the end of the cycle
 					try:
-						log_client_stats(status=connected, country=c_country)
-					except:
+						shell_check_output_cmd('ip link | grep {}'.format(TUN_IFACE)) # raises exception if tunnel is down
+						geo_result = get_geo_location()
+						assert geo_result, '{}: client tunnel down'.format(this)
+						print('client-vpn-geo: {}'.format(geo_result))
+						if DEVICE_TYPE == 3: log_server_stats(status=started) # server up only if client-vpn is up
+					except Exception as e:
 						print('exception-handler in {}: {}'.format(this, repr(e)))
 						if DEBUG: print_exc()
+						connected = False
+						connecting = False
+						c_proc.terminate()
+						while c_proc.poll() is None: sleep(LOOP_TIMER)
+						c_pid = None
+						if DEVICE_TYPE == 3: log_server_stats() # force server down if clienv-vpn is down
 
+					log_client_stats(status=connected, country=c_country)
 					w_clnts = get_stations()
-					c_status_line = 'client-status: cycle={} connected={} connecting={} c_proto={} c_pid={} w_clnts={} mgmt_ipaddr={} AF={} hostAPd={} UPNP={}'.format(
+					c_status_line = 'client-status: cycle={} connected={} connecting={} c_proto={} c_pid={} w_clnts={} AF={} hostAPd={} UPNP={}'.format(
 						i,
 						connected,
 						connecting,
 						c_proto,
 						c_pid,
 						w_clnts,
-						mgmt_ipaddr,
 						AF,
 						AP,
 						UPNP

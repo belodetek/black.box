@@ -16,7 +16,7 @@ function finish() {
 trap finish EXIT
 
 function install_venv() {
-    python3.9 -m venv src/tests/venv
+    python3 -m venv src/tests/venv
 
     export PATH="$(pwd)/src/tests/venv/bin:${PATH}"
 

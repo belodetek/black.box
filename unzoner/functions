@@ -294,25 +294,8 @@ function generate_vpn_profile() {
 function download_ipasn_db() {
     mkdir -p ${DATADIR}
     pushd ${DATADIR}
-    with_backoff wget --no-clobber "${IPASN_DB}"
+    with_backoff wget --ca-directory=/etc/ssl/certs --no-clobber "${IPASN_DB}"
     popd
-}
-
-
-# start WANProxy server
-function start_wanproxy_server() {
-    local temp_file=$(mktemp) && \
-      ($(which wanproxy) -c ${WORKDIR}/server.conf &>${temp_file}&) && \
-      sleep 5 && \
-      local port=$(grep -Po "[0-9]+$" ${temp_file}) && \
-      rm ${temp_file} && \
-      local pid=$(netstat -a -n -p | grep ${port} | grep -Po "[0-9]+/wanproxy" | awk -F'/' '{print $1}') && \
-
-      if [[ "${WANPROXY}" == "SOCAT" ]]; then
-          $(which socat) TCP${AF}-LISTEN:${SOCAT_PORT},su=nobody,fork,reuseaddr TCP${AF}:localhost:${port} &
-      fi
-
-      echo ${pid} ${port}
 }
 
 

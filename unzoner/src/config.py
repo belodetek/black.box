@@ -69,8 +69,6 @@ OPENVPN_VERSION = os.getenv('OPENVPN_VERSION', None)
 PAIRED_DEVICE_GUID = os.getenv('PAIRED_DEVICE_GUID', None)
 PAIRED_DEVICES_FREE = int(os.getenv('PAIRED_DEVICES_FREE', 1))
 PAYPAL_SUBSCRIPTION_CHECK = int(os.getenv('PAYPAL_SUBSCRIPTION_CHECK', 1))
-PING_COUNT = int(os.getenv('PING_COUNT', 10))
-PING_TIMEOUT = int(os.getenv('PING_TIMEOUT', 5))
 POLICY_ROUTING_CHECK = int(os.getenv('POLICY_ROUTING_CHECK', 1))
 POLL_FREQ = int(os.getenv('POLL_FREQ', 100)) # X times per cycle (e.g. LOOP_CYCLE / POLL_FREQ = 4)
 REMOTE_OVERRIDE = os.getenv('REMOTE_OVERRIDE')
@@ -98,8 +96,6 @@ VPN_PROVIDER = os.getenv('VPN_PROVIDER', None)
 VPN_TCP_MGMT_PORT = int(os.getenv('VPN_TCP_MGMT_PORT', 7506))
 VPN_UDP_MGMT_PORT = int(os.getenv('VPN_UDP_MGMT_PORT', 7505))
 VPN_USERNAME = os.getenv('VPN_USERNAME', None)
-WANPROXY = os.getenv('WANPROXY', None) # proxy transports: SOCAT or SSH
-WANPROXY_PORT= os.getenv('WANPROXY_PORT', '3300')
 
 ON_POSIX = '' in sys.builtin_module_names
 
