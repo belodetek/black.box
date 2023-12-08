@@ -6,21 +6,20 @@ build-variables:
       # https://en.wikipedia.org/wiki/Bird_Internet_routing_daemon
       - BUILD_BIRD=0
       # https://github.com/openssl/openssl
-      - BUILD_OPENSSL_VERSION=3.0.5
+      # Setting up openssh-server (1:8.9p1-3ubuntu0.4) ...
+      # OpenSSL version mismatch. Built against 30000020, you have 30200000
+      - BUILD_OPENSSL_VERSION=3.0.12
       - BUILD_OPENSSL=1
       # https://gcc.gnu.org/onlinedocs/gcc/AArch64-Options.html
       - AARCH64_OPTIMISE_FLAGS=-O3 -mtune=cortex-a72 -march=armv8-a
       # https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
       - ARM_OPTIMISE_FLAGS=-O3 -mtune=cortex-a53 -mcpu=cortex-a53+crypto -mfpu=crypto-neon-fp-armv8
       # https://github.com/OpenVPN/openvpn
-      - BUILD_OPENVPN_VERSION=2.5.7
+      - BUILD_OPENVPN_VERSION=2.6.8
       - BUILD_OPENVPN=1
       # FIXME: https://sources.debian.org/patches/sniproxy/0.6.0-2/
-      - BUILD_SNIPROXY_VERSION=0.6.0
-      - BUILD_SNIPROXY=0
-      # project abandoned http://wanproxy.org/)
-      - BUILD_WANPROXY_VERSION=0.8.0
-      - BUILD_WANPROXY=0
+      - BUILD_SNIPROXY_VERSION=0.6.1
+      - BUILD_SNIPROXY=1
       # https://nuitka.net/
       - COMPILE_CODE=1
       # (e.g.) dig +short us.{{ DNS_SUB_DOMAIN }}.{{ DNS_DOMAIN }}

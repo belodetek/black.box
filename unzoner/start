@@ -77,8 +77,6 @@ declare -x TUN_PASSWD=${TUN_PASSWD:-$(${WORKDIR}/scripts/pyboot.sh gen_hash)}
 declare -x REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE:-${DATADIR}/cacert.pem}
 declare -x STUNNEL=${STUNNEL:-0}
 declare -x STUNNEL_PORT=${STUNNEL_PORT:-443}
-declare -x WANPROXY=${WANPROXY}
-declare -x WANPROXY_PORT=${WANPROXY_PORT:-3300}
 declare -x SOCAT_PORT=${SOCAT_PORT:-3302}
 declare -x UPNP_TCP_PORT_FORWARD=${UPNP_TCP_PORT_FORWARD:-${OPENVPN_PORT} ${STUNNEL_PORT} ${SOCAT_PORT}}
 declare -x UPNP_UDP_PORT_FORWARD=${UPNP_UDP_PORT_FORWARD:-${OPENVPN_PORT}}
@@ -831,79 +829,6 @@ EOF
     fi
 fi
 
-if [[ ${WANPROXY} ]]; then
-    if [[ "${DEVICE_TYPE}" == "1" ]] || [[ "${DEVICE_TYPE}" == "3" ]] || [[ "${DEVICE_TYPE}" == "4" ]]; then
-        log 'generating WANProxy server config...'
-        cat << EOF > ${WORKDIR}/server.conf
-create codec codec0
-set codec0.codec XCodec
-set codec0.compressor zlib
-set codec0.compressor_level 6
-activate codec0
-
-create interface $(get_iface)
-set $(get_iface).family IPv${AF}
-set $(get_iface).host "localhost"
-set $(get_iface).port "0"
-activate $(get_iface)
-
-create peer peer0
-set peer0.family IPv${AF}
-set peer0.host "localhost"
-set peer0.port "${OPENVPN_PORT}"
-activate peer0
-
-create proxy proxy0
-set proxy0.interface $(get_iface)
-set proxy0.interface_codec codec0
-set proxy0.peer peer0
-set proxy0.peer_codec None
-activate proxy0
-EOF
-
-        if [[ "${WANPROXY}" == "SOCAT" ]]; then
-            ipt_add_rule flter I "INPUT -i ${EXT_IFACE} -p tcp -m tcp --dport ${SOCAT_PORT} -j ACCEPT"
-            if [[ "${AF}" == "6" ]] && [[ $(ip6tables -t nat -L) ]]; then
-                ip6t_add_rule filter I "INPUT -i ${EXT_IFACE} -p tcp -m tcp --dport ${SOCAT_PORT}"
-            fi
-            start_wanproxy_server
-        fi
-    fi
-
-    if [[ "${DEVICE_TYPE}" == "2" ]] || [[ "${DEVICE_TYPE}" == "3" ]]; then
-        log 'generating WANProxy client config...'
-        cat << EOF > ${WORKDIR}/client.conf
-create codec codec0
-set codec0.codec XCodec
-set codec0.compressor zlib
-set codec0.compressor_level 6
-activate codec0
-
-create interface $(get_iface)
-set $(get_iface).family IPv${AF}
-set $(get_iface).host "localhost"
-set $(get_iface).port "${WANPROXY_PORT}"
-activate $(get_iface)
-
-create peer peer0
-set peer0.family IPv${AF}
-set peer0.host "localhost"
-set peer0.port "3301"
-activate peer0
-
-create proxy proxy0
-set proxy0.interface $(get_iface)
-set proxy0.interface_codec None
-set proxy0.peer peer0
-set proxy0.peer_codec codec0
-activate proxy0
-EOF
-
-        log 'starting WANProxy client...'
-        (nohup $(which wanproxy) -c ${WORKDIR}/client.conf) &
-        cat "${WORKDIR}/id_rsa.pub" >> "${HOME}/.ssh/authorized_keys"
-    fi
-fi
 
 if [[ ${VPN_PROVIDER} ]] && [[ ${VPN_LOCATION_GROUP} ]] && [[ ${VPN_LOCATION} ]]; then
     log 'generating custom VPN client configuration...'

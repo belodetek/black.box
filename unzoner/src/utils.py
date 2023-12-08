@@ -9,7 +9,6 @@ import re
 import json
 import jwt
 import dns.resolver
-import pingparsing
 
 from time import time, sleep
 from inspect import stack
@@ -20,26 +19,6 @@ from traceback import print_exc
 
 from common import retry
 from config import *
-
-
-def ping_host(host='localhost', timeout=PING_TIMEOUT, count=PING_COUNT):
-	ping_parser = pingparsing.PingParsing()
-	transmitter = pingparsing.PingTransmitter()
-	transmitter.destination = host
-	transmitter.count = count
-	result = transmitter.ping()
-	ping_stats = ping_parser.parse(result).as_dict()
-	if DEBUG: print(
-		'{}: ping_stats={}'.format(
-			stack()[0][3],
-			ping_stats
-		)
-	)
-	assert ping_stats['packet_loss_rate'] < THRESHOLD, '{}: timeout={}'.format(
-		stack()[0][3],
-		host
-	)
-	return ping_stats['packet_loss_rate']
 
 
 def shell_check_output_cmd(cmd):
@@ -153,7 +132,7 @@ def get_hostname():
 	hostname = 'localhost'
 	try:
 		hostname = socket.gethostname()
-	except Exception:
+	except:
 		pass
 	return hostname
 
@@ -172,9 +151,7 @@ def get_geo_location(family=AF):
 	# get the VPN server location, not the location of the device
 	if DEVICE_TYPE in [3, 5]:
 		try:
-			shell_check_output_cmd(
-				'ip link | grep %s' % TUN_IFACE
-			)
+			shell_check_output_cmd('ip link | grep {}'.format(TUN_IFACE))
 			cmd.append('--interface')
 			cmd.append(TUN_IFACE)
 		except:
@@ -186,14 +163,12 @@ def get_geo_location(family=AF):
 		assert result[0] == 0
 		data = json.loads(result[1])
 	except Exception as e:
-		print(
-			'{}: family={} data={} e={}'.format(
-				stack()[0][3],
-				family,
-				data,
-				repr(e)
-			)
-		)
+		print('{}: family={} data={} e={}'.format(
+			stack()[0][3],
+			family,
+			data,
+			repr(e)
+		))
 	return data
 
 
