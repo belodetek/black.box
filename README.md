@@ -1,6 +1,10 @@
 [![publish to balenaCloud](https://github.com/belodetek/black.box/actions/workflows/balena.yml/badge.svg?branch=master)](https://github.com/belodetek/black.box/actions/workflows/balena.yml)
 
+> Due to changing market conditions I've decided to shutdown this project, which has been running since 2016. Thank you for your support! 👋
+<!--
 <a href="https://dashboard.unzoner.com/sub"><img align="left" src="https://api.unzoner.com/api/v1.0/countries/available/flags.png"></a><br><br>
+-->
+---
 
 `black.box` is a VPN policy routing appliance, which runs on [Raspberry Pi(s)](https://en.wikipedia.org/wiki/Raspberry_Pi),
 [DD-WRT](https://privacyapp.flashrouters.com/) routers and other[[n8](#footnotes)] devices. <img align="right" src="https://raw.githubusercontent.com/ab77/black.box/master/images/unzoner.jpg" width="125">
